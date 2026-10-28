@@ -16,8 +16,12 @@ name into ``statistic``.
 
 ``Release`` is ESMIS's release of WASDE, re-shaped from ``xippios-usda-esmis``'s model
 (ADR-0021); ``WasdeXmlCell`` is one value of a release's XML file, as
-``parse.wasde_xml.parse_wasde_xml`` reads it. No record here carries a documented
-personal identifier (ADR-0017).
+``parse.wasde_xml.parse_wasde_xml`` reads it. ``Table``, ``Commodity``, ``Region`` and
+``Attribute`` are the records of the four packaged lists under ``reference/``, which
+``scripts/refresh_reference.py`` writes from the latest release's files (conventions §3,
+ADR-0022): labels as the files print them, each record with the ``report_month`` of the
+release it was read from. No record here carries a documented personal identifier
+(ADR-0017).
 """
 
 from decimal import Decimal
@@ -26,7 +30,7 @@ from pydantic import AwareDatetime
 from xippios.core import UpstreamModel
 from xippios.usda.esmis.models import ReleaseFile
 
-__all__ = ["Release", "WasdeXmlCell"]
+__all__ = ["Attribute", "Commodity", "Region", "Release", "Table", "WasdeXmlCell"]
 
 
 class Release(UpstreamModel):
@@ -145,3 +149,127 @@ class WasdeXmlCell(UpstreamModel):
     unit: str | None
     cell_value: str
     value: Decimal | None
+
+
+class Table(UpstreamModel):
+    """One page of a WASDE release's tables, as its XML file heads it: a ``list_tables`` row.
+
+    One record per page element, ``sr08`` to ``sr37``, read from the attributes of the
+    page's ``<Report>`` and the names of its report items, as printed
+    (``reference/tables.json``).
+
+    Attributes:
+        report: The page's ``Name``, e.g. ``"sr12"``: what a ``WasdeXmlCell``'s
+            ``report`` holds.
+        page: The printed page number, the number that ends ``page_title``
+            (``" WASDE - 676 - 12"`` gives ``12``).
+        sub_report_title: The page's first title as printed, e.g. ``"U.S. Feed Grain and
+            Corn Supply and Use  1/"``.
+        sub_report_title2: ``sub_report_title2`` as printed, the second table's title on
+            pages 11, 16, 31 and 33 (October 2026), e.g. ``"U.S. Wheat by Class: Supply
+            and Use"``; ``None`` where the page has none.
+        sub_report_title3: ``sub_report_title3`` as printed, on page 9 (October 2026),
+            ``"World and U.S. Supply and Use for Cotton  1/"``; ``None`` elsewhere.
+        sub_report_subtitle: ``sub_report_subtitle`` as printed, e.g. ``"(Million
+            Metric Tons)"``; ``None`` where the page prints none.
+        sub_report_subtitle2: ``sub_report_subtitle2`` as printed; ``None`` on every page
+            of October 2026.
+        sub_report_subtitle3: ``sub_report_subtitle3`` as printed, on page 9 (October
+            2026), ``"Million 480-lb. Bales"``; ``None`` elsewhere.
+        matrices: The page's report items in document order, their element names as
+            printed, e.g. ``["matrix1", "matrix2"]``, ``["matrix3", "matrix4"]`` on page
+            26, ``["table1", "table2", "table3", "table4"]`` on page 37: the values a
+            ``WasdeXmlCell``'s ``matrix`` takes on the page, and their number.
+        report_month: The page's ``Report_Month`` as printed, e.g. ``"October 2026"``.
+    """
+
+    report: str
+    page: int
+    sub_report_title: str
+    sub_report_title2: str | None
+    sub_report_title3: str | None
+    sub_report_subtitle: str | None
+    sub_report_subtitle2: str | None
+    sub_report_subtitle3: str | None
+    matrices: list[str]
+    report_month: str
+
+
+class Commodity(UpstreamModel):
+    """One supply-and-use matrix of pages 11 to 30, with its commodity: a ``list_commodities`` row.
+
+    One record per report item of the U.S. pages 11 to 17 and the world pages 18 to 30
+    (``reference/commodities.json``). The XML names the commodity of none of them: on
+    pages 12 to 15 it is the XLS's block title, the Nth of sheet ``Page N`` for the page's
+    Nth report item (``FEED GRAINS``, ``CORN``); on the other pages it is the commodity
+    the page's title names. Pages 8 to 10 (the world and U.S. aggregates) and 31 to 37 are
+    not in the list.
+
+    Attributes:
+        commodity: The commodity as printed: on pages 12 to 15 the XLS block title
+            verbatim, e.g. ``"CORN"``, ``"SOYBEAN MEAL"``; on pages 11 and 16 to 30 the
+            words of the item's title between its region and ``Supply and Use`` (or
+            ``by Class: Supply and Use``), e.g. ``"Wheat"``, ``"Coarse Grain"``,
+            ``"Soybean Oil"``.
+        region: The region the item's title names: ``"United States"`` for a title that
+            starts ``U.S.`` (pages 11 to 17), ``"Mexico"`` for page 16's second item,
+            ``"World"`` for the world pages 18 to 30, whose matrices hold the world and
+            its regions, as ``list_regions`` prints them.
+        report: The page's ``Name``, e.g. ``"sr12"``.
+        matrix: The report item, its element name, e.g. ``"matrix2"``: with ``report``,
+            the ``WasdeXmlCell`` records of the matrix.
+        table: The item's title as ``parse_wasde_xml`` assigns it, e.g. ``"U.S. Feed
+            Grain and Corn Supply and Use  1/"``.
+        report_month: The page's ``Report_Month`` as printed, e.g. ``"October 2026"``.
+    """
+
+    commodity: str
+    region: str
+    report: str
+    matrix: str
+    table: str
+    report_month: str
+
+
+class Region(UpstreamModel):
+    """One region a WASDE release's XML prints, with the pages it is on: a ``list_regions`` row.
+
+    One record per distinct ``region`` text of the file, in the order of its first
+    appearance (``reference/regions.json``): the rows of the world pages 18 to 30, page
+    9's cotton table and the reliability pages 35 and 36. The U.S. pages print no region
+    text.
+
+    Attributes:
+        region: The text as printed, with its indent, footnote marker and spaces, e.g.
+            ``"World"``, ``"World  3/"``, ``"United States"``, ``"        Burma"``,
+            ``"U.S."``: what a ``WasdeXmlCell``'s ``region`` holds.
+        reports: The pages that print it, their ``Name`` in file order, e.g.
+            ``["sr09", "sr18", "sr35"]``.
+        report_month: The release's ``Report_Month`` as printed, e.g. ``"October 2026"``.
+    """
+
+    region: str
+    reports: list[str]
+    report_month: str
+
+
+class Attribute(UpstreamModel):
+    r"""One row label of a WASDE table: an ``attribute`` a matrix of the XML prints.
+
+    One record per distinct ``report``, ``matrix`` and ``attribute`` of the file, in file
+    order (``reference/attributes.json``); a value without an ``attribute`` (page 31,
+    page 37's tables 2 to 4, which name their rows by commodity) gives none. Packaged for
+    the tasks that name a table's rows; no task answers with it in 0.1.0.
+
+    Attributes:
+        report: The page's ``Name``, e.g. ``"sr12"``.
+        matrix: The report item, e.g. ``"matrix1"``.
+        attribute: The row label as printed, e.g. ``"Area Planted"``, ``"    Supply,
+            Total"``, ``"Total\r\nSupply"``.
+        report_month: The page's ``Report_Month`` as printed, e.g. ``"October 2026"``.
+    """
+
+    report: str
+    matrix: str
+    attribute: str
+    report_month: str
