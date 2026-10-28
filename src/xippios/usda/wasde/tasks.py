@@ -659,9 +659,10 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
         regions = PackagedList.load(PACKAGE, "region")
         for text in regions.parse(Region, source=SOURCE):
             bare = _bare(text.region)
-            on = printed.setdefault(bare, []) if bare else []
-            on += [report for report in text.reports if report in reports and report not in on]
-        printed = {bare: on for bare, on in printed.items() if on}
+            on = [report for report in text.reports if report in reports]
+            if bare and on:
+                kept = printed.setdefault(bare, [])
+                kept += [report for report in on if report not in kept]
         if region in printed:
             return world, True
     choices = {bare: f"rows of {', '.join(on)}" for bare, on in printed.items()}
@@ -809,8 +810,9 @@ async def read_report_text_async(month: str | None = None) -> Result[list[str]]:
     October 2026's XLS), and 2 more where a PDF is read after an XLS without the sheet. A
     month without a release, or whose releases carry neither file (those of 1995 to 1997
     carry TXT files), raises ``NotFoundError`` naming their formats; a month not written
-    ``"YYYY-MM"`` ``InvalidRequestError``; a PDF whose narrative's end cannot be told (no
-    page headed Interagency Commodity Estimates Committees, as in a scan without text)
+    ``"YYYY-MM"`` ``InvalidRequestError``; an XLS whose narrative sheet holds anything but
+    text in its first column, or a PDF whose narrative's end cannot be told (no page
+    headed Interagency Commodity Estimates Committees, as in a scan without text),
     ``ValidationError``.
 
     Args:
