@@ -7,17 +7,17 @@
 The World Agricultural Supply and Demand Estimates (WASDE) are documented on two sites:
 ESMIS, the National Agricultural Library's catalog of USDA reports, which publishes the
 release files, and the World Agricultural Outlook Board's pages on www.usda.gov, which
-describe the report, its release dates and its historical data. www.usda.gov answers 403
-at its CDN edge to an automated request, so each of its pages is recorded by status and
-kept from USDA's CDN origin, usda.azureedge.us, which serves the same Drupal site. The
-script writes:
+describe the report, its release dates, its changes and its historical data. www.usda.gov
+answers 403 at its CDN edge to an automated request for some of its pages; such a page is
+recorded by its status and kept from USDA's CDN origin, usda.azureedge.us, which serves
+the same Drupal site (``UsdaPage``). The script writes:
 
 - ``pages/publication-wasde.md``: the ESMIS publication page, converted to Markdown;
 - ``pages/release-wasde.md``: the ESMIS page of the newest release, the first row of the
   publication page's release list, converted to Markdown;
-- ``pages/wasde-report.md``, ``pages/historical-wasde-report-data.md`` and
-  ``pages/wasde-faqs.md``: WAOB's WASDE page, its historical data page and its FAQ,
-  converted to Markdown;
+- ``pages/wasde-report.md``, ``pages/about-wasde.md``, ``pages/wasde-faqs.md``,
+  ``pages/historical-changes-revisions.md`` and ``pages/historical-wasde-report-data.md``:
+  WAOB's WASDE page and the four pages its menu links, converted to Markdown;
 - ``New_WASDE_Filename_Format.pdf``: WAOB's 2018 notice of the file names, byte for byte;
 - ``FETCHED.md``: regenerated whole, one row per file and per page recorded without a
   file, and a row for ``layout.md``, which is written by hand from release files, not
@@ -117,14 +117,45 @@ class Page:
     canonical: str | None = None
 
 
+@dataclass(frozen=True)
+class UsdaPage:
+    """A WAOB page on www.usda.gov, whose CDN edge refuses this script some pages.
+
+    The run asks www.usda.gov first. Where it answers 200, the page is kept from there and
+    has one row. Where it answers 403, that URL gets a row by its status and the page is
+    kept from the same path on USDA's CDN origin, the row after it (Johannes, 2026-10-28).
+
+    Attributes:
+        path: The page's path, the same on www.usda.gov and on USDA's CDN origin.
+        file: Its path under ``docs/upstream/``: Markdown for a page, the original for a PDF.
+        what: What it is, for the notes (``WAOB's WASDE page``).
+        title: The text of its one ``<h1>``, for a page converted to Markdown.
+        more: Added to the note of the row that keeps the file.
+    """
+
+    path: str
+    file: str
+    what: str
+    title: str | None = None
+    more: str = ""
+
+    @property
+    def url(self) -> str:
+        """The page's canonical URL, on www.usda.gov."""
+        return f"{USDA}{self.path}"
+
+
 _CONVERTED = "converted to Markdown; Bytes and sha256 are the HTML page's"
 _DENIED = (
     "403 Access Denied at the CDN edge; the body carries a per-request reference, so "
     "status only; kept from USDA's CDN origin in the next row"
 )
-_FROM_ORIGIN = f"{_CONVERTED}; the page above, from USDA's CDN origin"
+_WASDE_REPORT = (
+    "/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets"
+    "/wasde-report"
+)
 
-PAGES: tuple[Page, ...] = (
+PAGES: tuple[Page | UsdaPage, ...] = (
     Page(
         DOCS_URL,
         "pages/publication-wasde.md",
@@ -132,50 +163,34 @@ PAGES: tuple[Page, ...] = (
         "every release; the next row is its first row's View link",
         title="World Agricultural Supply and Demand Estimates",
     ),
-    Page(
-        f"{USDA}/oce/commodity/wasde",
-        status=403,
-        stable=False,
-        note=f"WAOB's WASDE page; {_DENIED}",
+    UsdaPage("/oce/commodity/wasde", "pages/wasde-report.md", "WAOB's WASDE page", "WASDE Report"),
+    UsdaPage(
+        f"{_WASDE_REPORT}/about-wasde",
+        "pages/about-wasde.md",
+        "About WASDE, from the WASDE page's menu",
+        "About WASDE",
     ),
-    Page(
-        f"{ORIGIN}/oce/commodity/wasde",
-        "pages/wasde-report.md",
-        note=_FROM_ORIGIN,
-        title="WASDE Report",
-        canonical=f"{USDA}/oce/commodity/wasde",
+    UsdaPage("/node/33540", "pages/wasde-faqs.md", "WAOB's WASDE FAQ", "FAQs and Resources"),
+    UsdaPage(
+        f"{_WASDE_REPORT}/historical-changes-revisions",
+        "pages/historical-changes-revisions.md",
+        "Historical Changes & Revisions, from the WASDE page's menu",
+        "Historical Changes & Revisions",
+        more="; the files it links are not fetched",
     ),
-    Page(
-        f"{USDA}/sites/default/files/documents/New_WASDE_Filename_Format.pdf",
-        status=403,
-        stable=False,
-        note=f"WAOB's notice of the file names (2018); {_DENIED}",
-    ),
-    Page(
-        f"{ORIGIN}/sites/default/files/documents/New_WASDE_Filename_Format.pdf",
-        "New_WASDE_Filename_Format.pdf",
-        note="verbatim, byte for byte; the document above, from USDA's CDN origin",
-    ),
-    Page(
-        f"{USDA}/node/42884",
-        status=403,
-        stable=False,
-        note=f"WAOB's historical data page; {_DENIED}",
-    ),
-    Page(
-        f"{ORIGIN}/node/42884",
+    UsdaPage(
+        "/node/42884",
         "pages/historical-wasde-report-data.md",
-        note=f"{_FROM_ORIGIN}; the data files it links are not fetched",
-        title="Historical WASDE Report Data",
-        canonical=f"{USDA}/node/42884",
+        "WAOB's historical data page",
+        "Historical WASDE Report Data",
+        more="; the address WAOB's pages link, /oce/commodity-markets/wasde/"
+        "historical-wasde-report-data, led to the same page on USDA's CDN origin on "
+        "2026-10-28; the data files it links are not fetched",
     ),
-    Page(f"{USDA}/node/33540", status=403, stable=False, note=f"WAOB's WASDE FAQ; {_DENIED}"),
-    Page(
-        f"{ORIGIN}/node/33540",
-        "pages/wasde-faqs.md",
-        note=_FROM_ORIGIN,
-        title="FAQs and Resources",
-        canonical=f"{USDA}/node/33540",
+    UsdaPage(
+        "/sites/default/files/documents/New_WASDE_Filename_Format.pdf",
+        "New_WASDE_Filename_Format.pdf",
+        "WAOB's notice of the file names (2018)",
     ),
     Page(
         "http://www.usda.gov/oce/commodity/wasde/WASDE-Schema.xsd",
@@ -188,7 +203,8 @@ PAGES: tuple[Page, ...] = (
 """Every page the snapshot records, in the order of ``FETCHED.md``'s rows.
 
 The ESMIS page of the newest release follows the publication page; its URL is read from
-the publication page on every run (``latest_release``).
+the publication page on every run (``latest_release``). A ``UsdaPage`` has one row or two,
+as www.usda.gov answers (``capture_usda``).
 """
 
 SPEC_URL: str | None = None
@@ -215,23 +231,27 @@ EXIT_NOTICE = (
 )
 """A sentence of the notice that the usda.gov pages' settings carry for a link off the site.
 
-``FETCHED.md``'s Attribution describes the notice; a run stops when a page kept from
-USDA's CDN origin no longer carries this sentence.
+``FETCHED.md``'s Attribution describes the notice; a run stops when a WAOB page kept as
+Markdown no longer carries this sentence.
 """
 
 CAPTURE = " ".join(
     (
         "The two ESMIS pages, the publication page of the World Agricultural Supply and",
         "Demand Estimates and the page of its newest release, are converted to Markdown, and",
-        "so are the three pages of the World Agricultural Outlook Board (WAOB). The newest",
-        "release is the first row of the publication page's release list, read from its View",
-        "link on every run; the run stops when that row is not the page's Latest Release.",
-        "www.usda.gov answers 403 Access Denied at its CDN edge to an automated request, so",
-        "each of WAOB's pages is recorded by its status at its canonical www.usda.gov URL and",
-        f"kept from {ORIGIN}, the CDN origin that www.usda.gov fronts, which serves the same",
-        "Drupal site; the canonical URL is the www.usda.gov one, and each Markdown file names",
-        "both. The 2018 notice of the file names is kept byte for byte as a PDF; the script",
-        "does not read its text, so a change to it shows in its sha256.",
+        "so are five pages of the World Agricultural Outlook Board (WAOB): its WASDE page and",
+        "the four pages that page's menu links, About WASDE, the FAQ, Historical Changes &",
+        "Revisions and the historical data page. The newest release is the first row of the",
+        "publication page's release list, read from its View link on every run; the run",
+        "stops when that row is not the page's Latest Release. www.usda.gov answers 403",
+        "Access Denied at its CDN edge to an automated request for some of WAOB's pages. The",
+        "script asks www.usda.gov first: a page it serves is kept from there, and a page it",
+        "refuses is recorded by its status at its www.usda.gov URL and kept from",
+        f"{ORIGIN}, the CDN origin that www.usda.gov fronts, which serves the same Drupal site",
+        "at the same paths; the canonical URL is the www.usda.gov one, and each Markdown file",
+        "kept from the CDN origin names both. The 2018 notice of the file names is kept byte",
+        "for byte as a PDF; the script does not read its text, so a change to it shows in its",
+        "sha256.",
     )
 )
 """``FETCHED.md``'s "How this is captured": what is converted, cut or left out, and why."""
@@ -351,7 +371,7 @@ def _log(message: str) -> None:
     print(message, flush=True)  # noqa: T201
 
 
-def _get(url: str, expect: int) -> Response:
+def _get(url: str, expect: tuple[int, ...]) -> Response:
     redirects = _RecordRedirects()
     opener = urllib.request.build_opener(redirects)
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
@@ -363,15 +383,15 @@ def _get(url: str, expect: int) -> Response:
     except urllib.error.HTTPError as error:
         if error.code >= 500:
             raise _RetryableError(f"HTTP {error.code} {error.reason}") from None
-        if error.code != expect:
+        if error.code not in expect:
             raise SystemExit(f"GET {url}: HTTP {error.code} {error.reason}") from None
         body, status, headers = error.read(), error.code, error.headers
     except (http.client.HTTPException, OSError) as error:  # URLError is an OSError
         raise _RetryableError(str(error)) from None
     finally:
         _TALLY.requests += 1 + len(redirects.hops)
-    if status != expect:
-        raise SystemExit(f"GET {url}: expected HTTP {expect}, got {status}")
+    if status not in expect:
+        raise SystemExit(f"GET {url}: expected HTTP {' or '.join(map(str, expect))}, got {status}")
     encoding = headers.get("Content-Encoding", "identity").strip().lower()
     if encoding != "identity":
         raise SystemExit(f"GET {url}: unexpected Content-Encoding {encoding!r}")
@@ -385,8 +405,13 @@ def _get(url: str, expect: int) -> Response:
     )
 
 
-def fetch(url: str, expect: int = 200) -> Response:
-    """GET ``url`` after a polite pause; retry once on a network error or a 5xx."""
+def fetch(url: str, expect: int | tuple[int, ...] = 200) -> Response:
+    """GET ``url`` after a polite pause; retry once on a network error or a 5xx.
+
+    ``expect`` is the status, or the statuses, the URL may answer with; another stops the
+    run.
+    """
+    expect = (expect,) if isinstance(expect, int) else expect
     time.sleep(PAUSE)
     try:
         response = _get(url, expect)
@@ -464,8 +489,8 @@ def check_attribution(page: Page, response: Response) -> None:
     The check reads the visible text of an HTML page, its header and footer included and
     its scripts left out: a link's URL (``sort=CopyrightDate``) and the usda.gov pages'
     settings, which carry the exit notice ``FETCHED.md`` describes, are not statements of
-    the page's own terms. A page kept from USDA's CDN origin must still carry
-    ``EXIT_NOTICE``. The PDF is binary and its text is not read; its sha256 tells a change.
+    the page's own terms. A WAOB page kept as Markdown, from either host, must still
+    carry ``EXIT_NOTICE``. The PDF is binary and its text is not read; its sha256 tells a change.
     """
     if not _is_html(page):
         return
@@ -482,7 +507,8 @@ def check_attribution(page: Page, response: Response) -> None:
             "record it in ATTRIBUTION and update scripts/refresh_upstream.py. Nothing was "
             "written."
         )
-    if page.canonical and EXIT_NOTICE not in raw:
+    usda = urlsplit(page.url).netloc in {urlsplit(USDA).netloc, urlsplit(ORIGIN).netloc}
+    if usda and page.file and EXIT_NOTICE not in raw:
         raise changed(page.url, "the settings no longer carry the exit notice EXIT_NOTICE quotes")
 
 
@@ -639,10 +665,45 @@ def capture(page: Page) -> Row:
     return Row(page, response, reduce(page, response) if page.file else None)
 
 
-def capture_all(pages: Sequence[Page]) -> list[Row]:
+def capture_usda(page: UsdaPage) -> list[Row]:
+    """Capture a WAOB page from www.usda.gov, or from USDA's CDN origin where it is refused.
+
+    One row where www.usda.gov serves the page; where it answers 403, a row for that answer
+    by its status and a row for the same path on the CDN origin, which must answer 200.
+    """
+    response = fetch(page.url, (200, 403))
+    markdown_file = page.file.endswith(".md")
+    how = _CONVERTED if markdown_file else "verbatim, byte for byte"
+    if response.status == 200:
+        served = Page(
+            page.url,
+            page.file,
+            note=f"{how}; {page.what}, served by www.usda.gov itself, so no CDN-origin row"
+            f"{page.more}",
+            title=page.title,
+        )
+        check_attribution(served, response)
+        return [Row(served, response, reduce(served, response))]
+    refused = Page(page.url, status=403, stable=False, note=f"{page.what}; {_DENIED}")
+    check_attribution(refused, response)
+    copy = "page" if markdown_file else "document"
+    kept = Page(
+        f"{ORIGIN}{page.path}",
+        page.file,
+        note=f"{how}; the {copy} above, from USDA's CDN origin{page.more}",
+        title=page.title,
+        canonical=page.url,
+    )
+    return [Row(refused, response, None), capture(kept)]
+
+
+def capture_all(pages: Sequence[Page | UsdaPage]) -> list[Row]:
     """Capture every page in order, the newest release's page after the publication page."""
     rows: list[Row] = []
     for page in pages:
+        if isinstance(page, UsdaPage):
+            rows += capture_usda(page)
+            continue
         rows.append(capture(page))
         if page.url == DOCS_URL:
             rows.append(capture(latest_release(rows[-1].response)))
@@ -701,6 +762,23 @@ def _attribution() -> list[str]:
     )
 
 
+def _usda_answers(rows: Sequence[Row]) -> str:
+    """Which WAOB pages www.usda.gov served in this run, and which it refused."""
+    served: list[str] = []
+    refused: list[str] = []
+    for row, after in zip(rows, [*rows[1:], None], strict=True):
+        if not row.page.url.startswith(USDA):
+            continue
+        if row.response.status == 200 and row.page.file:
+            served.append(f"`{row.page.file}`")
+        elif row.response.status == 403 and after and after.page.canonical == row.page.url:
+            refused.append(f"`{after.page.file}`")
+    kept = f"{', '.join(refused)}, which are kept from the CDN origin" if refused else "none"
+    return (
+        f"In this run www.usda.gov served {', '.join(served) or 'none'} itself and refused {kept}."
+    )
+
+
 def render_fetched(rows: Sequence[Row], fetched: str) -> str:
     """The whole of ``FETCHED.md``, ``fetched`` being the UTC time the run started."""
     lines = [
@@ -719,7 +797,7 @@ def render_fetched(rows: Sequence[Row], fetched: str) -> str:
         *_attribution(),
         "## How this is captured",
         "",
-        *_paragraph(CAPTURE),
+        *_paragraph(CAPTURE, _usda_answers(rows)),
         *_paragraph(CONVERSION),
         *_paragraph(LEFT_OUT),
         *_paragraph(
@@ -832,7 +910,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not (out / LAYOUT_FILE).is_file():
         raise SystemExit(f"{out / LAYOUT_FILE} is missing; FETCHED.md lists it. Nothing fetched.")
     fetched = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-    _log(f"Fetching {len(pages) + 1} pages; nothing is written before the last")
+    _log("Fetching every page; nothing is written before the last")
     rows = capture_all(pages)
     _log(f"{_TALLY.requests} HTTP requests, redirects and retries included")
     if args.check:
