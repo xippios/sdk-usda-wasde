@@ -91,6 +91,9 @@ exactly tasks.__all__. -->
 | the XML's pages, their titles, subtitles, footnotes and matrices, packaged from the latest release (`reference/table.json`), no request | `list_tables(search=None)` | `usda_wasde_list_tables` | alpha |
 | the XML's supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, on pages 12 to 15 the XLS's block titles, packaged (`reference/commodity.json`), no request | `list_commodities(search=None)` | `usda_wasde_list_commodities` | alpha |
 | the XML's region texts with their pages, packaged (`reference/region.json`), no request | `list_regions(search=None)` | `usda_wasde_list_regions` | alpha |
+| one page of the release's XML, as `get_release` reads it, one download per call | `get_table(table, month=None)` | `usda_wasde_get_table` | alpha |
+| one commodity's supply-and-use matrix of the release's XML, a U.S. or Mexico page or the world pages' rows of one region, matrices from `reference/commodity.json`, one download per call | `get_balance_sheet(commodity, region="United States", month=None)` | `usda_wasde_get_balance_sheet` | alpha |
+| the release's narrative: its XLS's sheet `WASDE Text` read with xlrd, else its PDF's narrative pages read with pypdf, text only | `read_report_text(month=None)` | `usda_wasde_read_report_text` | alpha |
 
 ## Upstream terms and attribution
 
