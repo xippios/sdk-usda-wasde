@@ -11,13 +11,17 @@ the parameter the list serves:
   `Name`, the printed page number, its titles, subtitles and footers as printed, stated
   once for the page (`sub_report_footer` to `sub_report_footer3` of its `<Report>`, on
   pages 35 to 37 the one report item's `sub_report_footer`; Johannes, 2026-10-28, G5
-  inside PR 5), its report items; `list_tables` answers from it.
+  inside PR 5), its report items; `list_tables` answers from it, and `get_table` checks
+  its `table` against it before anything is sent.
 - `commodity.json`: one record per supply-and-use matrix of the U.S. pages 11 to 17, 32
   and 33 and the world pages 18 to 30 (`models.Commodity`): the commodity, the region the
-  title names, the page, the matrix and its title; `list_commodities` answers from it.
+  title names, the page, the matrix and its title; `list_commodities` answers from it,
+  and `get_balance_sheet` finds a commodity's matrices in it, which it then reads from
+  the month's XML.
 - `region.json`: every distinct `region` text of the XML as printed, indents and
   footnote markers kept, with the pages that print it (`models.Region`); `list_regions`
-  answers from it.
+  answers from it, and `get_balance_sheet` checks a world page's region against it,
+  matched without indent and footnote marker.
 - `attribute.json`: every distinct `attribute` text of the XML by page and matrix
   (`models.Attribute`), for the tasks that name a table's rows; no task answers with it
   in 0.1.0.

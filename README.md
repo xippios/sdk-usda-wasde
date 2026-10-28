@@ -75,14 +75,17 @@ name them (`"CORN"` is page 12's U.S. corn, `"Corn"` the world corn pages; `"Arg
 matches `"        Argentina"`). Their records (`WasdeTableValue`) leave out the page's
 own labels: its subtitle and footnotes, to which a marker such as `Trade 2/` refers, are
 `list_tables`'s, stated once per page with its titles, the page's number line
-(` WASDE - 676 - 12`) is left out, and the report month is `meta.vintage`. So every page and balance sheet of October 2026 fits its tool's cap
-(`get_table` 400 rows or 128 KB, `get_balance_sheet` 300 rows or 128 KB), each with a
-note that says how to see the rest should one not. Each call downloads the month's XML
-and keeps nothing, so a Python caller wanting several slices of one month calls
-`get_release` once.
+(` WASDE - 676 - 12`) is left out, and the report month is `meta.vintage`. So every page
+and balance sheet of October 2026 fits its tool's cap (`get_table` 400 rows or 128 KB,
+`get_balance_sheet` 300 rows or 128 KB), each with a note that says how to see the rest
+should one not. Each call downloads the month's XML and keeps nothing, so a Python
+caller wanting several slices of one month calls `get_release` once.
+
 `read_report_text` answers the narrative as text, from the XLS's sheet `WASDE Text`, or
-from the PDF's narrative pages for a release without one; no figure is ever read from a
-PDF. Task functions are listed in the status table below.
+from the PDF's narrative pages for a release without an XLS or whose XLS has no such
+sheet; no figure is ever read from a PDF. `meta.vintage` is the month the XLS prints, or
+for a PDF, which prints a date, the ESMIS release id. Task functions are listed in the
+status table below.
 
 ## MCP
 
