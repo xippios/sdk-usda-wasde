@@ -10,18 +10,20 @@ the parameter the list serves:
 - `table.json`: one record per page of the XML, `sr08` to `sr37` (`models.Table`): its
   `Name`, the printed page number, its titles and subtitles as printed, its report
   items; `list_tables` answers from it.
-- `commodity.json`: one record per supply-and-use matrix of the U.S. pages 11 to 17 and
-  the world pages 18 to 30 (`models.Commodity`): the commodity, the region the title
-  names, the page, the matrix and its title; `list_commodities` answers from it.
-- `region.json`: every distinct `region` text of the XML as printed, with the pages that
-  print it (`models.Region`); `list_regions` answers from it.
+- `commodity.json`: one record per supply-and-use matrix of the U.S. pages 11 to 17, 32
+  and 33 and the world pages 18 to 30 (`models.Commodity`): the commodity, the region the
+  title names, the page, the matrix and its title; `list_commodities` answers from it.
+- `region.json`: every distinct `region` text of the XML as printed, indents and
+  footnote markers kept, with the pages that print it (`models.Region`); `list_regions`
+  answers from it.
 - `attribute.json`: every distinct `attribute` text of the XML by page and matrix
   (`models.Attribute`), for the tasks that name a table's rows; no task answers with it
   in 0.1.0.
 
 **The commodity on pages 12 to 15 is matched by position.** The XML names the commodity
-of no matrix on the U.S. pages; pages 11, 16 and 17 name it in their titles
-(`U.S. Wheat Supply and Use  1/`), but the titles of pages 12 to 15 name several
+of no matrix on the U.S. pages; pages 11, 16, 17, 32 and 33 name it in their titles
+(`U.S. Wheat Supply and Use  1/`, `U.S. Milk Supply and Use`), but the titles of pages 12
+to 15 name several
 (`U.S. Feed Grain and Corn Supply and Use  1/`). There the XLS's sheet `Page N` prints a
 block title in column 0 of each block's header row, the row whose other cells hold the
 market years (`FEED GRAINS`, `CORN` on `Page 12`), in the order of the XML's report items
@@ -29,8 +31,16 @@ of the page: the Nth title is the commodity of the Nth item, taken verbatim. The
 refuses to write unless every one of the four pages has as many titles as report items,
 and the nightly live test checks the match on the current release. Elsewhere the
 commodity is the title's words between its region and `Supply and Use`, as printed
-(`Wheat`, `Coarse Grain`); the region is `United States` for a title that starts `U.S.`,
-`Mexico` and `World` as printed. Each file's `note` states its rule.
+(`Wheat`, `Coarse Grain`, `Meats`); the region is `United States` for a title that starts
+`U.S.`, `Mexico` and `World` as printed. Each file's `note` states its rule.
+
+**When they are refreshed.** Before each release, in the release train's refresh PR of
+its own (D15, conventions §12): a release ships the lists of the latest WASDE, whose
+`Report_Month` is their vintage (ADR-0022 decision 1). Between releases the nightly live
+tests compare the packaged tables, commodities and regions with the latest release's,
+every field but `report_month`, with the month word of the reliability titles masked
+(`Reliability of <Month> Projections`, pages 35 to 37), since every release names its
+own month there; any other difference fails, naming the rows.
 
 `endpoint` is the XML's name as ESMIS catalogs it (`wasde1026.xml`), the file every
 record's page, matrix and labels come from; the commodity file's `note` names the XLS as

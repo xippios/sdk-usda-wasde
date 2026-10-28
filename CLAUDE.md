@@ -165,7 +165,7 @@ The API needs no key, so the workflow uses no secret.
   row 189). The catalog fixtures are esmis's
   answers recorded here through core's recorder with esmis's client (ADR-0021).
 - **The packaged lists** (decided by Johannes on 2026-10-28, G5). `reference/table.json`
-  (30 pages), `commodity.json` (40 matrices), `region.json` (70 texts) and
+  (30 pages), `commodity.json` (43 matrices), `region.json` (70 texts) and
   `attribute.json` (451 row labels) are `PackagedList` files, written by
   `scripts/refresh_reference.py` from the latest release's XML and XLS with
   `PackagedList.write`, never by hand; each is named after its `param` (`table`,
@@ -177,23 +177,30 @@ The API needs no key, so the workflow uses no secret.
   answer from them without a request, `meta` from `PackagedList.meta`, `search` through
   core's `matches`, the default MCP cap (the largest answer 9,312 bytes); the attribute
   list has no task in 0.1.0 and is kept for the tasks that name a table's rows. The
-  commodity list holds one record per report item of pages 11 to 30; the XML names none
+  commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
+  32 and 33 (pages 32 and 33 by the session, 2026-10-28, rule 7); the XML names none
   of their commodities, so on pages 12 to 15 the commodity is the XLS's block title, the
   Nth of sheet `Page N` (column 0 of a header row whose other cells hold market years)
   for the Nth item, and the script refuses to write when a page's counts differ;
   elsewhere it is the title's words between its region and `Supply and Use`; `region`
-  is `United States` for a `U.S.` title, `Mexico` and `World` as printed. The rules are
+  is `United States` for a `U.S.` title, `Mexico` and `World` as printed. Region texts
+  stay as printed, with indents and footnote markers; a task that slices a table by
+  region (to come) matches the text stripped of both (gap row 195). The rules are
   `_vocabulary.py`'s docstring. Nothing is generated into `enums.py` (no value list) and
   `params.PACKAGED_LISTS` names the four files, as the template's
   `/refresh-reference-data` expects; the script replaces the template's `LISTS`,
   `ID_LISTS` and `TABLES` and its `--render-only`, as sdk-usda-esmis's does. The refresh
   budget: five keyless requests (the latest release, then the release and the file for
-  the XML and for the XLS), about 3.8 MB, at esmis's pace; a refresh is a PR of its own
-  (Workflow rules). `--keep DIR` keeps the downloaded files with what the run learnt of
-  them, `--from DIR` rebuilds from them without a request.
+  the XML and for the XLS), about 3.8 MB, at esmis's pace. The lists are refreshed
+  before each release, in the release train's refresh PR of its own (D15, conventions
+  §12; Workflow rules), so each release ships the lists of the latest WASDE, its month
+  their vintage (ADR-0022 decision 1). `--keep DIR` keeps the downloaded files with what
+  the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (decided by Johannes on 2026-10-28): one session fixture runs `get_release()` and
   keeps the XML for the live parser test, then downloads the release's XLS once for the
   block titles; the live tests of the three list tasks build the lists from those files
-  and compare them with the packaged ones, every field but `report_month`, a difference
-  naming the rows. Eight keyless requests, two of them downloads, about 3.8 MB.
+  and compare them with the packaged ones, every field but `report_month`, with the
+  month word of the reliability titles masked (`Reliability of <Month> Projections`,
+  pages 35 to 37: every release names its own month; gap row 195), a difference naming
+  the rows. Eight keyless requests, two of them downloads, about 3.8 MB.
