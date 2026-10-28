@@ -24,7 +24,7 @@ these read only what the refresh script and the live tests need (the session,
   starts with, ``U.S.`` read as ``"United States"`` (as the world pages' rows print it),
   ``Mexico`` and ``World`` as printed (Johannes, 2026-10-28, G5). Its ``commodity`` names
   the matrix as a whole, which the XML does for none of these items: only page 32's
-  records carry a ``commodity``, one per row (``Beef``, ``Pork``, ``Broiler``,
+  records carry a ``commodity``, one per row (e.g. ``Beef``, ``Pork``, ``Broiler``,
   ``Turkey``, ``Red Meat & Poultry``), and its matrix is ``Meats`` here, so a search
   for a row's commodity finds nothing in this list. The commodity is on pages 12 to 15
   the XLS's block title by position

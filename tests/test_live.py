@@ -14,9 +14,13 @@ the refresh script's rules (``_vocabulary``) and compare them with the packaged 
 every field but ``report_month``, the month word of the reliability titles masked
 (``Reliability of <Month> Projections``, pages 35 to 37), since every release names its
 own month there and the lists carry the release they came from (ADR-0022 decision 1;
-gap row 195). The packaged lists are refreshed before each release, in the release
-train's refresh PR (conventions §12), so a difference between releases is a change
-upstream made: it fails, naming the rows, and the lists are refreshed
+gap row 195); each footer of a table, ``sub_report_footer`` to ``sub_report_footer3``,
+is compared only for whether it is set on both sides, never its text, which changes
+every release (the projection month on page 35, the months of the estimates on pages
+13 and 16; the session, 2026-10-28, rule 7; gap row 195). The packaged lists are
+refreshed before each release, in the release train's refresh PR (conventions §12), so
+a difference between releases is a change upstream made: it fails, naming the rows, and
+the lists are refreshed
 (``scripts/refresh_reference.py``). Keyless requests, paced by
 esmis's client at 30 a minute: the reachability check 1, ``list_releases`` 1 (page 0),
 ``get_latest_release`` 1, the fixture's ``get_release`` 3 (the latest release, the
@@ -209,6 +213,16 @@ def month_masked(table: Table) -> Table:
     )
 
 
+FOOTERS = ("sub_report_footer", "sub_report_footer2", "sub_report_footer3")
+
+
+def footers_set(table: Table) -> Table:
+    """The table with each footer reduced to whether it is set: its text changes monthly."""
+    return table.model_copy(
+        update={name: "<set>" for name in FOOTERS if getattr(table, name) is not None}
+    )
+
+
 def by_report(row: UpstreamModel) -> str:
     return str(getattr(row, "report", ""))
 
@@ -236,11 +250,16 @@ def test_block_titles_live(latest: Latest) -> None:
 
 
 async def test_list_tables_live(latest: Latest) -> None:
-    """The packaged tables are the latest release's, the reliability titles' month masked."""
+    """The packaged tables are the latest release's, but for the month and the footers' text.
+
+    The reliability titles' month word is masked, and each footer is compared only for
+    whether it is set on both sides, never its text.
+    """
     result = await tasks.list_tables_async()
-    packaged = [month_masked(table) for table in result.data]
-    assert sum(table != month for table, month in zip(result.data, packaged, strict=True)) == 3
-    current = [month_masked(table) for table in vocabulary.tables(latest.xml)]
+    masked = [month_masked(table) for table in result.data]
+    assert sum(table != month for table, month in zip(result.data, masked, strict=True)) == 3
+    packaged = [footers_set(table) for table in masked]
+    current = [footers_set(month_masked(table)) for table in vocabulary.tables(latest.xml)]
     assert not differences(packaged, current, by_report)
     assert result.meta.endpoint.endswith(".xml")
 

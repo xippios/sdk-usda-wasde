@@ -24,7 +24,7 @@ the parameter the list serves:
 
 **The commodity on pages 12 to 15 is matched by position.** The XML names the commodity
 of no matrix on the U.S. pages as a whole: only page 32's records carry a `commodity`,
-one per row (`Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`), while the list
+one per row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`), while the list
 names its matrix `Meats`, so `list_commodities(search="beef")` answers nothing. Pages
 11, 16, 17, 32 and 33 name the matrix's commodity in their titles
 (`U.S. Wheat Supply and Use  1/`, `U.S. Milk Supply and Use`), but the titles of pages 12
@@ -45,7 +45,10 @@ its own (conventions §12): a release ships the lists of the latest WASDE, whose
 tests compare the packaged tables, commodities and regions with the latest release's,
 every field but `report_month`, with the month word of the reliability titles masked
 (`Reliability of <Month> Projections`, pages 35 to 37), since every release names its
-own month there; any other difference fails, naming the rows.
+own month there, and each table footer, `sub_report_footer` to `sub_report_footer3`,
+compared only for whether it is set on both sides, never its text, which changes every
+release (the projection month on page 35, the months of the estimates on pages 13 and
+16); any other difference fails, naming the rows.
 
 `endpoint` is the XML's name as ESMIS catalogs it (`wasde1026.xml`), the file every
 record's page, matrix and labels come from; the commodity file's `note` names the XLS as

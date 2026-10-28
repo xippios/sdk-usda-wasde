@@ -182,7 +182,7 @@ The API needs no key, so the workflow uses no secret.
   commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
   32 and 33 (pages 32 and 33 by the session, 2026-10-28, rule 7); the XML names none
   of their commodities as a whole: only page 32's records carry a `commodity`, one per
-  row (`Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`), while the list names
+  row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`), while the list names
   its matrix `Meats`, so `list_commodities(search="beef")` answers nothing. On pages 12
   to 15 the commodity is the XLS's block title, the
   Nth of sheet `Page N` (column 0 of a header row whose other cells hold market years)
@@ -207,5 +207,7 @@ The API needs no key, so the workflow uses no secret.
   block titles; the live tests of the three list tasks build the lists from those files
   and compare them with the packaged ones, every field but `report_month`, with the
   month word of the reliability titles masked (`Reliability of <Month> Projections`,
-  pages 35 to 37: every release names its own month; gap row 195), a difference naming
-  the rows. Eight keyless requests, two of them downloads, about 3.7 MiB.
+  pages 35 to 37: every release names its own month; gap row 195) and each table footer,
+  `sub_report_footer` to `sub_report_footer3`, compared only for whether it is set on
+  both sides, never its text, which changes every release (the session, 2026-10-28,
+  rule 7; gap row 195), a difference naming the rows. Eight keyless requests, two of them downloads, about 3.7 MiB.

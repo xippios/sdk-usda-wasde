@@ -372,7 +372,7 @@ async def list_commodities_async(search: str | None = None) -> Result[list[Commo
     regions), its ``report`` and ``matrix``, which together name the matrix's
     ``WasdeXmlCell`` records, and its ``table``, the title. The XML names none of these
     matrices' commodities as a whole: only page 32's records carry a ``commodity``, one
-    per row (``"Beef"``, ``"Pork"``, ``"Broiler"``, ``"Turkey"``, ``"Red Meat &
+    per row (e.g. ``"Beef"``, ``"Pork"``, ``"Broiler"``, ``"Turkey"``, ``"Red Meat &
     Poultry"``), while this list names its matrix ``"Meats"``, so ``search="beef"``
     answers nothing here: read page 32's records for its rows. On pages 12 to 15 the
     commodities are the XLS's block titles, upper case as

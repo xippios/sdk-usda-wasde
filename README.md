@@ -54,7 +54,7 @@ before each release: its 30 table pages with their titles, subtitles and footnot
 43 supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, and its
 70 region texts, as printed. The XML names none of these matrices' commodities as a
 whole: on pages 12 to 15 they are the XLS's block titles; only page 32's records carry a
-`commodity`, one per row (`Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`),
+`commodity`, one per row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`),
 while the list names its matrix `Meats`, so `list_commodities(search="beef")` answers
 nothing. Task functions are listed in the status table below.
 
