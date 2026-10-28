@@ -24,7 +24,14 @@ No API key is needed.
 ```python
 from datetime import date
 
-from xippios.usda.wasde import get_latest_release, get_release, list_commodities, list_releases
+from xippios.usda.wasde import (
+    get_balance_sheet,
+    get_latest_release,
+    get_release,
+    list_commodities,
+    list_releases,
+    read_report_text,
+)
 
 latest = get_latest_release()  # the newest WASDE release in ESMIS
 latest.data.id, latest.data.month  # "796099", "2026-10"
@@ -36,10 +43,13 @@ releases = list_releases(since=date(2026, 1, 1))  # bound it: without since, 29 
 page_12 = list_commodities(search="sr12")  # packaged with the package: no request
 [row.commodity for row in page_12.data]  # ["FEED GRAINS", "CORN"]: matrix1 and matrix2
 
-october = get_release("2026-10")  # Python only: downloads the XML, parses it, removes it
-october.meta.endpoint, october.meta.vintage  # "wasde1026.xml", "October 2026"
-corn = [cell for cell in october.data if cell.report == "sr12" and cell.matrix == "matrix2"]
-corn[0].attribute, corn[0].market_year, corn[0].cell_value  # "Area Planted", "2024/25", "90.9"
+corn = get_balance_sheet("CORN")  # page 12's U.S. corn matrix, read from the latest XML
+corn.meta.endpoint, corn.meta.vintage, len(corn.data)  # "wasde1026.xml", "October 2026", 60
+corn.data[0].attribute, corn.data[0].cell_value  # "Area Planted", "90.9" (2024/25)
+
+october = get_release("2026-10")  # Python only: every value, 6543 records, one download
+narrative = read_report_text("2026-10")  # the XLS's sheet WASDE Text, one string a paragraph
+narrative.data[1][:6]  # "WHEAT:"
 ```
 
 Each record of `get_release` is one value of the release's tables with the labels its
@@ -56,7 +66,16 @@ before each release: its 30 table pages with their titles, subtitles and footnot
 whole: on pages 12 to 15 they are the XLS's block titles; only page 32's records carry a
 `commodity`, one per row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`),
 while the list names its matrix `Meats`, so `list_commodities(search="beef")` answers
-nothing. Task functions are listed in the status table below.
+nothing.
+
+`get_table` and `get_balance_sheet` answer a slice of `get_release`'s records, a page or
+one commodity's matrix, the world pages' rows of one region, named as the packaged lists
+name them (`"CORN"` is page 12's U.S. corn, `"Corn"` the world corn pages; `"Argentina"`
+matches `"        Argentina"`); each call downloads the month's XML and keeps nothing,
+so a Python caller wanting several slices of one month calls `get_release` once.
+`read_report_text` answers the narrative as text, from the XLS's sheet `WASDE Text`, or
+from the PDF's narrative pages for a release without one; no figure is ever read from a
+PDF. Task functions are listed in the status table below.
 
 ## MCP
 

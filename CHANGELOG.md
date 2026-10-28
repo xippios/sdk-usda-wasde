@@ -59,4 +59,29 @@ All notable changes to this project are documented here. The format follows
   the nightly live test compares them with the latest release, the month word of the
   reliability titles masked and each table footer compared only for whether it is set,
   never its text, which changes every release.
-- `xlrd` is a dependency, reading the XLS's block titles.
+- `xlrd` is a dependency, reading the XLS's block titles and its narrative sheet.
+- `get_table(table, month)` and `get_balance_sheet(commodity, region, month)`, MCP tools
+  `usda_wasde_get_table` and `usda_wasde_get_balance_sheet`: the records of one page of
+  the month's XML, or of one commodity's supply-and-use matrix as the packaged commodity
+  list names it, the U.S. or Mexico page for `"United States"` (the default) or
+  `"Mexico"` where the commodity has one (page 11's by-class wheat table left to
+  `get_table`), else the rows of its world pages whose region, without indent and
+  footnote marker, is the one given (`"Argentina"`, `"World"`). Both read the XML as
+  `get_release` does, one download per call, nothing kept, with its `meta`; a page,
+  commodity or region the packaged lists lack is refused before anything is sent,
+  naming the closest. `get_table`'s MCP cap is 400 rows or 128 KB with a note of its own.
+- `read_report_text(month)`, MCP tool `usda_wasde_read_report_text`: the release's
+  narrative as text, from its XLS's sheet `WASDE Text` (25 paragraphs for October 2026,
+  `meta.vintage` the month the first table sheet prints), or, for a release without an
+  XLS or whose XLS holds no such sheet, from its PDF's narrative pages, up to the page
+  headed Interagency Commodity Estimates Committees, `meta.vintage` empty; no figure is
+  read from a PDF.
+- `parse.parse_wasde_xls(path)` and `parse.parse_wasde_pdf(path)`, the narrative's
+  parsers (`WasdeXlsText`, `WasdePdfPage`); `pypdf` is a dependency, `xlwt` a dev
+  dependency that writes the XLS sample.
+- `scripts/cut_sample.py` cuts XLS samples (sheets copied cell by cell with xlwt) and
+  keeps PDF samples whole: an XLS sample of the October 2026 release's sheets `WASDE
+  Text` and `Page 8`, the July 2010 PDF (release 95659) and their download fixtures, a
+  second XML download fixture whose body is the sample of pages 11 and 24. The live
+  tests fetch the latest release's PDF once beside its XML and XLS and run the new tasks
+  on those files.
