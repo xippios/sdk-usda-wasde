@@ -1,0 +1,457 @@
+{
+  "param": "table",
+  "endpoint": "wasde1026.xml",
+  "fetched": "2026-10-28T16:26:51Z",
+  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z: one record per page element of the XML, the attributes of the page's <Report> as printed (Name, Report_Month, sub_report_title to sub_report_title3, sub_report_subtitle to sub_report_subtitle3), the number that ends page_title, and the element names of the page's report items in document order.",
+  "records": [
+    {
+      "report": "sr08",
+      "page": 8,
+      "sub_report_title": "World and U.S. Supply and Use for Grains  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "Million Metric Tons",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "page": 9,
+      "sub_report_title": "World and U.S. Supply and Use for Grains, Continued  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": "World and U.S. Supply and Use for Cotton  1/",
+      "sub_report_subtitle": "Million Metric Tons",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": "Million 480-lb. Bales",
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "page": 10,
+      "sub_report_title": "World and U.S. Supply and Use for Oilseeds  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2",
+        "matrix3"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "page": 11,
+      "sub_report_title": "U.S. Wheat Supply and Use  1/",
+      "sub_report_title2": "U.S. Wheat by Class: Supply and Use",
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "page": 12,
+      "sub_report_title": "U.S. Feed Grain and Corn Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "page": 13,
+      "sub_report_title": "U.S. Sorghum, Barley, and Oats Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2",
+        "matrix3"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "page": 14,
+      "sub_report_title": "U.S. Rice Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": " (Rough Equivalent of Rough and Milled Rice)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2",
+        "matrix3"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "page": 15,
+      "sub_report_title": "U.S. Soybeans and Products Supply and Use (Domestic Measure)  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2",
+        "matrix3"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "page": 16,
+      "sub_report_title": "U.S. Sugar Supply and Use  1/",
+      "sub_report_title2": "Mexico Sugar Supply and Use and High Fructose Corn Syrup Consumption 1/",
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "page": 17,
+      "sub_report_title": "U.S. Cotton Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "page": 18,
+      "sub_report_title": "World Wheat Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "page": 19,
+      "sub_report_title": "World Wheat Supply and Use  1/  (Cont'd.)",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "page": 20,
+      "sub_report_title": "World Coarse Grain Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "page": 21,
+      "sub_report_title": "World Coarse Grain Supply and Use  1/  (Cont'd.)",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "page": 22,
+      "sub_report_title": "World Corn Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "page": 23,
+      "sub_report_title": "World Corn Supply and Use  1/  (Cont'd.)",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "page": 24,
+      "sub_report_title": "World Rice Supply and Use  (Milled Basis)  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr25",
+      "page": 25,
+      "sub_report_title": "World Rice Supply and Use  (Milled Basis)  1/  (Cont'd.)",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "page": 26,
+      "sub_report_title": "World Cotton Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million 480-Pound Bales)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix3",
+        "matrix4"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "page": 27,
+      "sub_report_title": "World Cotton Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million 480-Pound Bales)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "page": 28,
+      "sub_report_title": "World Soybean Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix4",
+        "matrix5",
+        "matrix3"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "page": 29,
+      "sub_report_title": "World Soybean Meal Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix4",
+        "matrix5",
+        "matrix6"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "page": 30,
+      "sub_report_title": "World Soybean Oil Supply and Use  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": "(Million Metric Tons)",
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix4",
+        "matrix5",
+        "matrix6"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr31",
+      "page": 31,
+      "sub_report_title": "U.S. Quarterly Animal Product Production  1/",
+      "sub_report_title2": "U.S. Quarterly Prices for Animal Products",
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "page": 32,
+      "sub_report_title": "U.S. Meats Supply and Use",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "page": 33,
+      "sub_report_title": "U.S. Egg Supply and Use",
+      "sub_report_title2": "U.S. Milk Supply and Use",
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1",
+        "matrix2"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "page": 34,
+      "sub_report_title": "U.S. Dairy Prices",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "matrix1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr35",
+      "page": 35,
+      "sub_report_title": "Reliability of October Projections 1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "table1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr36",
+      "page": 36,
+      "sub_report_title": "Reliability of October Projections  (Continued) 1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "table1"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr37",
+      "page": 37,
+      "sub_report_title": "Reliability of United States October Projections  1/",
+      "sub_report_title2": null,
+      "sub_report_title3": null,
+      "sub_report_subtitle": null,
+      "sub_report_subtitle2": null,
+      "sub_report_subtitle3": null,
+      "matrices": [
+        "table1",
+        "table2",
+        "table3",
+        "table4"
+      ],
+      "report_month": "October 2026"
+    }
+  ]
+}
