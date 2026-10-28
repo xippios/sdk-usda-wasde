@@ -115,7 +115,8 @@ Units also stand on elements: `m1_unit_description1` and `m2_unit_description1` 
 of the elements in a value's path. Each holds the text of its own column's cell, so a unit
 printed across columns is split over them (`Million` over Broiler and ` Pounds` over
 Turkey on page 31, `Million` and `Bushels` over two of page 11's six classes), and the
-other columns hold an empty one.
+other columns hold an empty one. The XML thus carries no per-row unit for these pages;
+the XLS and the TXT print the unit rows in place (below).
 
 Other attributes on elements are layout text, not labels of a value: `m1_filler1` and its
 like (`Filler`), page 13's `Textbox2` in a value's path (`Million Bushels` in 42 of 168),
