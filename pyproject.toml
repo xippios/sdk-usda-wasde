@@ -47,6 +47,9 @@ dev = [
   "respx>=0.22",
   "anyio>=4",
   "detect-secrets>=1.5",
+  # Pinned to the `# /// script` block of scripts/refresh_upstream.py, so that mypy --strict
+  # reads its types; the two pins move together.
+  "markdownify==1.2.3",
 ]
 
 [build-system]
