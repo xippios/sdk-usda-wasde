@@ -8,7 +8,8 @@ and every packaged commodity matrix and region is one the samples print. The com
 rule is checked on records shaped as the whole file's from the packaged list, since the
 samples lack pages 14, 15, 17 to 23, 25 to 30 and 33, and no XLS sample exists: the XLS's
 block titles are read by the live test only. The refusals are tested on records changed
-in the test, never on a fixture file.
+in the test, and on small XML texts the test writes to ``tmp_path``, never on a fixture
+file.
 """
 
 import re
@@ -232,3 +233,80 @@ def test_records_of_two_months_are_refused() -> None:
     november = CELLS[-1].model_copy(update={"report_month": "November 2026"})
     with pytest.raises(ValidationError, match="2 Report_Month values"):
         vocabulary.regions([*CELLS, november])
+
+
+PAGE = (
+    'Name="sr12" Report_Month="October 2026" page_title=" WASDE - 676 - 12" '
+    'sub_report_title="U.S. Feed Grain and Corn Supply and Use  1/"'
+)
+"""The attributes a page's ``<Report>`` must carry, as page 12 prints them."""
+
+
+def one_page(tmp_path: Path, page: str, items: str = "<matrix1 />") -> Path:
+    """A small XML text written in the test, one page ``<sr12>``: not a fixture."""
+    path = tmp_path / "page.xml"
+    text = f'<Report Name="wasde"><sr12><Report {page}>{items}</Report></sr12></Report>'
+    path.write_text(f'<?xml version="1.0" encoding="utf-8"?>{text}', encoding="utf-8")
+    return path
+
+
+def test_tables_reads_a_page_and_its_items_footer(tmp_path: Path) -> None:
+    items = '<table1 /><table4 sub_report_footer="1/ See pages 35 and 36." />'
+    (table,) = vocabulary.tables(one_page(tmp_path, PAGE, items))
+    assert (table.report, table.page, table.matrices) == ("sr12", 12, ["table1", "table4"])
+    assert table.sub_report_footer == "1/ See pages 35 and 36."
+    assert (table.sub_report_title2, table.sub_report_subtitle, table.sub_report_footer3) == (
+        None,
+        None,
+        None,
+    )
+
+
+@pytest.mark.parametrize(
+    ("page", "items", "message"),
+    [
+        (PAGE, None, "<sr12> holds no <Report>"),
+        (
+            PAGE.replace('page_title=" WASDE - 676 - 12" ', ""),
+            "<matrix1 />",
+            "<sr12>'s <Report> lacks ['page_title']",
+        ),
+        (
+            f'{PAGE} sub_report_title4="A fourth"',
+            "<matrix1 />",
+            "sr12 carries ['sub_report_title4']; a table names titles, subtitles and footers "
+            "1 to 3",
+        ),
+        (
+            f'{PAGE} sub_report_footer5="5/"',
+            "<matrix1 />",
+            "sr12 carries ['sub_report_footer5']",
+        ),
+        (PAGE.replace("676 - 12", "676 - "), "<matrix1 />", "sr12: page_title ends in no page"),
+        (
+            f'{PAGE} sub_report_footer="1/"',
+            '<table1 sub_report_footer="2/" />',
+            "sr12: footers on its <Report> and on ['table1 sub_report_footer']",
+        ),
+        (
+            PAGE,
+            '<table1 sub_report_footer="1/" /><table2 sub_report_footer="2/" />',
+            "sr12: footers on ['table1 sub_report_footer', 'table2 sub_report_footer']",
+        ),
+        (
+            PAGE,
+            '<table1 sub_report_footer2="1/" />',
+            "sr12: footers on ['table1 sub_report_footer2']",
+        ),
+    ],
+)
+def test_tables_refuses_a_page_it_cannot_read(
+    tmp_path: Path, page: str, items: str | None, message: str
+) -> None:
+    path = one_page(tmp_path, page, items or "")
+    if items is None:  # a page element without its <Report>
+        text = path.read_text(encoding="utf-8").replace(f"<Report {page}></Report>", "<x />")
+        path.write_text(text, encoding="utf-8")
+    with pytest.raises(ValidationError) as caught:
+        vocabulary.tables(path)
+    assert str(caught.value).startswith(f"reference lists: {message}")
