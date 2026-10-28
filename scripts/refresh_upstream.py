@@ -1,41 +1,50 @@
 # /// script
 # requires-python = ">=3.12"
-# dependencies = []
+# dependencies = ["markdownify==1.2.3"]
 # ///
 """Refresh the upstream documentation snapshot in ``docs/upstream/`` (``/refresh-upstream``).
 
-The template's skeleton of a capture script. A source fills ``PAGES``, ``SPEC_URL`` where
-its documentation names a machine-readable API document, ``ATTRIBUTION``, ``CAPTURE`` and,
-where a page is not kept as fetched, ``reduce``, and rewrites this paragraph to say what it
-captures; the rest is the family's capture frame. Until ``PAGES`` or ``SPEC_URL`` is
-filled, the script refuses to run.
+The World Agricultural Supply and Demand Estimates (WASDE) are documented on two sites:
+ESMIS, the National Agricultural Library's catalog of USDA reports, which publishes the
+release files, and the World Agricultural Outlook Board's pages on www.usda.gov, which
+describe the report, its release dates and its historical data. www.usda.gov answers 403
+at its CDN edge to an automated request, so each of its pages is recorded by status and
+kept from USDA's CDN origin, usda.azureedge.us, which serves the same Drupal site. The
+script writes:
+
+- ``pages/publication-wasde.md``: the ESMIS publication page, converted to Markdown;
+- ``pages/release-wasde.md``: the ESMIS page of the newest release, the first row of the
+  publication page's release list, converted to Markdown;
+- ``pages/wasde-report.md``, ``pages/historical-wasde-report-data.md`` and
+  ``pages/wasde-faqs.md``: WAOB's WASDE page, its historical data page and its FAQ,
+  converted to Markdown;
+- ``New_WASDE_Filename_Format.pdf``: WAOB's 2018 notice of the file names, byte for byte;
+- ``FETCHED.md``: regenerated whole, one row per file and per page recorded without a
+  file, and a row for ``layout.md``, which is written by hand from release files, not
+  fetched, and which this script neither writes nor checks.
 
 Everything is fetched before anything is written, one request at a time after a pause,
-each URL retried at most once after a network error or a 5xx. Each page with a file is
-written under ``docs/upstream/``, and ``FETCHED.md`` is regenerated whole: the UTC time of
-the run with an explicit ``Z``, the attribution, and one row per page with its HTTP
-status, the size and sha256 of the body as fetched, and its ETag and Last-Modified where
-sent. A page recorded without a file (a 403 or a 404, a page without documentation text)
-has a row of its own, and a file cut from a shared document keeps the whole document's
-size and sha256 in its row (conventions §3). Files the run does not produce are removed
-from the subdirectories it writes to; nothing else under ``docs/upstream/`` is touched.
-Every run stops, before writing, when a page states a copyright, a licence or terms of use
-that ``ATTRIBUTION`` does not record. No key is needed or read. Run from the repository
-root::
+each URL retried at most once after a network error or a 5xx. ``FETCHED.md`` records the
+UTC time of the run with an explicit ``Z``, the attribution, and one row per page with its
+HTTP status, the size and sha256 of the body as fetched, and its ETag and Last-Modified
+where sent; a page recorded by its status only (a 403 or a 404) has a row without them.
+Files under ``pages/`` the run does not produce are removed; nothing else under
+``docs/upstream/`` is touched. Every run stops, before writing, when the visible text of
+an HTML page states a copyright, a licence or terms of use that ``ATTRIBUTION`` does not
+record, and on a page the converter does not recognise. No key is needed or read. Run from
+the repository root::
 
     uv run scripts/refresh_upstream.py            # fetch, then write the snapshot
     uv run scripts/refresh_upstream.py --check    # fetch and compare; write nothing
 
 ``--check`` exits 1 when the snapshot differs from what upstream serves now, ``Fetched``
-aside. Where the documentation is HTML, ``reduce`` converts it to Markdown with
-``markdownify``, the one converter a capture script may declare: in the ``# /// script``
-block above, ``dependencies = ["markdownify==X.Y.Z"]``, and at the same pin in the dev
+aside. HTML is converted to Markdown with ``markdownify``, the one converter a capture
+script may declare: in the ``# /// script`` block above, and at the same pin in the dev
 group of ``pyproject.toml``, so that ``mypy --strict`` reads its types.
 """
 
 import argparse
 import hashlib
-import html
 import http.client
 import json
 import re
@@ -48,8 +57,12 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import IO, Any
+from urllib.parse import urlsplit
+
+from markdownify import ATX, BACKSLASH, MarkdownConverter
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUT = ROOT / "docs/upstream"
@@ -64,6 +77,14 @@ PAUSE = 2.0
 RETRY_PAUSE = 10.0
 """Seconds before the one retry after a network error or a 5xx."""
 
+USDA = "https://www.usda.gov"
+"""The canonical site of WAOB's pages; its CDN edge answers 403 to this script."""
+ORIGIN = "https://usda.azureedge.us"
+"""USDA's CDN origin: the Drupal site that www.usda.gov fronts, served without the edge."""
+RELEASE_FILE = "pages/release-wasde.md"
+LAYOUT_FILE = "layout.md"
+"""Written by hand from release files (ADR-0020 decision 2); listed, never written here."""
+
 
 @dataclass(frozen=True)
 class Page:
@@ -71,15 +92,19 @@ class Page:
 
     Attributes:
         url: Where the page is fetched from.
-        file: Its path under ``docs/upstream/`` (``pages/guide.md``,
-            ``openapi/openapi.json``), or ``None`` for a page recorded without a file.
+        file: Its path under ``docs/upstream/`` (``pages/wasde-faqs.md``), or ``None`` for
+            a page recorded without a file.
         status: The HTTP status it must answer with: 200, or the 403 or 404 of a page
             recorded by its status.
         note: The row's note in ``FETCHED.md``: how the file was made, or why there is none.
-        stable: ``False`` for a body that changes on every request (a per-request
-            reference in a refusal page): its row records no size, sha256 or validators.
+        stable: ``False`` for a page recorded by its status only: its row records no
+            size, sha256 or validators, and its note says why.
         excerpt: The file is this source's part of a shared document (conventions §3);
             the row keeps the whole document's size and sha256, and its note says so.
+        title: The text of the page's one ``<h1>``, for a page converted to Markdown; the
+            run stops when the page serves another.
+        canonical: For a page kept from USDA's CDN origin, the www.usda.gov URL it is
+            the copy of; the Markdown file names both.
     """
 
     url: str
@@ -88,21 +113,91 @@ class Page:
     note: str = ""
     stable: bool = True
     excerpt: bool = False
+    title: str | None = None
+    canonical: str | None = None
 
+
+_CONVERTED = "converted to Markdown; Bytes and sha256 are the HTML page's"
+_DENIED = (
+    "403 Access Denied at the CDN edge; the body carries a per-request reference, so "
+    "status only; kept from USDA's CDN origin in the next row"
+)
+_FROM_ORIGIN = f"{_CONVERTED}; the page above, from USDA's CDN origin"
 
 PAGES: tuple[Page, ...] = (
-    # Page(DOCS_URL, "pages/index.md", note="converted to Markdown"),
-    # Page("https://api.example.org/legal", status=403, note="403 at the CDN edge"),
+    Page(
+        DOCS_URL,
+        "pages/publication-wasde.md",
+        note=f"{_CONVERTED}; the first page of the release list, which changes with "
+        "every release; the next row is its first row's View link",
+        title="World Agricultural Supply and Demand Estimates",
+    ),
+    Page(
+        f"{USDA}/oce/commodity/wasde",
+        status=403,
+        stable=False,
+        note=f"WAOB's WASDE page; {_DENIED}",
+    ),
+    Page(
+        f"{ORIGIN}/oce/commodity/wasde",
+        "pages/wasde-report.md",
+        note=_FROM_ORIGIN,
+        title="WASDE Report",
+        canonical=f"{USDA}/oce/commodity/wasde",
+    ),
+    Page(
+        f"{USDA}/sites/default/files/documents/New_WASDE_Filename_Format.pdf",
+        status=403,
+        stable=False,
+        note=f"WAOB's notice of the file names (2018); {_DENIED}",
+    ),
+    Page(
+        f"{ORIGIN}/sites/default/files/documents/New_WASDE_Filename_Format.pdf",
+        "New_WASDE_Filename_Format.pdf",
+        note="verbatim, byte for byte; the document above, from USDA's CDN origin",
+    ),
+    Page(
+        f"{USDA}/node/42884",
+        status=403,
+        stable=False,
+        note=f"WAOB's historical data page; {_DENIED}",
+    ),
+    Page(
+        f"{ORIGIN}/node/42884",
+        "pages/historical-wasde-report-data.md",
+        note=f"{_FROM_ORIGIN}; the data files it links are not fetched",
+        title="Historical WASDE Report Data",
+        canonical=f"{USDA}/node/42884",
+    ),
+    Page(f"{USDA}/node/33540", status=403, stable=False, note=f"WAOB's WASDE FAQ; {_DENIED}"),
+    Page(
+        f"{ORIGIN}/node/33540",
+        "pages/wasde-faqs.md",
+        note=_FROM_ORIGIN,
+        title="FAQs and Resources",
+        canonical=f"{USDA}/node/33540",
+    ),
+    Page(
+        "http://www.usda.gov/oce/commodity/wasde/WASDE-Schema.xsd",
+        status=404,
+        stable=False,
+        note="the XML schema the July 2010 XML file names in `xsi:schemaLocation`; "
+        "www.usda.gov's page-not-found page, status only",
+    ),
 )
-"""Every page the snapshot records, in the order of ``FETCHED.md``'s rows."""
+"""Every page the snapshot records, in the order of ``FETCHED.md``'s rows.
+
+The ESMIS page of the newest release follows the publication page; its URL is read from
+the publication page on every run (``latest_release``).
+"""
 
 SPEC_URL: str | None = None
-"""The machine-readable API document (OpenAPI, Swagger) the documentation names, if any.
+"""The machine-readable API document (OpenAPI, Swagger) the documentation names: none.
 
 The convention of ``/refresh-upstream``: a document named inside a page rather than linked
 from it (a Swagger UI's configuration) is recorded here once found, and kept verbatim as
-``SPEC_FILE`` after ``PAGES``. Where the page's setting must be read on every run, the
-source reads it there instead and ``CAPTURE`` says from where.
+``SPEC_FILE`` after ``PAGES``. ESMIS's OpenAPI document is snapshotted by xippios-usda-esmis,
+whose tasks this package uses (ADR-0021).
 """
 SPEC_FILE = "openapi/openapi.json"
 """The document's path under ``docs/upstream/``, with the extension it is served with."""
@@ -110,18 +205,95 @@ SPEC_FILE = "openapi/openapi.json"
 ATTRIBUTION: tuple[str, ...] = ()
 """Every copyright line, licence or terms of use the documentation states, as printed.
 
-Empty: it states none. ``FETCHED.md`` quotes them under Attribution, and every run stops
-when a page states one that is not here.
+Empty: the visible text of the HTML pages states none. ``FETCHED.md`` says so under
+Attribution, and every run stops when a page states one that is not here.
 """
 
-CAPTURE = ""
+EXIT_NOTICE = (
+    "Once you access another site through a link that we provide, you are subject to the "
+    "copyright and licensing restrictions of the new site."
+)
+"""A sentence of the notice that the usda.gov pages' settings carry for a link off the site.
+
+``FETCHED.md``'s Attribution describes the notice; a run stops when a page kept from
+USDA's CDN origin no longer carries this sentence.
+"""
+
+CAPTURE = " ".join(
+    (
+        "The two ESMIS pages, the publication page of the World Agricultural Supply and",
+        "Demand Estimates and the page of its newest release, are converted to Markdown, and",
+        "so are the three pages of the World Agricultural Outlook Board (WAOB). The newest",
+        "release is the first row of the publication page's release list, read from its View",
+        "link on every run; the run stops when that row is not the page's Latest Release.",
+        "www.usda.gov answers 403 Access Denied at its CDN edge to an automated request, so",
+        "each of WAOB's pages is recorded by its status at its canonical www.usda.gov URL and",
+        f"kept from {ORIGIN}, the CDN origin that www.usda.gov fronts, which serves the same",
+        "Drupal site; the canonical URL is the www.usda.gov one, and each Markdown file names",
+        "both. The 2018 notice of the file names is kept byte for byte as a PDF; the script",
+        "does not read its text, so a change to it shows in its sha256.",
+    )
+)
 """``FETCHED.md``'s "How this is captured": what is converted, cut or left out, and why."""
+
+CONVERSION = " ".join(
+    (
+        "The Markdown is `markdownify`'s rendering of the page's `<main>` element, with",
+        "headings in ATX style. Breadcrumbs, menus and the other navigation, forms (the",
+        "release list's date filter), buttons, images and icons, share links and",
+        "screen-reader-only text are dropped; a `<time>` keeps its `datetime` attribute in",
+        "parentheses after its text, a link with a `type` attribute (an ESMIS release file's",
+        "media type) keeps it in parentheses after the link, two links side by side get a",
+        "space between them, a no-break space becomes a space, an emphasis holding only",
+        "spaces becomes a space, and a line break that ends a paragraph is dropped; trailing",
+        "spaces are removed. Links are kept as the page prints them: a link starting with `/`",
+        "is relative to the site the page was served from, which for WAOB's pages is",
+        "www.usda.gov as well.",
+        "No table on these pages has merged cells or a nested table; the run stops on one, and",
+        "on a page whose `<h1>` is not the one the script expects. The ESMIS pages change with",
+        "every release.",
+    )
+)
+"""How a page becomes Markdown, for ``FETCHED.md``."""
+
+LEFT_OUT = " ".join(
+    (
+        "Not snapshotted: ESMIS's release calendar, which xippios-usda-esmis keeps as an",
+        "excerpt; the data files the historical data page links (CSV, ZIP); the release",
+        "files themselves. No upstream page documents the layout of the XML, XLS or TXT",
+        f"files: `{LAYOUT_FILE}` describes them as observed in release files, by hand, and",
+        "says what it was written from; its row records no fetch.",
+    )
+)
+"""What the snapshot leaves out, for ``FETCHED.md``."""
 
 _STATEMENT = re.compile(
     r"\N{COPYRIGHT SIGN}|copyright|licen[cs]e|terms of (?:use|service)|public domain",
     re.IGNORECASE,
 )
 _FETCHED = re.compile(r"\| (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z) \|")
+_VIEW = re.compile(
+    r'<a href="(/publication/world-agricultural-supply-and-demand-estimates/'
+    r'(\d{4}-\d{2}-\d{2})(?:-\d+)?)"[^>]*>View</a>'
+)
+_LATEST_BLOCK = "block-views-blockpublication-releases-latest-release-block"
+_DATETIME = re.compile(r'<time datetime="(\d{4}-\d{2}-\d{2})T[^"]*"')
+_NO_TEXT = frozenset({"script", "style", "template"})
+"""Elements whose content a reader never sees as text."""
+_DROP_TAGS = frozenset(
+    {"nav", "form", "button", "img", "svg", "iframe", "script", "style", "noscript", "template"}
+)
+_DROP_CLASSES = frozenset({"usa-sr-only", "visually-hidden", "share"})
+
+
+@dataclass
+class _Tally:
+    """HTTP requests sent by this run, redirects and retries included."""
+
+    requests: int = 0
+
+
+_TALLY = _Tally()
 
 
 @dataclass(frozen=True)
@@ -134,6 +306,11 @@ class Response:
     etag: str | None
     last_modified: str | None
     redirects: tuple[tuple[int, str], ...]
+
+    @property
+    def served_url(self) -> str:
+        """The URL the body came from: the last redirect's target, or the URL asked for."""
+        return self.redirects[-1][1] if self.redirects else self.url
 
 
 @dataclass(frozen=True)
@@ -191,6 +368,8 @@ def _get(url: str, expect: int) -> Response:
         body, status, headers = error.read(), error.code, error.headers
     except (http.client.HTTPException, OSError) as error:  # URLError is an OSError
         raise _RetryableError(str(error)) from None
+    finally:
+        _TALLY.requests += 1 + len(redirects.hops)
     if status != expect:
         raise SystemExit(f"GET {url}: expected HTTP {expect}, got {status}")
     encoding = headers.get("Content-Encoding", "identity").strip().lower()
@@ -243,25 +422,68 @@ def decode(response: Response) -> str:
         raise changed(response.url, f"the body is not UTF-8 ({error})") from None
 
 
+def _is_html(page: Page) -> bool:
+    return page.file is None or page.file.endswith(".md")
+
+
+class _VisibleText(HTMLParser):
+    """The text a reader sees: every text node outside scripts, styles and templates."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+        self._hidden = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """Enter a script, a style or a template."""
+        if tag in _NO_TEXT:
+            self._hidden += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        """Leave a script, a style or a template."""
+        if tag in _NO_TEXT and self._hidden:
+            self._hidden -= 1
+
+    def handle_data(self, data: str) -> None:
+        """Keep visible text."""
+        if not self._hidden:
+            self.parts.append(data)
+
+
+def visible_text(text: str) -> str:
+    """The visible text of an HTML document, entities decoded, whitespace collapsed."""
+    parser = _VisibleText()
+    parser.feed(text)
+    parser.close()
+    return " ".join("".join(parser.parts).split())
+
+
 def check_attribution(page: Page, response: Response) -> None:
     """Stop when the page states a copyright, licence or terms that ``ATTRIBUTION`` lacks.
 
-    The check reads the whole body with its entities decoded, so a footer that the Markdown
-    drops counts too; a source whose markup carries one of the words without stating
-    anything (a ``license`` class) checks the text its ``reduce`` keeps instead.
+    The check reads the visible text of an HTML page, its header and footer included and
+    its scripts left out: a link's URL (``sort=CopyrightDate``) and the usda.gov pages'
+    settings, which carry the exit notice ``FETCHED.md`` describes, are not statements of
+    the page's own terms. A page kept from USDA's CDN origin must still carry
+    ``EXIT_NOTICE``. The PDF is binary and its text is not read; its sha256 tells a change.
     """
-    body = html.unescape(response.body.decode("utf-8", "replace"))
+    if not _is_html(page):
+        return
+    raw = decode(response)
+    body = visible_text(raw)
     for statement in ATTRIBUTION:
         body = body.replace(statement, "")
     match = _STATEMENT.search(body)
     if match:
-        around = " ".join(body[max(match.start() - 60, 0) : match.end() + 60].split())
+        around = body[max(match.start() - 60, 0) : match.end() + 60]
         raise SystemExit(
             f"GET {page.url}: the page states {match.group(0)!r} ({around!r}), a copyright, "
             "licence or terms of use that ATTRIBUTION does not record.\nRead it by hand, "
             "record it in ATTRIBUTION and update scripts/refresh_upstream.py. Nothing was "
             "written."
         )
+    if page.canonical and EXIT_NOTICE not in raw:
+        raise changed(page.url, "the settings no longer carry the exit notice EXIT_NOTICE quotes")
 
 
 def _no_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -301,22 +523,112 @@ def load_json(response: Response, indent: int = 2) -> Any:
     return document
 
 
-def reduce(page: Page, response: Response) -> bytes:
-    """The content ``page``'s file is written with: the body as fetched, by default.
+def _dropped(tag: Any) -> bool:
+    classes = tag.get("class") or []
+    return tag.name in _DROP_TAGS or not _DROP_CLASSES.isdisjoint(classes)
 
-    A source fills this where a page is not kept as fetched, and stops the run with
-    ``changed`` on a page it does not recognise, before anything is written:
 
-    - an HTML page becomes Markdown, its headings, tables and parameter lists kept, its
-      navigation dropped and a table with merged cells kept as HTML (conventions §3)::
+class _Markdown(MarkdownConverter):
+    """``markdownify``'s converter for one page: its ``<main>``, navigation dropped.
 
-          from markdownify import markdownify  # the one converter (module docstring)
-
-          return markdownify(decode(response), heading_style="ATX").encode("utf-8")
-
-    - a shared document is cut to this source's part, ``load_json`` then ``dump_json``,
-      and its page marked ``excerpt=True``.
+    ``convert_soup`` is ``markdownify``'s hook for a parsed document; this one picks the
+    ``<main>`` element, checks it and prepares it as ``CONVERSION`` describes before the
+    converter renders it.
     """
+
+    def __init__(self, page: Page) -> None:
+        super().__init__(heading_style=ATX, bullets="-", newline_style=BACKSLASH)
+        self.page = page
+
+    def convert_soup(self, soup: Any) -> str:
+        """Render the page's one ``<main>``, prepared; stop on one the script does not know."""
+        url = self.page.url
+        mains = soup.find_all("main")
+        if len(mains) != 1:
+            raise changed(url, f"expected one <main>, found {len(mains)}")
+        main = mains[0]
+        for element in main.find_all(True):
+            if not element.decomposed and _dropped(element):
+                element.decompose()
+        headings = [" ".join(h1.get_text().split()) for h1 in main.find_all("h1")]
+        if headings != [self.page.title]:
+            raise changed(url, f"the <h1> is {headings}, not [{self.page.title!r}]")
+        for table in main.find_all("table"):
+            cells = table.find_all(["td", "th"])
+            if table.find_all("table") or any(c.get("rowspan") or c.get("colspan") for c in cells):
+                raise changed(
+                    url,
+                    "a table with merged cells or a nested table, which this script does not "
+                    "convert yet; extend it to keep such a table as HTML (conventions §3)",
+                )
+        for moment in main.find_all("time", datetime=True):
+            moment.append(f" (`{moment['datetime']}`)")
+        for link in main.find_all("a", type=True):
+            link.insert_after(f" (`{link['type']}`)")
+        for link in main.find_all("a"):
+            if getattr(link.next_sibling, "name", None) == "a":
+                link.insert_after(" ")
+        for text in main.find_all(string=lambda value: "\N{NO-BREAK SPACE}" in value):
+            text.replace_with(text.replace("\N{NO-BREAK SPACE}", " "))
+        for emphasis in main.find_all(["strong", "b", "em", "i"]):
+            if emphasis.get_text() and not emphasis.get_text().strip():
+                emphasis.replace_with(" ")
+        for brk in main.find_all("br"):
+            if all(isinstance(after, str) and not after.strip() for after in brk.next_siblings):
+                brk.decompose()
+        return super().convert_soup(main)
+
+
+def markdown(page: Page, response: Response) -> bytes:
+    """The page as Markdown: a line naming where it came from, then its ``<main>``."""
+    body = _Markdown(page).convert(decode(response))
+    lines = [line.rstrip() for line in body.strip("\n").splitlines()]
+    text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines))
+    source = response.served_url
+    if page.canonical:
+        source += f", which USDA's CDN origin serves for {page.canonical}"
+    header = f"Converted by `scripts/refresh_upstream.py` from {source}; see `../FETCHED.md`."
+    return f"{header}\n\n{text}\n".encode()
+
+
+def latest_release(response: Response) -> Page:
+    """The ESMIS page of the newest release: the first row of the publication's release list.
+
+    The row's View link gives the URL; the run stops unless its date is the date of the
+    page's Latest Release.
+    """
+    text = decode(response)
+    views = _VIEW.findall(text)
+    if not views:
+        raise changed(response.url, "the release list has no View link")
+    path, date = views[0]
+    block = text.find(_LATEST_BLOCK)
+    latest = _DATETIME.search(text, block) if block >= 0 else None
+    if latest is None or latest.group(1) != date:
+        found = latest.group(1) if latest else None
+        raise changed(
+            response.url,
+            f"the release list's first row ({date}) is not the Latest Release ({found}), so "
+            "the newest release is unclear",
+        )
+    site = urlsplit(response.served_url)
+    return Page(
+        f"{site.scheme}://{site.netloc}{path}",
+        RELEASE_FILE,
+        note=f"{_CONVERTED}; the page of the newest release, the first row of the "
+        "publication page's release list, so the URL changes with every release",
+        title="World Agricultural Supply and Demand Estimates",
+    )
+
+
+def reduce(page: Page, response: Response) -> bytes:
+    """The content ``page``'s file is written with: Markdown for HTML, else the body as fetched.
+
+    ``markdown`` stops the run with ``changed`` on a page it does not recognise, before
+    anything is written.
+    """
+    if page.file and page.file.endswith(".md"):
+        return markdown(page, response)
     return response.body
 
 
@@ -325,6 +637,16 @@ def capture(page: Page) -> Row:
     response = fetch(page.url, page.status)
     check_attribution(page, response)
     return Row(page, response, reduce(page, response) if page.file else None)
+
+
+def capture_all(pages: Sequence[Page]) -> list[Row]:
+    """Capture every page in order, the newest release's page after the publication page."""
+    rows: list[Row] = []
+    for page in pages:
+        rows.append(capture(page))
+        if page.url == DOCS_URL:
+            rows.append(capture(latest_release(rows[-1].response)))
+    return rows
 
 
 def _iso_http_date(value: str | None) -> str:
@@ -347,51 +669,69 @@ def _note(row: Row) -> str:
     parts = [f"redirected ({code}) to {target}" for code, target in row.response.redirects]
     if row.page.excerpt:
         parts.append("excerpt of a shared document; Bytes and sha256 are the whole document's")
-    if not row.page.stable:
-        parts.append("the body changes on every request, so no size, sha256 or validators")
     if row.page.note:
         parts.append(row.page.note)
     return "; ".join(parts) or "-"
 
 
-def render_fetched(rows: Sequence[Row], fetched: str) -> str:
-    """The whole of ``FETCHED.md``, ``fetched`` being the UTC time the run started."""
+def _attribution() -> list[str]:
     if ATTRIBUTION:
         stated = "The documentation states " + "; ".join(f"`{s}`" for s in ATTRIBUTION) + "."
     else:
-        stated = "None stated: no page this script reads states a copyright line, a licence"
-        stated += " or terms of use."
+        stated = (
+            "The visible text of the HTML pages this script reads, their headers and footers "
+            "included, states no copyright line, licence or terms of use; the WASDE FAQ, read "
+            "for terms of use and a citation wording, states neither."
+        )
+    return _paragraph(
+        "The documentation and the release files are works of the United States Government",
+        "(USDA: the World Agricultural Outlook Board, https://www.usda.gov, and the National",
+        "Agricultural Library's ESMIS, https://esmis.nal.usda.gov), in the public domain in",
+        "the United States under 17 U.S.C. \N{SECTION SIGN} 105.",
+        stated,
+        "The script stops when a page it reads starts to state one. The 2018 notice of the",
+        "file names, a PDF whose text the script does not read, stated none either when this",
+        "snapshot was set up (2026-10-28). The usda.gov pages carry in their settings the",
+        "notice a browser shows when a reader follows a link off the site; it says that the",
+        "linked site's copyright and licensing restrictions apply there",
+        f'("{EXIT_NOTICE}") and states nothing about USDA\'s own pages; the script stops if',
+        "it goes. The documentation's text is reproduced here as this package's reference",
+        "(ADR-0003); the publisher's objection is met by replacing it with a summary that",
+        "keeps the names and semantics the package relies on.",
+    )
+
+
+def render_fetched(rows: Sequence[Row], fetched: str) -> str:
+    """The whole of ``FETCHED.md``, ``fetched`` being the UTC time the run started."""
     lines = [
         f"# Upstream documentation snapshot \N{EM DASH} {SOURCE_NAME}",
         "",
         *_paragraph(
-            "Source of truth for every endpoint wrapper (ADR-0003). The files in this",
-            "directory are written by `scripts/refresh_upstream.py` (`/refresh-upstream`)",
-            "from the pages in the table below and refreshed deliberately by PR, so that",
-            "changes show up as diffs. This file is generated by the same script; nothing",
-            "here is edited by hand.",
+            "Source of truth for every endpoint wrapper and parser (ADR-0003, ADR-0020). The",
+            "files in this directory are written by `scripts/refresh_upstream.py`",
+            "(`/refresh-upstream`) from the pages in the table below and refreshed",
+            "deliberately by PR, so that changes show up as diffs. This file is generated by",
+            "the same script; nothing here is edited by hand except",
+            f"`{LAYOUT_FILE}`, the file layouts as observed, which its row describes.",
         ),
         "## Attribution",
         "",
-        *_paragraph(
-            stated,
-            "The script stops when a page it reads states one it does not record. The",
-            "documentation's text is reproduced here as this package's reference",
-            "(ADR-0003); the publisher's objection is met by replacing it with a summary",
-            "that keeps the names and semantics the wrappers rely on.",
-        ),
+        *_attribution(),
         "## How this is captured",
         "",
-        *(_paragraph(CAPTURE) if CAPTURE else []),
+        *_paragraph(CAPTURE),
+        *_paragraph(CONVERSION),
+        *_paragraph(LEFT_OUT),
         *_paragraph(
             "Fetched is the UTC time the run started, in ISO 8601 with an explicit Z, the",
             "same for every row. Bytes and sha256 are those of the body as fetched: a",
-            "converted page's row holds the HTML page's, an excerpt's the whole document's.",
-            "Last-Modified is the HTTP header in UTC, ETag as sent. A page recorded without",
-            "a file is `(no file)`, and a body that changes on every request records no",
-            f"size, sha256 or validators. Requests go one at a time, {PAUSE:g} s apart,",
-            f"each retried at most once, identified as `{USER_AGENT}`; no API key is sent",
-            "or read.",
+            "converted page's row holds the HTML page's. Last-Modified is the HTTP header in",
+            "UTC, ETag as sent; Drupal sets both to the time it last rendered the page, so",
+            "they change with a new rendering of the same page. A page recorded without a",
+            "file is `(no file)`, and one recorded by its status only, a 403 whose body",
+            "carries a per-request reference or a page-not-found page, has no size, sha256",
+            f"or validators. Requests go one at a time, {PAUSE:g} s apart, each retried at",
+            f"most once, identified as `{USER_AGENT}`; no API key is sent or read.",
         ),
         "## Files and pages",
         "",
@@ -412,6 +752,19 @@ def render_fetched(rows: Sequence[Row], fetched: str) -> str:
             _note(row),
         ]
         lines.append("| " + " | ".join(_cell(cell) for cell in cells) + " |")
+    layout = [
+        LAYOUT_FILE,
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "-",
+        "written by hand from release files, not fetched: the file layouts as observed, "
+        "not documented (ADR-0020 decision 2); the file says what it was written from",
+    ]
+    lines.append("| " + " | ".join(layout) + " |")
     lines += ["", f"Regenerate: `{COMMAND}`"]
     return "\n".join(lines) + "\n"
 
@@ -476,9 +829,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             "Nothing to fetch: fill PAGES, and SPEC_URL where the documentation names an "
             "API document, as /refresh-upstream says."
         )
+    if not (out / LAYOUT_FILE).is_file():
+        raise SystemExit(f"{out / LAYOUT_FILE} is missing; FETCHED.md lists it. Nothing fetched.")
     fetched = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-    _log(f"Fetching {len(pages)} pages; nothing is written before the last")
-    rows = [capture(page) for page in pages]
+    _log(f"Fetching {len(pages) + 1} pages; nothing is written before the last")
+    rows = capture_all(pages)
+    _log(f"{_TALLY.requests} HTTP requests, redirects and retries included")
     if args.check:
         differ = compare(out, rows)
         for name in differ:
