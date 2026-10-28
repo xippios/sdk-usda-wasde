@@ -61,7 +61,7 @@ All notable changes to this project are documented here. The format follows
   never its text, which changes every release.
 - `xlrd` is a dependency, reading the XLS's block titles and its narrative sheet.
 - `get_table(table, month)` and `get_balance_sheet(commodity, region, month)`, MCP tools
-  `usda_wasde_get_table` and `usda_wasde_get_balance_sheet`: the records of one page of
+  `usda_wasde_get_table` and `usda_wasde_get_balance_sheet`: the values of one page of
   the month's XML, or of one commodity's supply-and-use matrix as the packaged commodity
   list names it, the U.S. or Mexico page for `"United States"` (the default) or
   `"Mexico"` where the commodity has one (page 11's by-class wheat table left to
@@ -69,7 +69,11 @@ All notable changes to this project are documented here. The format follows
   footnote marker, is the one given (`"Argentina"`, `"World"`). Both read the XML as
   `get_release` does, one download per call, nothing kept, with its `meta`; a page,
   commodity or region the packaged lists lack is refused before anything is sent,
-  naming the closest. `get_table`'s MCP cap is 400 rows or 128 KB with a note of its own.
+  naming the closest. Their records, `WasdeTableValue`, are `WasdeXmlCell` projected
+  without the page's labels (page title, subtitle, footnotes, report month), which
+  `list_tables` and `meta.vintage` state once. MCP caps of their own, each with a note
+  that says how to see the rest: `get_table` 400 rows or 128 KB, `get_balance_sheet`
+  300 rows or 128 KB; every page and balance sheet of October 2026 fits.
 - `read_report_text(month)`, MCP tool `usda_wasde_read_report_text`: the release's
   narrative as text, from its XLS's sheet `WASDE Text` (25 paragraphs for October 2026,
   `meta.vintage` the month the first table sheet prints), or, for a release without an

@@ -46,6 +46,7 @@ page_12 = list_commodities(search="sr12")  # packaged with the package: no reque
 corn = get_balance_sheet("CORN")  # page 12's U.S. corn matrix, read from the latest XML
 corn.meta.endpoint, corn.meta.vintage, len(corn.data)  # "wasde1026.xml", "October 2026", 60
 corn.data[0].attribute, corn.data[0].cell_value  # "Area Planted", "90.9" (2024/25)
+# its subtitle and footnotes are page 12's in list_tables(search="sr12"), stated once
 
 october = get_release("2026-10")  # Python only: every value, 6543 records, one download
 narrative = read_report_text("2026-10")  # the XLS's sheet WASDE Text, one string a paragraph
@@ -71,8 +72,14 @@ nothing.
 `get_table` and `get_balance_sheet` answer a slice of `get_release`'s records, a page or
 one commodity's matrix, the world pages' rows of one region, named as the packaged lists
 name them (`"CORN"` is page 12's U.S. corn, `"Corn"` the world corn pages; `"Argentina"`
-matches `"        Argentina"`); each call downloads the month's XML and keeps nothing,
-so a Python caller wanting several slices of one month calls `get_release` once.
+matches `"        Argentina"`). Their records (`WasdeTableValue`) leave out the page's
+own labels: its subtitle and footnotes, to which a marker such as `Trade 2/` refers, are
+`list_tables`'s, stated once per page with its titles, the page's number line
+(` WASDE - 676 - 12`) is left out, and the report month is `meta.vintage`. So every page and balance sheet of October 2026 fits its tool's cap
+(`get_table` 400 rows or 128 KB, `get_balance_sheet` 300 rows or 128 KB), each with a
+note that says how to see the rest should one not. Each call downloads the month's XML
+and keeps nothing, so a Python caller wanting several slices of one month calls
+`get_release` once.
 `read_report_text` answers the narrative as text, from the XLS's sheet `WASDE Text`, or
 from the PDF's narrative pages for a release without one; no figure is ever read from a
 PDF. Task functions are listed in the status table below.
@@ -110,8 +117,8 @@ exactly tasks.__all__. -->
 | the XML's pages, their titles, subtitles, footnotes and matrices, packaged from the latest release (`reference/table.json`), no request | `list_tables(search=None)` | `usda_wasde_list_tables` | alpha |
 | the XML's supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, on pages 12 to 15 the XLS's block titles, packaged (`reference/commodity.json`), no request | `list_commodities(search=None)` | `usda_wasde_list_commodities` | alpha |
 | the XML's region texts with their pages, packaged (`reference/region.json`), no request | `list_regions(search=None)` | `usda_wasde_list_regions` | alpha |
-| one page of the release's XML, as `get_release` reads it, one download per call | `get_table(table, month=None)` | `usda_wasde_get_table` | alpha |
-| one commodity's supply-and-use matrix of the release's XML, a U.S. or Mexico page or the world pages' rows of one region, matrices from `reference/commodity.json`, one download per call | `get_balance_sheet(commodity, region="United States", month=None)` | `usda_wasde_get_balance_sheet` | alpha |
+| one page of the release's XML, as `get_release` reads it, its values without the page's labels (`list_tables` states them), one download per call | `get_table(table, month=None)` | `usda_wasde_get_table` | alpha |
+| one commodity's supply-and-use matrix of the release's XML, a U.S. or Mexico page or the world pages' rows of one region, matrices from `reference/commodity.json`, its values without the page's labels, one download per call | `get_balance_sheet(commodity, region="United States", month=None)` | `usda_wasde_get_balance_sheet` | alpha |
 | the release's narrative: its XLS's sheet `WASDE Text` read with xlrd, else its PDF's narrative pages read with pypdf, text only | `read_report_text(month=None)` | `usda_wasde_read_report_text` | alpha |
 
 ## Upstream terms and attribution

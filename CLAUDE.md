@@ -32,10 +32,11 @@ src/xippios/usda/wasde/
                    upstream's documented error shapes
   errors.py        the package's own error classes, where conventions §5 calls for one
   models.py        pydantic models (UpstreamModel): Release, esmis's release re-shaped,
-                   WasdeXmlCell, one value of a release's XML file, WasdeXlsText and
-                   WasdePdfPage, a paragraph of its XLS's narrative and a narrative page of
-                   its PDF, and Table, Commodity, Region and Attribute, the records of the
-                   four packaged lists
+                   WasdeXmlCell, one value of a release's XML file, WasdeTableValue, its
+                   projection without the page's labels that the slices answer,
+                   WasdeXlsText and WasdePdfPage, a paragraph of its XLS's narrative and a
+                   narrative page of its PDF, and Table, Commodity, Region and Attribute,
+                   the records of the four packaged lists
   api/             empty: the package wraps no endpoint of its own; ESMIS's catalog and the
                    download are xippios-usda-esmis's tasks (ADR-0021)
   parse/           file parsers, one module per file kind: parse_<file_kind>(path) -> list[Model];
@@ -162,10 +163,15 @@ The API needs no key, so the workflow uses no secret.
   and a unit on a value's path is its column's share of a unit printed across columns;
   the XLS and the TXT print the unit rows in place.
 - **The slices** (Johannes, 2026-10-28, G5). `get_table(table, month)` answers the
-  records of one page, `get_balance_sheet(commodity, region, month)` those of one
+  values of one page, `get_balance_sheet(commodity, region, month)` those of one
   commodity's supply-and-use matrix; both read the month's XML through `get_release`'s
   lookup and read (`_releases`, `_read_xml`), one download per call and nothing kept,
-  and answer its `meta` with the arguments given. The page, the commodity and the
+  and answer its `meta` with the arguments given. Their records are `WasdeTableValue`,
+  `WasdeXmlCell` projected with `UpstreamModel.project` without the page's labels,
+  `page_title`, `sub_report_subtitle`, `sub_report_footer` and `report_month`
+  (Johannes, 2026-10-28, G5 inside PR 5): `list_tables` states the page's titles,
+  subtitles and footnotes once, to which a marker in a label (`Trade 2/`) refers, and
+  the month is `meta.vintage`; `get_release` keeps the full record. The page, the commodity and the
   region are checked against the packaged lists before anything is sent, case kept; a
   near miss raises core's `UnknownCode` naming the closest (core's `closest` on the
   texts, so `"corn"` names `CORN` and `Corn`). A balance sheet is the U.S. or Mexico
@@ -176,19 +182,22 @@ The API needs no key, so the workflow uses no secret.
   the world table's U.S. rows for Coarse Grain, Corn, Rice, Soybean, Soybean Meal and
   Soybean Oil, which have no U.S. matrix under that name. A record is kept where its
   page, matrix and title are a packaged matrix's: a month's file that holds none raises
-  `NotFoundError`. The MCP caps (`MCP_CAPS`; ADR-0016): `get_table` 400 rows or 128 KB
-  with a note naming `get_balance_sheet`, every other tool the default. A record is about
-  1 KB of compact JSON, its page's titles and footnotes repeated, so in October 2026 8 of
-  30 pages fit `get_table`'s cap (page 19, the largest answer, measures 438,621 bytes)
-  and the default cap cuts 5 of the 23 U.S. and Mexico balance sheets (Meats, 280
-  records and 245,130 bytes; U.S. Sugar; the three U.S. rice matrices); the measured
-  sizes are in the comment above `MCP_CAPS`.
+  `NotFoundError`. The MCP caps (`MCP_CAPS`; ADR-0016; Johannes, 2026-10-28, G5 inside
+  PR 5): `get_table` 400 rows or 128 KB, its note naming `get_balance_sheet` for one
+  matrix or region and Python for the whole page; `get_balance_sheet` 300 rows or 128
+  KB, its note naming a region on the world pages and Python for the whole matrix;
+  every other tool the default, whose note's narrowing only `list_releases` (`since`,
+  `until`) can need. A value is about 350 bytes of the tool's JSON, so every answer of
+  October 2026 fits whole: the largest page, sr28, 364 values and 129,899 bytes, 1,173
+  under the bound; the largest balance sheet, Meats, 280 values and 90,850 bytes; the
+  measured sizes are in the comment above `MCP_CAPS`.
 - **The narrative** (Johannes, 2026-10-28, G5). `read_report_text(month)` reads the
   release's XLS, sheet `WASDE Text` (`parse/wasde_xls.py`): one string per row with
   text, verbatim (25 for October 2026, the first `WASDE - 676\r`), `meta.vintage` the
   month cell (0, 0) of the first `Page N` sheet prints (`October 2026`). A release
   without an XLS, or whose XLS has no such sheet or no text in it while it has a PDF,
-  is read from the PDF (`parse/wasde_pdf.py`, pypdf): one string per page from page 1
+  is read from the PDF (`parse/wasde_pdf.py`, pypdf; the fallback kept by Johannes,
+  2026-10-28, G5 inside PR 5): one string per page from page 1
   up to the first page that prints `Interagency Commodity Estimates Committees` on a
   line of its own, after its running header (`WASDE-484-6`, `WASDE-676-6`): pages 1 to
   5 in July 2010 and October 2026; no later page is read, no figure comes from a PDF
