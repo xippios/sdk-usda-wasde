@@ -8,8 +8,10 @@ ADR-0022; decided by Johannes on 2026-10-28, G5). Each file is named after its `
 the parameter the list serves:
 
 - `table.json`: one record per page of the XML, `sr08` to `sr37` (`models.Table`): its
-  `Name`, the printed page number, its titles and subtitles as printed, its report
-  items; `list_tables` answers from it.
+  `Name`, the printed page number, its titles, subtitles and footers as printed, stated
+  once for the page (`sub_report_footer` to `sub_report_footer3` of its `<Report>`, on
+  pages 35 to 37 the one report item's `sub_report_footer`; Johannes, 2026-10-28, G5
+  inside PR 5), its report items; `list_tables` answers from it.
 - `commodity.json`: one record per supply-and-use matrix of the U.S. pages 11 to 17, 32
   and 33 and the world pages 18 to 30 (`models.Commodity`): the commodity, the region the
   title names, the page, the matrix and its title; `list_commodities` answers from it.
@@ -64,7 +66,7 @@ was read from, Fetched the file's `fetched`, the UTC time the XML was complete.
 
 | File | Origin | Fetched |
 | --- | --- | --- |
-| `table.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its pages' `<Report>` attributes (30 records) | 2026-10-28T16:26:51Z |
+| `table.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its pages' `<Report>` attributes and the reliability items' footers (30 records) | 2026-10-28T16:26:51Z |
 | `commodity.json` | `wasde1026.xml` and `wasde1026.xls`, ESMIS release 796099 of 2026-10-09, the XML's report items of pages 11 to 30, 32 and 33 and the XLS's block titles of pages 12 to 15 (43 records) | 2026-10-28T16:26:51Z |
 | `region.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its `region` texts (70 records) | 2026-10-28T16:26:51Z |
 | `attribute.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its `attribute` texts by page and item (451 records) | 2026-10-28T16:26:51Z |

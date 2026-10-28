@@ -9,15 +9,19 @@ call time.
 - ``tables``: one ``Table`` per page element of the XML, ``sr08`` to ``sr37``, from the
   attributes of the page's ``<Report>`` (``Name``, ``Report_Month``, the number that ends
   ``page_title``, ``sub_report_title`` to ``sub_report_title3``, ``sub_report_subtitle``
-  to ``sub_report_subtitle3``) and the element names of its report items, as printed.
+  to ``sub_report_subtitle3``, ``sub_report_footer`` to ``sub_report_footer3``) and the
+  element names of its report items, as printed. A page whose ``<Report>`` holds no
+  footer takes the ``sub_report_footer`` of its one report item that carries it (the
+  reliability pages 35 to 37: ``table1``, ``table1``, ``table4``), so the page's
+  footnotes are stated once here (Johannes, 2026-10-28, G5 inside PR 5).
 - ``commodities``: one ``Commodity`` per report item of the supply-and-use pages, the
   U.S. pages 11 to 17, 32 and 33 and the world pages 18 to 30, in file order (Johannes,
   2026-10-28, G5; pages 32 and 33 by the session, 2026-10-28, rule 7). Its ``table`` is
-  the title
-  ``parse_wasde_xml`` gives the item; its ``region`` the region that title starts with,
-  ``U.S.`` read as ``"United States"`` (as the world pages' rows print it), ``Mexico``
-  and ``World`` as printed (Johannes, 2026-10-28, G5). Its ``commodity``, which the XML
-  holds for none of these items, is on pages 12 to 15 the XLS's block title by position
+  the title ``parse_wasde_xml`` gives the item; its ``region`` the region that title
+  starts with, ``U.S.`` read as ``"United States"`` (as the world pages' rows print it),
+  ``Mexico`` and ``World`` as printed (Johannes, 2026-10-28, G5). Its ``commodity``, which
+  the XML holds for none of these items, is on pages 12 to 15 the XLS's block title by
+  position
   (``block_titles``): sheet ``Page N`` prints one in column 0 of each block's header row,
   in the order of the page's report items, and the Nth title goes to the Nth item. On
   the other pages it is the title's words between its region and ``Supply and Use`` (a
@@ -34,7 +38,9 @@ A file these rules do not fit raises ``ValidationError`` naming the page, and th
 refresh script writes nothing: a supply-and-use page without values, a title that does not
 start with ``U.S.``, ``Mexico`` or ``World`` and name a commodity before ``Supply and
 Use``, a page of 12 to 15 whose XLS block titles are not as many as its report items, a
-sheet the XLS lacks, more than one ``Report_Month``, a page without a printed number.
+sheet the XLS lacks, more than one ``Report_Month``, a page without a printed number, a
+title, subtitle or footer numbered beyond 3, footers on both a page and its items or on
+several items.
 """
 
 import io
@@ -80,7 +86,8 @@ _TITLE = re.compile(
 )
 _MARKET_YEAR = re.compile(r"\d{4}/\d{2}")
 _PAGE_NUMBER = re.compile(r"(\d+)\s*$")
-_HEADINGS = re.compile(r"(sub_report_title|sub_report_subtitle)(\d*)")
+_HEADINGS = re.compile(r"(sub_report_title|sub_report_subtitle|sub_report_footer)(\d*)")
+_FOOTER = re.compile(r"sub_report_footer\d*")
 _HEADING_NUMBERS = ("", "2", "3")
 
 
@@ -112,7 +119,9 @@ def tables(path: str | PathLike[str]) -> list[Table]:
     Raises:
         ValidationError: A page lacks its ``<Report>``, its ``Name``, ``Report_Month``,
             ``page_title`` or ``sub_report_title``, a number at the end of
-            ``page_title``, or carries a title or subtitle numbered beyond 3.
+            ``page_title``, carries a title, subtitle or footer numbered beyond 3, or
+            footers on both its ``<Report>`` and an item, on several items, or numbered
+            on an item.
     """
     root = ET.parse(Path(path)).getroot()
     found: list[Table] = []
@@ -135,10 +144,29 @@ def tables(path: str | PathLike[str]) -> list[Table]:
             if (match := _HEADINGS.fullmatch(key)) and match.group(2) not in _HEADING_NUMBERS
         ]
         if beyond:
-            _refuse(f"{name} carries {beyond}; a table names titles and subtitles 1 to 3", beyond)
+            _refuse(
+                f"{name} carries {beyond}; a table names titles, subtitles and footers 1 to 3",
+                beyond,
+            )
         page = _PAGE_NUMBER.search(attributes["page_title"])
         if page is None:
             _refuse(f"{name}: page_title ends in no page number", {"report": name})
+        footers = {key: text for key, text in attributes.items() if _FOOTER.fullmatch(key)}
+        on_items = [
+            (item.tag, key, text)
+            for item in report
+            for key, text in item.attrib.items()
+            if _FOOTER.fullmatch(key)
+        ]
+        if on_items:
+            if footers or len(on_items) > 1 or on_items[0][1] != "sub_report_footer":
+                _refuse(
+                    f"{name}: footers on {'its <Report> and on ' if footers else ''}"
+                    f"{[f'{tag} {key}' for tag, key, _ in on_items]}; a table takes its "
+                    "page's footers, or the sub_report_footer of one report item",
+                    {"report": name},
+                )
+            footers = {"sub_report_footer": on_items[0][2]}
         found.append(
             Table(
                 report=name,
@@ -149,6 +177,9 @@ def tables(path: str | PathLike[str]) -> list[Table]:
                 sub_report_subtitle=attributes.get("sub_report_subtitle"),
                 sub_report_subtitle2=attributes.get("sub_report_subtitle2"),
                 sub_report_subtitle3=attributes.get("sub_report_subtitle3"),
+                sub_report_footer=footers.get("sub_report_footer"),
+                sub_report_footer2=footers.get("sub_report_footer2"),
+                sub_report_footer3=footers.get("sub_report_footer3"),
                 matrices=[item.tag for item in report],
                 report_month=attributes["Report_Month"],
             )

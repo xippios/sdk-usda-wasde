@@ -86,7 +86,7 @@ BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 # 64 KB. list_releases called without since answers every WASDE release (703 on
 # 2026-10-28), and its docstring tells an agent to bound it; the three packaged lists fit
 # whole, list_tables 30 rows, list_commodities 43 and list_regions 70, the largest
-# result list_tables's 9,312 bytes of compact JSON (October 2026).
+# result list_tables's 29,639 bytes of compact JSON, its footnotes included (October 2026).
 
 PUBLICATION = "wasde"
 """WASDE's publication identifier in ESMIS, which esmis's release tasks take."""
@@ -320,14 +320,16 @@ def _packaged[M: (Table, Commodity, Region)](
 
 
 async def list_tables_async(search: str | None = None) -> Result[list[Table]]:
-    """WASDE's table pages with their titles, subtitles and matrices, from the packaged list.
+    """WASDE's table pages with their titles, subtitles, footnotes and matrices, from the package.
 
     Answered without a request from the list the package read from the October 2026
     release's XML (``wasde1026.xml``, ``reference/table.json``): 30 pages, printed pages
     8 to 37, each with its ``report`` (``"sr12"``, the page as a ``WasdeXmlCell``'s
-    ``report`` names it), its printed ``page`` number, its titles and subtitles as
-    printed and its ``matrices``, the report items in document order, the values a
-    ``WasdeXmlCell``'s ``matrix`` takes there (``["matrix3", "matrix4"]`` on page 26).
+    ``report`` names it), its printed ``page`` number, its titles, subtitles and
+    footnotes (``sub_report_footer`` to ``sub_report_footer3``) as printed, stated once
+    here for the page, and its ``matrices``, the report items in document order, the
+    values a ``WasdeXmlCell``'s ``matrix`` takes there (``["matrix3", "matrix4"]`` on
+    page 26).
     Pages 8 to 10 hold the world and U.S. aggregates, 11 to 17 the U.S. supply and use,
     18 to 30 the world supply and use by region, 31 to 34 U.S. animal products, eggs,
     milk and dairy prices, 35 to 37 the reliability of the month's projections. A page
@@ -337,9 +339,9 @@ async def list_tables_async(search: str | None = None) -> Result[list[Table]]:
 
     Args:
         search: Keep the pages where this text occurs, ignoring case, in the report, the
-            page number, a title, a subtitle or a matrix name, each on its own, e.g.
-            ``"wheat"`` (pages 11, 18 and 19), ``"sr24"``, ``"reliability"`` (pages 35
-            to 37). ``None`` (the default) keeps every page.
+            page number, a title, a subtitle or a matrix name, each on its own, never in
+            a footnote, e.g. ``"wheat"`` (pages 11, 18 and 19), ``"sr24"``,
+            ``"reliability"`` (pages 35 to 37). ``None`` (the default) keeps every page.
     """
     return _packaged(
         "table",

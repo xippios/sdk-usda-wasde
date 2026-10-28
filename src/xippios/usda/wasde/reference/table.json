@@ -2,7 +2,7 @@
   "param": "table",
   "endpoint": "wasde1026.xml",
   "fetched": "2026-10-28T16:26:51Z",
-  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z: one record per page element of the XML, the attributes of the page's <Report> as printed (Name, Report_Month, sub_report_title to sub_report_title3, sub_report_subtitle to sub_report_subtitle3), the number that ends page_title, and the element names of the page's report items in document order.",
+  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z: one record per page element of the XML, the attributes of the page's <Report> as printed (Name, Report_Month, sub_report_title to sub_report_title3, sub_report_subtitle to sub_report_subtitle3, sub_report_footer to sub_report_footer3; on a page whose <Report> holds no footer, the sub_report_footer of its one report item that carries it, pages 35 to 37), the number that ends page_title, and the element names of the page's report items in document order.",
   "records": [
     {
       "report": "sr08",
@@ -13,6 +13,9 @@
       "sub_report_subtitle": "Million Metric Tons",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Aggregate of local marketing years. 2/ Based on export estimate. See individual commodity tables for treatment of export/import imbalances. 3/ Total use for the United States is equal to domestic consumption only (excludes exports). 4/ Wheat, coarse grains, and milled rice. 5/ Corn, sorghum, barley, oats, rye, millet, and mixed grains (for U.S. excludes millet and mixed grains).    ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -28,6 +31,9 @@
       "sub_report_subtitle": "Million Metric Tons",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": "Million 480-lb. Bales",
+      "sub_report_footer": "1/ Aggregate of local marketing years.  2/ Based on export estimate.  See individual commodity tables for treatment of export/import imbalances.  3/ Total foreign is equal to world minus United States.  4/ Wheat, coarse grains, and milled rice.    5/ Corn, sorghum, barley, oats, rye, millet, and mixed grains.",
+      "sub_report_footer2": "1/ Marketing year beginning August 1.  2/ Based on export estimate.  3/ Includes mill use only.  4/  Total Foreign is equal to world minus United States. See global cotton tables for treatment of export/import imbalances.",
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -43,6 +49,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Aggregate of local marketing years with Brazil and Argentina on an Oct.-Sept. year.  2/ Crush only for oilseeds.  3/ Total Foreign is equal to World minus United States.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2",
@@ -59,6 +68,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "Note: Totals may not add due to rounding. 1/ Marketing year beginning June 1. 2/ Marketing-year weighted average price received by farmers. 3/ Includes imports. ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -74,6 +86,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "Note:  Totals may not add due to rounding.  1/ Marketing year beginning September 1 for corn and sorghum; June 1 for barley and oats.  2/ For a breakout of FSI corn uses, see Feed Outlook table 5.  3/ Corn processed in ethanol plants to produce ethanol and by-products including distillers' grains, corn gluten feed, corn gluten meal, and corn oil.  4/ Marketing-year weighted average price received by farmers.  * For July, corn planted and harvested area as reported in the June 30, 2026, \"Acreage.\"  The yield projection is based on a weather-adjusted trend assuming normal planting progress and summer growing season weather.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -89,6 +104,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "Note:  Totals may not add due to rounding.  1/ Marketing year beginning September 1 for sorghum; June 1 for barley and oats.  2/ Marketing-year weighted average price received by farmers.  * For July sorghum planted and harvested acres reported in the June 30, 2026, \"Acreage.\" The yield is the median yield for 2006-2025.  Barley and oats area planted, area harvested, yield, and production as reported in the July 10, 2026, \"Crop Production.\"",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2",
@@ -105,6 +123,9 @@
       "sub_report_subtitle": " (Rough Equivalent of Rough and Milled Rice)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "Note: Totals may not add due to rounding. 1/ Marketing year beginning August 1. 2/ Includes the following quantities of broken kernel rice (type undetermined) not included in estimates of ending stocks by type (in mil. cwt): 22/23- 2.3; 23/24-1.6;24/25—2.8  3/ Residual includes unreported use, processing losses, and estimating errors. Use by type may not add to total rice use because of the difference in brokens between beginning and ending stocks. 4/ Includes rough rice and milled rice exports. Milled rice exports are converted to an equivalent rough basis. 5/ Expressed as a percent, i.e., the total quantity of whole kernel and broken rice produced divided by the quantity of rough rice milled. 6/ Marketing-year weighted average price received by farmers. 7/ Includes imports. 8/ Exports by type of rice are estimated. 9/ The California medium/short-grain season-average- farm price (SAFP) largely reflects rice that is marketed through price pools in California. The pool price is not final until all the rice in the pool is marketed for the crop year. Therefore, SAFP forecasts based on the average of NASS monthly prices and the final price may differ. 10/ Marketing year beginning October 1. ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2",
@@ -121,6 +142,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "Note:  Totals may not add due to rounding.  Reliability calculations at end of report.  1/ Marketing year beginning September 1 for soybeans; October 1 for soybean oil and soybean meal.  2/ Prices: soybeans, marketing year weighted average price received by farmers; oil, simple average of crude soybean oil, Decatur; meal, simple average of 48 percent protein, Decatur.  3/ Reflects soybean oil used for biofuels as reported by the U.S. Energy Information Administration.  4/ Based on an October year crush of 2,650 million bushels for 2025/26 and 2,780 million bushels for 2026/27. ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2",
@@ -137,6 +161,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Fiscal years beginning Oct 1. Data and projections correspond to category components from \"Sweetener Market Data\" (SMD). 2/  Production projections for 2025/26 and 2026/27 are based on Crop Production and/or processor projections/industry data and/or sugar ICEC analysis where appropriate.  3/ For 2025/26, WTO raw sugar TRQ shortfall (187) and for 2026/27 (96). 4/ Composed of sugar under the re-export and polyhydric alcohol programs.  5/ Transfers accompanying deliveries for sugar-containing products to be exported (SCP) and polyhydric alcohol manufacture (POLY), and deliveries for livestock feed and ethanol. Total refiner license transfers for SCP and POLY inclusive of WASDE-reported deliveries: 2024/25 -- 300; estimated 2025/26 -- 296; projected 2026/27 -- 295.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": "1/ HFCS consumption by Mexico (1,000 metric tons, dry basis): Estimated 2025/26 = 1,545; Estimated Oct.2025-Aug 2026 =1,414; Projected 2026/27 = 1,510. Footnote source for estimate: Comite Nacional para el Desarollo Sustentable de la Cana de Azucar. 2/Includes deliveries for consumption, Mexico's products export program (IMMEX), and Other Deliveries/Ending Year Statistical Adjustments.  IMMEX:  estimated 2025/26 (334 est = 321 dom.+13 import). Projected  2026/27 ( 316 proj = 302 dom.+14 import). Statistical Adjustments:  2025/26 (0); 2026/276 (0).",
       "matrices": [
         "matrix1",
         "matrix2"
@@ -152,6 +179,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": null,
+      "sub_report_footer2": null,
+      "sub_report_footer3": "Note: Reliability calculations at end of report. 1/ Upland and extra-long staple; marketing year beginning August 1. Totals may not add due to rounding. 2/ Reflects the difference between the previous season's supply less total use and ending stocks. 3/ Cents per pound for upland cotton. *September planted area, harvested, yield, and production as reported in the September 11, 2026 Crop Production report. **October planted area, harvested, yield, and production as reported in the October 9, 2026 Crop Production report. ",
       "matrices": [
         "matrix1"
       ],
@@ -166,6 +196,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Aggregate of local marketing years.  2/ Total foreign and world use adjusted to reflect the differences in world imports and exports.  3/ World imports and exports may not balance due to differences in marketing years, grain in transit, and reporting discrepancies in some countries. 4/ Argentina, Australia, Canada, European Union, Russia, and Ukraine. 5/ Trade excludes intra-trade. 6/ Bangladesh, Brazil, China, South Korea, Japan, Nigeria, Mexico, Turkey, Egypt, Algeria, Libya, Morocco, Tunisia, Indonesia, Malaysia, Philippines, Thailand, Vietnam, Lebanon, Iraq, Iran, Israel, Jordan, Kuwait, Saudi Arabia, Yemen, United Arab Emirates, and Oman.  7/ Algeria, Egypt, Libya, Morocco, and Tunisia. 8/Lebanon, Iraq, Iran, Israel, Jordan, Kuwait, Saudi Arabia, Yemen, United Arab Emirates, and Oman 9/ Indonesia, Malaysia, Philippines, Thailand, and Vietnam.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -181,6 +214,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Aggregate of local marketing years.  2/ Total foreign and world use adjusted to reflect the differences in world imports and exports.  3/ World imports and exports may not balance due to differences in marketing years, grain in transit, and reporting discrepancies in some countries. 4/ Argentina, Australia, Canada, European Union, Russia, and Ukraine. 5/ Trade excludes intra-trade. 6/ Bangladesh, Brazil, China, South Korea, Japan, Nigeria, Mexico, Turkey, Egypt, Algeria, Libya, Morocco, Tunisia, Indonesia, Malaysia, Philippines, Thailand, Vietnam, Lebanon, Iraq, Iran, Israel, Jordan, Kuwait, Saudi Arabia, Yemen, United Arab Emirates, and Oman.  7/ Algeria, Egypt, Libya, Morocco, and Tunisia. 8/Lebanon, Iraq, Iran, Israel, Jordan, Kuwait, Saudi Arabia, Yemen, United Arab Emirates, and Oman 9/ Indonesia, Malaysia, Philippines, Thailand, and Vietnam.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1"
       ],
@@ -195,6 +231,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Aggregate of local marketing years. Coarse grains include corn, sorghum, barley, oats, rye, millet, and mixed grains (for U.S. excludes millet and mixed grains).  2/ Total foreign and world use adjusted to reflect the differences in world imports and exports. 3/ World imports and exports may not balance due to differences in marketing years, grain in transit, and reporting discrepancies in some countries. 4/ Argentina, Australia, Brazil, Canada, Russia, South Africa, and Ukraine. 5/ European Union, Japan, Mexico, selected North Africa and Middle East, Saudi Arabia, Southeast Asia, and South Korea. 6/ Trade excludes intra-trade. 7/ Algeria, Egypt, Iran, Israel, Jordan, Libya, Morocco, Syria, Tunisia, and Turkey. 8/ Indonesia, Malaysia, Philippines, Thailand, and Vietnam.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -210,6 +249,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Aggregate of local marketing years. Coarse grains include corn, sorghum, barley, oats, rye, millet, and mixed grains (for U.S. excludes millet and mixed grains).  2/ Total foreign and world use adjusted to reflect the differences in world imports and exports. 3/ World imports and exports may not balance due to differences in marketing years, grain in transit, and reporting discrepancies in some countries. 4/ Argentina, Australia, Brazil, Canada, Russia, South Africa, and Ukraine. 5/ European Union, Japan, Mexico, selected North Africa and Middle East, Saudi Arabia, Southeast Asia, and South Korea. 6/ Trade excludes intra-trade. 7/ Algeria, Egypt, Iran, Israel, Jordan, Libya, Morocco, Syria, Tunisia, and Turkey. 8/ Indonesia, Malaysia, Philippines, Thailand, and Vietnam.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1"
       ],
@@ -224,6 +266,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": " 1/ Aggregate of local marketing years. 2/ Total foreign and world use adjusted to reflect the differences in world imports and exports. 3/ World imports and exports may not balance due to differences in marketing years, grain in transit, and reporting discrepancies in some countries. 4/ Argentina, Brazil, Russia, South Africa and Ukraine. 5/ Egypt, European Union, Japan, Mexico, Southeast Asia, and South Korea. 6/ Trade excludes intra-trade. 7/ Indonesia, Malaysia, Philippines, Thailand, and Vietnam.       ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -239,6 +284,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": " 1/ Aggregate of local marketing years. 2/ Total foreign and world use adjusted to reflect the differences in world imports and exports. 3/ World imports and exports may not balance due to differences in marketing years, grain in transit, and reporting discrepancies in some countries. 4/ Argentina, Brazil, Russia, South Africa and Ukraine. 5/ Egypt, European Union, Japan, Mexico, Southeast Asia, and South Korea. 6/ Trade excludes intra-trade. 7/ Indonesia, Malaysia, Philippines, Thailand, and Vietnam.       ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1"
       ],
@@ -253,6 +301,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Aggregate of local marketing years.  2/ Total foreign and world use adjusted to reflect the differences in world imports and exports. Total domestic includes both domestic use and unreported disappearance.  3/ World imports and exports may not balance due to differences in some countries.   4/ Burma, India, Pakistan, Thailand, and Vietnam.  5/ Bangladesh, China, Nigeria, European Union, Philippines, Cote d’Ivoire, Indonesia, Iran, Iraq, and Saudi Arabia. 6/ Trade excludes intra-trade.  7/ Selected Middle East includes Iran, Iraq, and Saudi Arabia. 8/ Central American and Caribbean countries.  ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -268,6 +319,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": null,
+      "sub_report_footer2": "1/ Aggregate of local marketing years.  2/ Total foreign and world use adjusted to reflect the differences in world imports and exports. Total domestic includes both domestic use and unreported disappearance.  3/ World imports and exports may not balance due to differences in some countries.   4/ Burma, India, Pakistan, Thailand, and Vietnam.  5/ Bangladesh, China, Nigeria, European Union, Philippines, Cote d’Ivoire, Indonesia, Iran, Iraq, and Saudi Arabia. 6/ Trade excludes intra-trade.  7/ Selected Middle East includes Iran, Iraq, and Saudi Arabia. 8/ Central American and Caribbean countries.  ",
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1"
       ],
@@ -282,6 +336,9 @@
       "sub_report_subtitle": "(Million 480-Pound Bales)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Marketing year beginning August 1. Totals may not add exactly and trade may not balance due to rounding and other factors.       2/ Generally reflects cotton lost or destroyed in the marketing channel; for Australia and the United States, reflects the difference between implicit stocks based on supply less total use and indicated ending stocks.  3/ Less than 5,000 bales.  4/ Includes Egypt and Syria in addition to the countries and regions listed.  5/ Azerbaijan, Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, and Uzbekistan.  6/ Benin, Burkina Faso, Cameroon, Central African Republic, Chad, Cote d'Ivoire, Mali, Niger, Senegal, and Togo.  7/ Argentina, Australia, Brazil, Lesotho, South Africa, Tanzania, Zambia, and Zimbabwe. 8/ In addition to the countries and regions listed, includes Japan, Russia, South Korea, and Taiwan. 9/ Includes intra-EU trade. ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix3",
         "matrix4"
@@ -297,6 +354,9 @@
       "sub_report_subtitle": "(Million 480-Pound Bales)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": null,
+      "sub_report_footer2": "1/ Marketing year beginning August 1. Totals may not add exactly and trade may not balance due to rounding and other factors.       2/ Generally reflects cotton lost or destroyed in the marketing channel; for Australia and the United States, reflects the difference between implicit stocks based on supply less total use and indicated ending stocks.  3/ Less than 5,000 bales.  4/ Includes Egypt and Syria in addition to the countries and regions listed.  5/ Azerbaijan, Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan, and Uzbekistan.  6/ Benin, Burkina Faso, Cameroon, Central African Republic, Chad, Cote d'Ivoire, Mali, Niger, Senegal, and Togo.  7/ Argentina, Australia, Brazil, Lesotho, South Africa, Tanzania, Zambia, and Zimbabwe. 8/ In addition to the countries and regions listed, includes Japan, Russia, South Korea, and Taiwan. 9/ Includes intra-EU trade. ",
+      "sub_report_footer3": null,
       "matrices": [
         "matrix2"
       ],
@@ -311,6 +371,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Data based on local marketing years except Argentina and Brazil which are adjusted to an October-September year.  2/ World imports and exports may not balance due to differences in local marketing years and to time lags between reported exports and imports.  Therefore, world supply may not equal world use.  3/ Includes Uruguay  4/ Includes Japan 5/ Indonesia, Malaysia, Philippines, Vietnam, and Thailand. Totals may not add due to rounding. ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix4",
         "matrix5",
@@ -327,6 +390,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Data based on local marketing years except for Argentina and Brazil which are adjusted to an October-September year.  2/ World imports and exports may not balance due to differences in local marketing years and to time lags between reported exports and imports.  Therefore, world supply may not equal world use.  3/ Argentina, Brazil, and India.  4/ Includes Japan.  5/ Indonesia, Malaysia, Philippines, Vietnam, and Thailand.  Totals may not add due to rounding. ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix4",
         "matrix5",
@@ -343,6 +409,9 @@
       "sub_report_subtitle": "(Million Metric Tons)",
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Data based on local marketing years except for Argentina and Brazil which are adjusted to an October-September year.  2/ World imports and exports may not balance due to differences in local marketing years and to time lags between reported exports and imports.  Therefore, world supply may not equal world use.  3/ Includes Paraguay  4/ Includes Bangladesh  5/ Algeria, Egypt, Morocco, and Tunisia.  Totals may not add due to rounding.   ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "matrix4",
         "matrix5",
@@ -359,6 +428,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "* Projection. 1/ Commercial production for red meats; federally inspected for poultry meats. 2/ Beef, pork, veal and lamb & mutton. 3/ Broilers, turkeys and mature chicken.  ",
+      "sub_report_footer2": "*Projection. 1/ Simple average of months. 2/ 5-Area, Direct, Total all grades 3/ National Daily Direct, Producer Sold Net Price, Live equiv. 4/ Wholesale, National Composite Weighted Average. 5/ 8-16 lbs, hens National. 6/ Grade A large, New York, volume buyers. 7/ Prices received by farmers for all milk. ",
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
@@ -374,6 +446,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": null,
+      "sub_report_footer2": "1/ Total including farm production for red meats and, for poultry, federally inspected plus non-federally inspected, less condemnations. 2/ Pounds, retail-weight basis for red meat and broilers; certified ready-to-cook weight for turkey. 3/ Population source: Dept. of Commerce. 4/ Carcass weight for red meats and certified ready-to-cook weight for poultry. 5/ Beef, pork, veal, lamb and mutton. 6/ Broilers, turkeys and mature chicken. ",
+      "sub_report_footer3": null,
       "matrices": [
         "matrix1"
       ],
@@ -388,6 +463,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": null,
+      "sub_report_footer2": null,
+      "sub_report_footer3": "Note: Totals may not add due to rounding. ",
       "matrices": [
         "matrix1",
         "matrix2"
@@ -403,6 +481,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": null,
+      "sub_report_footer2": null,
+      "sub_report_footer3": "All prices are January-December averages.  1/ Simple average of monthly prices calculated by AMS from weekly average dairy product prices for class price computations. 2/ Annual Class III and Class IV prices are the simple averages of monthly minimum Federal order milk prices paid by regulated plants for milk used in the respective classes. All milk price is the simple average of monthly prices received by farmers for milk at average test.  3/ Does not reflect any deductions from producers as authorized by legislation. ",
       "matrices": [
         "matrix1"
       ],
@@ -417,6 +498,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": " Note: Tables on pages 35-37 present a record of the October projection and the final Estimate. Using world wheat production as an example, the \"root mean square error\" means that chances are 2 out of 3 that the current forecast will not be above or below the final estimate by more than 1.6 percent.  Chances are 9 out of 10 (90% confidence level) that the difference will not exceed 2.8 percent. The average difference between the October projection and the final estimate is 7.5 million tons, ranging from 0.1 million to 27.8 million tons. The October projection has been below the estimate 32 times and above 11 times.  ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "table1"
       ],
@@ -431,6 +515,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ Marketing years 1981/82 through 2025/26 for grains, soybeans (U.S. only), and cotton. There was no WASDE published in October 2013 or October 2025, due to a partial government shutdown, so no 2013/14 or 2025/26 forecasts in that month were published for grains, soybeans, and cotton, and no 2013 or 2025 forecast was published in that month for animal products. Final for grains, soybeans, and cotton is defined as the first November estimate following the marketing year for 1981/82 through 2024/25, and for 2025/26 the last month’s estimate. 2/ Includes corn, sorghum, barley, oats, rye, millet, and mixed grain.  ",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "table1"
       ],
@@ -445,6 +532,9 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
+      "sub_report_footer": "1/ See pages 35 and 36 for record of reliability for U.S. wheat, rice, soybeans, and cotton. Marketing years 1981/82 through 2025/26 for grains, soybeans, and cotton. Final for grains, soybeans, and cotton is defined as the first November estimate following the marketing year for 1981/82 through 2025/26. Calendar years 1982 through 2025 for meats, eggs, and milk. Final for animal products is defined as the latest annual production estimate published by NASS for 1982-2025. There was no WASDE published in October 2013 or October 2025, due to a partial government shutdown, so no 2013/14 or 2025/26 forecasts in that month were published for grains, soybeans, and cotton, and no 2013 or 2025 forecast was published in that month for animal products.",
+      "sub_report_footer2": null,
+      "sub_report_footer3": null,
       "matrices": [
         "table1",
         "table2",

@@ -44,6 +44,33 @@ def test_the_builder_gives_the_packaged_tables_of_the_sampled_pages() -> None:
     assert sorted(built, key=lambda table: table.page) == expected
 
 
+def test_the_packaged_footers_are_the_parsers_by_page() -> None:
+    """A page's footers, stated once, are the ones ``parse_wasde_xml`` gives its items."""
+    checked = 0
+    for table in packaged("table", Table):
+        if table.report in SAMPLED:
+            given = [cell.sub_report_footer for cell in CELLS if cell.report == table.report]
+            stated = [table.sub_report_footer, table.sub_report_footer2, table.sub_report_footer3]
+            expected: list[str | None] = [footer for footer in stated if footer is not None]
+            expected = expected or [None]
+            assert list(dict.fromkeys(given)) == expected, table.report
+            checked += 1
+    assert checked == len(SAMPLED)
+
+
+def test_a_reliability_page_states_the_footer_of_its_item() -> None:
+    """Pages 35 to 37 carry their footer on an item (layout.md): ``table1``, ``table4``."""
+    footers = {table.report: table for table in packaged("table", Table)}
+    for report in ("sr35", "sr36", "sr37"):
+        assert footers[report].sub_report_footer, report
+        assert (footers[report].sub_report_footer2, footers[report].sub_report_footer3) == (
+            None,
+            None,
+        )
+    assert footers["sr17"].sub_report_footer is None, "page 17 prints sub_report_footer3"
+    assert footers["sr17"].sub_report_footer3
+
+
 def test_the_packaged_tables_name_the_samples_matrices() -> None:
     for table in packaged("table", Table):
         if table.report in SAMPLED:

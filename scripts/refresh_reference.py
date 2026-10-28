@@ -15,7 +15,7 @@ Johannes on 2026-10-28, G5):
 One run downloads the latest release's XML and XLS through xippios-usda-esmis's tasks,
 as ``scripts/cut_sample.py`` does: ``get_latest_release`` (one request), then
 ``download_release_file`` for each file (two requests each, the release and the file):
-three catalog requests and two downloads, about 3.8 MB, keyless, at esmis's pace. It
+three catalog requests and two downloads, about 3.7 MiB, keyless, at esmis's pace. It
 parses the XML with the package's ``parse_wasde_xml``, reads the XLS's block titles with
 xlrd, and builds the lists with ``xippios.usda.wasde._vocabulary``, whose docstring
 gives the rules; a file they do not fit (a page of 12 to 15 whose block titles are not
@@ -165,9 +165,11 @@ def build(directory: Path, release: Release) -> list[PackagedList]:
     notes = {
         "table": f"{source}: one record per page element of the XML, the attributes of the "
         "page's <Report> as printed (Name, Report_Month, sub_report_title to "
-        "sub_report_title3, sub_report_subtitle to sub_report_subtitle3), the number that "
-        "ends page_title, and the element names of the page's report items in document "
-        "order.",
+        "sub_report_title3, sub_report_subtitle to sub_report_subtitle3, sub_report_footer "
+        "to sub_report_footer3; on a page whose <Report> holds no footer, the "
+        "sub_report_footer of its one report item that carries it, pages 35 to 37), the "
+        "number that ends page_title, and the element names of the page's report items in "
+        "document order.",
         "commodity": f"{source}, and from {xls.name} of the same release, complete at "
         f"{xls.retrieved_at}: one record per report item of the supply-and-use pages 11 to "
         "30, 32 and 33, its table the "
@@ -205,7 +207,8 @@ def provenance(packaged: list[PackagedList], release: Release) -> None:
     xml, xls = release.files["xml"], release.files["xls"]
     origin = f"ESMIS release {release.release_id} of {release.release_date}"
     origins = {
-        "table": f"`{xml.name}`, {origin}, its pages' `<Report>` attributes",
+        "table": f"`{xml.name}`, {origin}, its pages' `<Report>` attributes and the "
+        "reliability items' footers",
         "commodity": f"`{xml.name}` and `{xls.name}`, {origin}, the XML's report items of "
         "pages 11 to 30, 32 and 33 and the XLS's block titles of pages 12 to 15",
         "region": f"`{xml.name}`, {origin}, its `region` texts",

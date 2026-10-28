@@ -156,7 +156,8 @@ class Table(UpstreamModel):
 
     One record per page element, ``sr08`` to ``sr37``, read from the attributes of the
     page's ``<Report>`` and the names of its report items, as printed
-    (``reference/table.json``).
+    (``reference/table.json``): its titles, subtitles and footers, stated once here for
+    the page.
 
     Attributes:
         report: The page's ``Name``, e.g. ``"sr12"``: what a ``WasdeXmlCell``'s
@@ -176,6 +177,17 @@ class Table(UpstreamModel):
             of October 2026.
         sub_report_subtitle3: ``sub_report_subtitle3`` as printed, on page 9 (October
             2026), ``"Million 480-lb. Bales"``; ``None`` elsewhere.
+        sub_report_footer: The page's footnotes as printed, ``sub_report_footer`` of its
+            ``<Report>``, e.g. ``"1/ Aggregate of local marketing years. ..."``; on the
+            reliability pages 35 to 37, whose ``<Report>`` holds none, the
+            ``sub_report_footer`` of the one report item that carries it (``table1``,
+            ``table4``); ``None`` where the page has none. Stated once here for the page
+            (Johannes, 2026-10-28, G5 inside PR 5).
+        sub_report_footer2: ``sub_report_footer2`` as printed, the second table's
+            footnotes, e.g. on pages 9, 25, 27, 31 and 32 (October 2026); ``None`` where
+            the page has none.
+        sub_report_footer3: ``sub_report_footer3`` as printed, e.g. on pages 16, 17, 33
+            and 34 (October 2026); ``None`` where the page has none.
         matrices: The page's report items in document order, their element names as
             printed, e.g. ``["matrix1", "matrix2"]``, ``["matrix3", "matrix4"]`` on page
             26, ``["table1", "table2", "table3", "table4"]`` on page 37: the values a
@@ -191,6 +203,9 @@ class Table(UpstreamModel):
     sub_report_subtitle: str | None
     sub_report_subtitle2: str | None
     sub_report_subtitle3: str | None
+    sub_report_footer: str | None
+    sub_report_footer2: str | None
+    sub_report_footer3: str | None
     matrices: list[str]
     report_month: str
 
