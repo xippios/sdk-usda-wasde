@@ -197,17 +197,33 @@ def test_get_release_refuses_a_month_not_written_yyyy_mm(
     assert sent_urls(listed) == [], "refused before anything is sent"
 
 
-def test_a_release_without_an_xml_file_is_refused_naming_its_formats() -> None:
-    """Every release before 2010-07-09 has none (layout.md); one is built from page 0's."""
-    october = page_0()[0]
-    pdf_only = october.model_copy(update={"files": [october.files[0], october.files[1]]})
+def without_xml(release: EsmisRelease) -> EsmisRelease:
+    """A recorded release with its PDF and TXT only, as the releases before 2010-07 are."""
+    return release.model_copy(update={"files": release.files[:2]})
+
+
+def test_a_month_without_an_xml_file_is_refused_naming_its_formats() -> None:
+    """Every month before 2010-07 has none (layout.md); built from page 0's releases."""
+    october = tasks._release(without_xml(page_0()[0]))
     with pytest.raises(NotFoundError) as caught:
-        tasks._xml_file(tasks._release(pdf_only))
+        tasks._with_xml([october], "2026-10")
     assert str(caught.value) == (
-        "WASDE release 796099 of 2026-10 (2026-10-09) has no XML file; its formats: pdf, "
+        "no WASDE release of 2026-10 has an XML file: release 796099 (2026-10-09) has pdf, "
         "txt. Of the WASDE releases ESMIS lists, the first with an XML file is that of "
         "2010-07-09 (release 95659)."
     )
+
+
+def test_a_month_answers_its_latest_release_with_an_xml_file() -> None:
+    """As 2014-01 does, whose later release carries an ASC file only (layout.md).
+
+    Built from page 0's releases, no recording: ESMIS's page 0 lists one release a month.
+    """
+    september, october = page_0()[1], page_0()[0]
+    later_without = [tasks._release(without_xml(october)), tasks._release(september)]
+    assert tasks._with_xml(later_without, "2026-10").id == "796054"
+    both = [tasks._release(october), tasks._release(september)]
+    assert tasks._with_xml(both, "2026-10").id == "796099", "the latest release time"
 
 
 @pytest.mark.anyio

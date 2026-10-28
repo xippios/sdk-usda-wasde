@@ -113,18 +113,32 @@ def _month_bounds(month: str) -> tuple[date, date]:
     return date(year, number, 1), date(year, number, calendar.monthrange(year, number)[1])
 
 
-def _xml_file(release: Release) -> ReleaseFile:
-    """The release's first XML file, the one esmis's download takes; none is refused."""
-    xml = next((file for file in release.files if file.format == "xml"), None)
-    if xml is None:
-        formats = ", ".join(dict.fromkeys(file.format for file in release.files)) or "none"
-        raise NotFoundError(
-            f"WASDE release {release.id} of {release.month} "
-            f"({release.release_datetime:%Y-%m-%d}) has no XML file; its formats: {formats}. "
-            f"Of the WASDE releases ESMIS lists, {FIRST_XML_RELEASE}.",
-            source=SOURCE,
-        )
-    return xml
+def _formats(release: Release) -> str:
+    """The release's formats in ESMIS's order, each once, e.g. ``"pdf, txt"``."""
+    return ", ".join(dict.fromkeys(file.format for file in release.files)) or "none"
+
+
+def _with_xml(releases: list[Release], month: str) -> Release:
+    """Of a month's releases, the latest that carries an XML file; none is refused.
+
+    The latest by release time, the first ESMIS lists where several share it (Johannes,
+    2026-10-28, G5 inside PR 3): in 2010-12 and 2014-01 a later release carries a TXT or
+    an ASC file only, and the month answers the earlier release's XML.
+    """
+    carrying = [
+        release for release in releases if any(file.format == "xml" for file in release.files)
+    ]
+    if carrying:
+        return max(carrying, key=lambda release: release.release_datetime)
+    listed = "; ".join(
+        f"release {release.id} ({release.release_datetime:%Y-%m-%d}) has {_formats(release)}"
+        for release in releases
+    )
+    raise NotFoundError(
+        f"no WASDE release of {month} has an XML file: {listed}. Of the WASDE releases "
+        f"ESMIS lists, {FIRST_XML_RELEASE}.",
+        source=SOURCE,
+    )
 
 
 async def list_releases_async(
@@ -189,18 +203,19 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
 
     A bulk task, Python only: neither the MCP server nor the HTTP router serves it
     (``BULK_TASKS``). The release is the latest, or the one of ``month`` with the latest
-    release time (the first ESMIS lists where several share it); its XML file is
-    downloaded through xippios-usda-esmis's ``download_release_file`` into a temporary
-    directory, parsed with ``parse.wasde_xml.parse_wasde_xml``, and the directory
-    removed. The records are the values of printed pages 8 to 37 in page order, each
+    release time that carries an XML file, the first ESMIS lists where several share it
+    (in 2010-12 and 2014-01 a later release carries a TXT or an ASC file only). Its XML
+    file is downloaded through xippios-usda-esmis's ``download_release_file`` into a
+    temporary directory, parsed with ``parse.wasde_xml.parse_wasde_xml``, and the
+    directory removed. The records are the values of printed pages 8 to 37 in page order, each
     with the labels its page prints (``WasdeXmlCell``): 6543 for October 2026, 5913
     table values and 630 reliability statistics. Requests: the latest release 1, or the
     month's pages of ``list_releases``, 25 releases a page from the newest back to the
     month (1 for a month of the last two years); then the release 1 and the file 1,
     3.4 MB for October 2026. A month without a release raises ``NotFoundError``
-    naming the latest release's month, a release without an XML file (every release
-    before 2010-07-09) ``NotFoundError`` naming the formats it has, and a month not
-    written ``"YYYY-MM"`` ``InvalidRequestError``.
+    naming the latest release's month, a month whose releases carry no XML file (every
+    month before 2010-07) ``NotFoundError`` naming the formats they have and the first
+    release with one, and a month not written ``"YYYY-MM"`` ``InvalidRequestError``.
 
     Args:
         month: The release month, ``"YYYY-MM"``, e.g. ``"2026-10"``, or ``"2026-06"``,
@@ -208,7 +223,8 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
             (``wasde0626v2.xml``); ``None`` (the default) reads the latest release.
     """
     if month is None:
-        release = _release((await esmis.get_latest_release_async(PUBLICATION)).data)
+        latest = _release((await esmis.get_latest_release_async(PUBLICATION)).data)
+        release = _with_xml([latest], latest.month)
     else:
         since, until = _month_bounds(month)
         listed = await esmis.list_releases_async(PUBLICATION, since=since, until=until)
@@ -220,8 +236,7 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
                 f"{latest.release_datetime:%Y-%m-%d})",
                 source=SOURCE,
             )
-        release = _release(max(listed.data, key=lambda item: item.release_datetime))
-    _xml_file(release)  # refused before anything is downloaded
+        release = _with_xml([_release(item) for item in listed.data], month)
     with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
         dest = Path(directory) / "release.xml"
         downloaded = await esmis.download_release_file_async(int(release.id), "xml", dest)
