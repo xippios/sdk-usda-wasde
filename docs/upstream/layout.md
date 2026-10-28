@@ -125,7 +125,7 @@ page 31's `Textbox17` and `m2_formatfiller7` (`Annual`, over rows without values
 `commodity_attribute2` (`Percent`, as `Textbox41` and `textbox4` on pages 36 and 37). The
 U.S. pages print a commodity heading over each matrix (`FEED GRAINS` and `CORN` on page
 12, `SORGHUM`, `BARLEY` and `OATS` on page 13) that no attribute of the file holds: there
-the matrix tells the commodities apart.
+the matrix tells the commodities apart, and the XLS prints the heading (below).
 
 ### Labels as printed
 
@@ -231,6 +231,12 @@ out as the page prints it, which differs from sheet to sheet:
   (`Million Acres` in column 9 of row 10 on `Page 11`);
 - `filler` as text where the XML has a filler cell (a blank line between groups on
   `Page 8`);
+- on `Page 12` to `Page 15`, a block title in column 0 of each block's header row, the
+  row whose other cells hold the market years (`FEED GRAINS` in row 8 and `CORN` in row
+  29 of `Page 12`; `TOTAL RICE`, `LONG-GRAIN RICE`, `MEDIUM & SHORT-GRAIN RICE` on
+  `Page 14`; `SOYBEANS`, `SOYBEAN OIL`, `SOYBEAN MEAL` on `Page 15`), one per matrix of
+  the XML's page, in the same order; `Page 11`, `Page 16` and `Page 17` leave column 0
+  of their header row empty (read with xlrd on 2026-10-28 from the file above);
 - the footnotes in the last row, in column 0.
 
 Value columns are not contiguous on some sheets: `Page 11` has 13 columns, its first
