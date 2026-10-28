@@ -148,7 +148,6 @@ def build(directory: Path, release: Release) -> list[PackagedList]:
     """
     xml, xls = release.files["xml"], release.files["xls"]
     cells = parse_wasde_xml(directory / xml.path)
-    month = cells[0].report_month
     titles = vocabulary.block_titles(directory / xls.path)
     lists: dict[str, list[UpstreamModel]] = {
         "table": list(vocabulary.tables(directory / xml.path)),
@@ -156,6 +155,7 @@ def build(directory: Path, release: Release) -> list[PackagedList]:
         "region": list(vocabulary.regions(cells)),
         "attribute": list(vocabulary.attributes(cells)),
     }
+    month = cells[0].report_month  # one month, or regions refused the records
     source = (
         f"Read from {xml.name} of ESMIS release {release.release_id} (released "
         f"{release.release_date}, Report_Month {month!r}), downloaded through "
