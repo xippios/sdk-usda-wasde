@@ -98,7 +98,7 @@ of this section gives each matrix's chain.
 | `cell_value1` to `cell_value6` | pages 8 to 30, 33, 34 | 5414 | a value as printed |
 | `m1_cell_value1`, `m2_cell_value1` | pages 31, 32 | 475 | a value as printed |
 | `wb_value` | page 16, the Mexico sugar table | 24 | a value as printed |
-| `m1_unit_descr1` to `m1_unit_descr5`, `m2_unit_descr1` | pages 11, 12, 14 to 17, 33, 34 | 1422 | a unit as printed, on a row of its own before the rows it governs (`Million Acres` before `Area Planted`); empty in the columns where the page prints none |
+| `m1_unit_descr1` to `m1_unit_descr5`, `m2_unit_descr1` | pages 11, 12, 14 to 17, 33, 34 | 1422 | a unit as printed, on a row of its own (`Million Acres` before `Area Planted`), empty in the columns where the page prints none; the file repeats each unit row in every row group of its matrix, with its text (page 12's `Million Acres`, `Metric Tons` and `Million Metric Tons` in all 13 groups of its first matrix), and does not say which of them the page shows |
 | `TextboxN`, `FormatFillerN`, `ReportFillerN`, `m1_filler2`, `m1_filler4`, `m2_filler2`, `m2_filler4`, `m3_filler2`, `m3_filler4`, `m1_formatfiller10` | most pages | 3126 | `filler` or `Filler` (36 `m1_filler2` cells on page 15 hold `1` to `4`): layout, no value of the table |
 | none | most pages | 1090 | an empty `<Cell />` |
 
@@ -112,7 +112,19 @@ be split over several unit cells where the page prints it on two lines
 
 Units also stand on elements: `m1_unit_description1` and `m2_unit_description1` (pages
 31, 32), `m2_unit_descr1` (page 11) and `m2_Unit_Description1` (page 16) are attributes
-of the elements in a value's path.
+of the elements in a value's path. Each holds the text of its own column's cell, so a unit
+printed across columns is split over them (`Million` over Broiler and ` Pounds` over
+Turkey on page 31, `Million` and `Bushels` over two of page 11's six classes), and the
+other columns hold an empty one.
+
+Other attributes on elements are layout text, not labels of a value: `m1_filler1` and its
+like (`Filler`), page 13's `Textbox2` in a value's path (`Million Bushels` in 42 of 168),
+page 31's `Textbox17` and `m2_formatfiller7` (`Annual`, over rows without values), page
+34's `m1_attribute_title1` (`Milk Prices 2/` once, empty six times), and page 35's
+`commodity_attribute2` (`Percent`, as `Textbox41` and `textbox4` on pages 36 and 37). The
+U.S. pages print a commodity heading over each matrix (`FEED GRAINS` and `CORN` on page
+12, `SORGHUM`, `BARLEY` and `OATS` on page 13) that no attribute of the file holds: there
+the matrix tells the commodities apart.
 
 ### Labels as printed
 
