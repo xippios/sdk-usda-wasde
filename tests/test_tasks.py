@@ -362,7 +362,7 @@ type Packaged = tuple[str, Callable[..., Any], type[UpstreamModel], int]
 
 PACKAGED: list[Packaged] = [
     ("table", tasks.list_tables, Table, 30),
-    ("commodity", tasks.list_commodities, Commodity, 40),
+    ("commodity", tasks.list_commodities, Commodity, 43),
     ("region", tasks.list_regions, Region, 70),
 ]
 
@@ -413,6 +413,7 @@ SEARCHES: list[tuple[Callable[..., Any], str, list[str]]] = [
     (tasks.list_tables, "Million 480-lb", ["sr09"]),
     (tasks.list_commodities, "sr13", ["SORGHUM", "BARLEY", "OATS"]),
     (tasks.list_commodities, "mexico", ["Sugar"]),
+    (tasks.list_commodities, "sr33", ["Egg", "Milk"]),
     (tasks.list_commodities, "grain rice", ["LONG-GRAIN RICE", "MEDIUM & SHORT-GRAIN RICE"]),
     (
         tasks.list_regions,

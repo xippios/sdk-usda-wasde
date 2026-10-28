@@ -55,6 +55,6 @@ was read from, Fetched the file's `fetched`, the UTC time the XML was complete.
 | File | Origin | Fetched |
 | --- | --- | --- |
 | `table.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its pages' `<Report>` attributes (30 records) | 2026-10-28T16:26:51Z |
-| `commodity.json` | `wasde1026.xml` and `wasde1026.xls`, ESMIS release 796099 of 2026-10-09, the XML's report items of pages 11 to 30 and the XLS's block titles of pages 12 to 15 (40 records) | 2026-10-28T16:26:51Z |
+| `commodity.json` | `wasde1026.xml` and `wasde1026.xls`, ESMIS release 796099 of 2026-10-09, the XML's report items of pages 11 to 30, 32 and 33 and the XLS's block titles of pages 12 to 15 (43 records) | 2026-10-28T16:26:51Z |
 | `region.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its `region` texts (70 records) | 2026-10-28T16:26:51Z |
 | `attribute.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its `attribute` texts by page and item (451 records) | 2026-10-28T16:26:51Z |

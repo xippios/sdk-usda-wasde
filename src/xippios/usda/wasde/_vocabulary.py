@@ -10,8 +10,10 @@ call time.
   attributes of the page's ``<Report>`` (``Name``, ``Report_Month``, the number that ends
   ``page_title``, ``sub_report_title`` to ``sub_report_title3``, ``sub_report_subtitle``
   to ``sub_report_subtitle3``) and the element names of its report items, as printed.
-- ``commodities``: one ``Commodity`` per report item of pages 11 to 30, the U.S. and the
-  world supply-and-use pages, in file order. Its ``table`` is the title
+- ``commodities``: one ``Commodity`` per report item of the supply-and-use pages, the
+  U.S. pages 11 to 17, 32 and 33 and the world pages 18 to 30, in file order (Johannes,
+  2026-10-28, G5; pages 32 and 33 by the session, 2026-10-28, rule 7). Its ``table`` is
+  the title
   ``parse_wasde_xml`` gives the item; its ``region`` the region that title starts with,
   ``U.S.`` read as ``"United States"`` (as the world pages' rows print it), ``Mexico``
   and ``World`` as printed (Johannes, 2026-10-28, G5). Its ``commodity``, which the XML
@@ -20,7 +22,8 @@ call time.
   in the order of the page's report items, and the Nth title goes to the Nth item. On
   the other pages it is the title's words between its region and ``Supply and Use`` (a
   ``by Class:`` before it left out), as printed: ``"Wheat"`` from ``"U.S. Wheat by Class:
-  Supply and Use"``, ``"Coarse Grain"`` from ``"World Coarse Grain Supply and Use  1/"``.
+  Supply and Use"``, ``"Coarse Grain"`` from ``"World Coarse Grain Supply and Use  1/"``,
+  ``"Meats"`` from ``"U.S. Meats Supply and Use"``.
 - ``regions``: one ``Region`` per distinct ``region`` text of the records, in the order
   of its first appearance, with the pages that print it.
 - ``attributes``: one ``Attribute`` per distinct ``report``, ``matrix`` and
@@ -28,7 +31,7 @@ call time.
   none.
 
 A file these rules do not fit raises ``ValidationError`` naming the page, and the
-refresh script writes nothing: a page of 11 to 30 without values, a title that does not
+refresh script writes nothing: a supply-and-use page without values, a title that does not
 start with ``U.S.``, ``Mexico`` or ``World`` and name a commodity before ``Supply and
 Use``, a page of 12 to 15 whose XLS block titles are not as many as its report items, a
 sheet the XLS lacks, more than one ``Report_Month``, a page without a printed number.
@@ -59,9 +62,11 @@ __all__ = [
     "tables",
 ]
 
-COMMODITY_PAGES = range(11, 31)
-"""The printed pages whose report items are the commodity list's: the U.S. supply-and-use
-pages 11 to 17 and the world pages 18 to 30."""
+COMMODITY_PAGES = (*range(11, 31), 32, 33)
+"""The printed pages whose report items are the commodity list's, the supply-and-use
+pages: the U.S. pages 11 to 17, 32 and 33 and the world pages 18 to 30. Pages 8 to 10
+(the world and U.S. aggregates), 31 (quarterly production and prices), 34 (dairy prices)
+and 35 to 37 (reliability) are not."""
 BLOCK_PAGES = (12, 13, 14, 15)
 """The printed pages whose commodities are the XLS's block titles: the XML names the
 commodity of none of their report items, and their titles name several
@@ -191,7 +196,7 @@ def block_titles(path: str | PathLike[str]) -> dict[str, list[str]]:
 def commodities(
     records: Sequence[WasdeXmlCell], titles: Mapping[str, Sequence[str]]
 ) -> list[Commodity]:
-    """One ``Commodity`` per report item of pages 11 to 30, in file order.
+    """One ``Commodity`` per report item of the supply-and-use pages, in file order.
 
     Args:
         records: Every record of the release's XML, as ``parse_wasde_xml`` reads it.
@@ -199,7 +204,7 @@ def commodities(
             ``{"sr12": ["FEED GRAINS", "CORN"], ...}``.
 
     Raises:
-        ValidationError: A page of 11 to 30 has no values; an item's title does not
+        ValidationError: A page of ``COMMODITY_PAGES`` has no values; an item's title does not
             start with ``U.S.``, ``Mexico`` or ``World`` and name a commodity before
             ``Supply and Use``; a page of 12 to 15 has no block titles, or not as many as
             report items. The message names the page.
@@ -213,7 +218,10 @@ def commodities(
         report = report_name(page)
         on_page = items.get(report)
         if not on_page:
-            _refuse(f"{report} has no values; the commodity list reads pages 11 to 30", report)
+            _refuse(
+                f"{report} has no values; the commodity list reads pages 11 to 30, 32 and 33",
+                report,
+            )
         blocks: Sequence[str] = ()
         if page in BLOCK_PAGES:
             blocks = titles.get(report, ())

@@ -85,7 +85,7 @@ BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 # name (conventions §8, ADR-0016). None here: every tool keeps the default, 200 rows or
 # 64 KB. list_releases called without since answers every WASDE release (703 on
 # 2026-10-28), and its docstring tells an agent to bound it; the three packaged lists fit
-# whole, list_tables 30 rows, list_commodities 40 and list_regions 70, the largest
+# whole, list_tables 30 rows, list_commodities 43 and list_regions 70, the largest
 # result list_tables's 9,312 bytes of compact JSON (October 2026).
 
 PUBLICATION = "wasde"
@@ -360,22 +360,23 @@ async def list_tables_async(search: str | None = None) -> Result[list[Table]]:
 
 
 async def list_commodities_async(search: str | None = None) -> Result[list[Commodity]]:
-    """WASDE's supply-and-use matrices of pages 11 to 30 with their commodities, from the package.
+    """WASDE's supply-and-use matrices with their commodities, from the packaged list.
 
     Answered without a request from the list the package read from the October 2026
-    release's XML and XLS (``reference/commodity.json``): 40 matrices of 20 commodities,
+    release's XML and XLS (``reference/commodity.json``): 43 matrices of 23 commodities,
     each with its ``commodity`` as the files print it, its ``region`` (``"United
-    States"`` on the U.S. pages 11 to 17, ``"Mexico"`` for page 16's second matrix,
+    States"`` on the U.S. pages 11 to 17, 32 and 33, ``"Mexico"`` for page 16's second matrix,
     ``"World"`` on the world pages 18 to 30, whose matrices hold the world and its
     regions), its ``report`` and ``matrix``, which together name the matrix's
     ``WasdeXmlCell`` records, and its ``table``, the title. The XML names none of these
     commodities: on pages 12 to 15 they are the XLS's block titles, upper case as
     printed (``"FEED GRAINS"``, ``"CORN"``, ``"SOYBEAN MEAL"``), matched to the matrices
-    by position; elsewhere the title's words (``"Wheat"``, ``"Coarse Grain"``). A world
-    commodity spans two pages, the past years and the projection by month (wheat, coarse
-    grain, corn, rice, cotton), or one page of three matrices (soybean, soybean meal,
-    soybean oil). Pages 8 to 10 (the aggregates) and 31 to 37 are not in the list; page
-    31 onwards names its commodities in its rows. ``meta.vintage`` is the release's
+    by position; elsewhere the title's words (``"Wheat"``, ``"Coarse Grain"``,
+    ``"Meats"``, ``"Egg"``, ``"Milk"``). A world commodity spans two pages, the past
+    years and the projection by month (wheat, coarse grain, corn, rice, cotton), or one
+    page of three matrices (soybean, soybean meal, soybean oil). Pages 8 to 10 (the
+    aggregates), 31 (quarterly production and prices), 34 (dairy prices) and 35 to 37
+    (reliability) are not in the list. ``meta.vintage`` is the release's
     ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when the XML was
     downloaded and ``meta.endpoint`` the XML.
 

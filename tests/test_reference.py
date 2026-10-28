@@ -6,7 +6,7 @@ are verbatim cuts of the same file, pages 8, 9, 11, 12, 13, 16, 24 and 31 to 37.
 pages the samples hold, the builder gives the packaged tables, regions and attributes,
 and every packaged commodity matrix and region is one the samples print. The commodity
 rule is checked on records shaped as the whole file's from the packaged list, since the
-samples lack pages 14, 15, 17 to 23 and 25 to 30, and no XLS sample exists: the XLS's
+samples lack pages 14, 15, 17 to 23, 25 to 30 and 33, and no XLS sample exists: the XLS's
 block titles are read by the live test only. The refusals are tested on records changed
 in the test, never on a fixture file.
 """
@@ -89,7 +89,7 @@ def test_every_packaged_region_is_printed_on_its_sampled_pages() -> None:
 def test_every_packaged_commodity_matrix_of_a_sampled_page_is_the_samples() -> None:
     held = {(cell.report, cell.matrix): cell.table for cell in CELLS}
     rows = [row for row in packaged("commodity", Commodity) if row.report in SAMPLED]
-    assert {row.report for row in rows} == {"sr11", "sr12", "sr13", "sr16", "sr24"}
+    assert {row.report for row in rows} == {"sr11", "sr12", "sr13", "sr16", "sr24", "sr32"}
     for row in rows:
         assert held.get((row.report, row.matrix)) == row.table, (row.report, row.matrix)
     on_pages = {key for key in held if int(key[0][2:]) in vocabulary.COMMODITY_PAGES}
@@ -120,6 +120,23 @@ def titles() -> dict[str, list[str]]:
 
 def test_the_commodity_rule_gives_the_packaged_list() -> None:
     assert vocabulary.commodities(whole_file(), titles()) == packaged("commodity", Commodity)
+
+
+def test_the_commodity_list_reads_the_supply_and_use_pages() -> None:
+    """Pages 11 to 30, 32 and 33 (G5; the session, 2026-10-28, rule 7), every item each."""
+    rows = packaged("commodity", Commodity)
+    assert list(dict.fromkeys(int(row.report[2:]) for row in rows)) == [
+        *range(11, 31),
+        32,
+        33,
+    ]
+    us = [(row.report, row.matrix, row.commodity) for row in rows if row.report in {"sr32", "sr33"}]
+    assert us == [
+        ("sr32", "matrix1", "Meats"),
+        ("sr33", "matrix1", "Egg"),
+        ("sr33", "matrix2", "Milk"),
+    ]
+    assert {row.region for row in rows if row.report in {"sr32", "sr33"}} == {"United States"}
 
 
 def test_the_block_titles_of_pages_12_to_15_are_the_xls_headings() -> None:
@@ -179,7 +196,7 @@ def test_a_title_the_rule_cannot_read_is_refused() -> None:
         vocabulary.commodities(records, titles())
 
 
-def test_a_page_of_11_to_30_without_values_is_refused() -> None:
+def test_a_supply_and_use_page_without_values_is_refused() -> None:
     with pytest.raises(ValidationError, match="sr14 has no values"):
         vocabulary.commodities(CELLS, titles())
 

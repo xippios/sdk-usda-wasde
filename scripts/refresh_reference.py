@@ -5,8 +5,8 @@ and written with core's ``PackagedList.write`` (conventions §3, ADR-0022; decid
 Johannes on 2026-10-28, G5):
 
 - ``reference/table.json``: one record per page of the XML (``Table``);
-- ``reference/commodity.json``: one record per supply-and-use matrix of pages 11 to 30
-  with its commodity (``Commodity``), on pages 12 to 15 the XLS's block title by
+- ``reference/commodity.json``: one record per supply-and-use matrix, pages 11 to 30, 32
+  and 33, with its commodity (``Commodity``), on pages 12 to 15 the XLS's block title by
   position;
 - ``reference/region.json``: every distinct ``region`` text of the XML (``Region``);
 - ``reference/attribute.json``: every distinct ``report``, ``matrix`` and ``attribute``
@@ -169,14 +169,15 @@ def build(directory: Path, release: Release) -> list[PackagedList]:
         "ends page_title, and the element names of the page's report items in document "
         "order.",
         "commodity": f"{source}, and from {xls.name} of the same release, complete at "
-        f"{xls.retrieved_at}: one record per report item of pages 11 to 30, its table the "
+        f"{xls.retrieved_at}: one record per report item of the supply-and-use pages 11 to "
+        "30, 32 and 33, its table the "
         "title parse_wasde_xml gives the item, its region the region the title starts "
         "with (U.S. as 'United States', Mexico, World). The commodity on pages 12 to 15 is "
         "the XLS's block title by position: sheet 'Page N' prints a title in column 0 of "
         "each block's header row (a row whose other cells hold market years, such as '2024/25'), "
         "in the order of the XML's report items of page N, and the Nth title is the Nth "
         "item's; the script writes only when every page has as many titles as report "
-        f"items ({counts}). On pages 11 and 16 to 30 the commodity is the title's words "
+        f"items ({counts}). On pages 11, 16 to 30, 32 and 33 the commodity is the title's words "
         "between its region and 'Supply and Use' (a 'by Class:' before it left out), as "
         "printed.",
         "region": f"{source}: every distinct region text of the XML's records as printed, "
@@ -206,7 +207,7 @@ def provenance(packaged: list[PackagedList], release: Release) -> None:
     origins = {
         "table": f"`{xml.name}`, {origin}, its pages' `<Report>` attributes",
         "commodity": f"`{xml.name}` and `{xls.name}`, {origin}, the XML's report items of "
-        "pages 11 to 30 and the XLS's block titles of pages 12 to 15",
+        "pages 11 to 30, 32 and 33 and the XLS's block titles of pages 12 to 15",
         "region": f"`{xml.name}`, {origin}, its `region` texts",
         "attribute": f"`{xml.name}`, {origin}, its `attribute` texts by page and item",
     }

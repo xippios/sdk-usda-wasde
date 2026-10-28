@@ -156,7 +156,7 @@ class Table(UpstreamModel):
 
     One record per page element, ``sr08`` to ``sr37``, read from the attributes of the
     page's ``<Report>`` and the names of its report items, as printed
-    (``reference/tables.json``).
+    (``reference/table.json``).
 
     Attributes:
         report: The page's ``Name``, e.g. ``"sr12"``: what a ``WasdeXmlCell``'s
@@ -196,23 +196,24 @@ class Table(UpstreamModel):
 
 
 class Commodity(UpstreamModel):
-    """One supply-and-use matrix of pages 11 to 30, with its commodity: a ``list_commodities`` row.
+    """One supply-and-use matrix, with its commodity: a ``list_commodities`` row.
 
-    One record per report item of the U.S. pages 11 to 17 and the world pages 18 to 30
-    (``reference/commodities.json``). The XML names the commodity of none of them: on
-    pages 12 to 15 it is the XLS's block title, the Nth of sheet ``Page N`` for the page's
-    Nth report item (``FEED GRAINS``, ``CORN``); on the other pages it is the commodity
-    the page's title names. Pages 8 to 10 (the world and U.S. aggregates) and 31 to 37 are
-    not in the list.
+    One record per report item of the supply-and-use pages, the U.S. pages 11 to 17, 32
+    and 33 and the world pages 18 to 30 (``reference/commodity.json``). The XML names the
+    commodity of none of them: on pages 12 to 15 it is the XLS's block title, the Nth of
+    sheet ``Page N`` for the page's Nth report item (``FEED GRAINS``, ``CORN``); on the
+    other pages it is the commodity the item's title names. Pages 8 to 10 (the world and
+    U.S. aggregates), 31 (quarterly production and prices), 34 (dairy prices) and 35 to 37
+    (reliability) are not in the list.
 
     Attributes:
         commodity: The commodity as printed: on pages 12 to 15 the XLS block title
-            verbatim, e.g. ``"CORN"``, ``"SOYBEAN MEAL"``; on pages 11 and 16 to 30 the
-            words of the item's title between its region and ``Supply and Use`` (or
-            ``by Class: Supply and Use``), e.g. ``"Wheat"``, ``"Coarse Grain"``,
-            ``"Soybean Oil"``.
+            verbatim, e.g. ``"CORN"``, ``"SOYBEAN MEAL"``; on pages 11, 16 to 30, 32 and
+            33 the words of the item's title between its region and ``Supply and Use``
+            (or ``by Class: Supply and Use``), e.g. ``"Wheat"``, ``"Coarse Grain"``,
+            ``"Meats"``, ``"Milk"``.
         region: The region the item's title names: ``"United States"`` for a title that
-            starts ``U.S.`` (pages 11 to 17), ``"Mexico"`` for page 16's second item,
+            starts ``U.S.`` (pages 11 to 17, 32, 33), ``"Mexico"`` for page 16's second item,
             ``"World"`` for the world pages 18 to 30, whose matrices hold the world and
             its regions, as ``list_regions`` prints them.
         report: The page's ``Name``, e.g. ``"sr12"``.
@@ -235,7 +236,7 @@ class Region(UpstreamModel):
     """One region a WASDE release's XML prints, with the pages it is on: a ``list_regions`` row.
 
     One record per distinct ``region`` text of the file, in the order of its first
-    appearance (``reference/regions.json``): the rows of the world pages 18 to 30, page
+    appearance (``reference/region.json``): the rows of the world pages 18 to 30, page
     9's cotton table and the reliability pages 35 and 36. The U.S. pages print no region
     text.
 
@@ -257,7 +258,7 @@ class Attribute(UpstreamModel):
     r"""One row label of a WASDE table: an ``attribute`` a matrix of the XML prints.
 
     One record per distinct ``report``, ``matrix`` and ``attribute`` of the file, in file
-    order (``reference/attributes.json``); a value without an ``attribute`` (page 31,
+    order (``reference/attribute.json``); a value without an ``attribute`` (page 31,
     page 37's tables 2 to 4, which name their rows by commodity) gives none. Packaged for
     the tasks that name a table's rows; no task answers with it in 0.1.0.
 

@@ -2,7 +2,7 @@
   "param": "commodity",
   "endpoint": "wasde1026.xml",
   "fetched": "2026-10-28T16:26:51Z",
-  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z, and from wasde1026.xls of the same release, complete at 2026-10-28T16:26:56Z: one record per report item of pages 11 to 30, its table the title parse_wasde_xml gives the item, its region the region the title starts with (U.S. as 'United States', Mexico, World). The commodity on pages 12 to 15 is the XLS's block title by position: sheet 'Page N' prints a title in column 0 of each block's header row (a row whose other cells hold market years, such as '2024/25'), in the order of the XML's report items of page N, and the Nth title is the Nth item's; the script writes only when every page has as many titles as report items (sr12 2, sr13 3, sr14 3, sr15 3). On pages 11 and 16 to 30 the commodity is the title's words between its region and 'Supply and Use' (a 'by Class:' before it left out), as printed.",
+  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z, and from wasde1026.xls of the same release, complete at 2026-10-28T16:26:56Z: one record per report item of the supply-and-use pages 11 to 30, 32 and 33, its table the title parse_wasde_xml gives the item, its region the region the title starts with (U.S. as 'United States', Mexico, World). The commodity on pages 12 to 15 is the XLS's block title by position: sheet 'Page N' prints a title in column 0 of each block's header row (a row whose other cells hold market years, such as '2024/25'), in the order of the XML's report items of page N, and the Nth title is the Nth item's; the script writes only when every page has as many titles as report items (sr12 2, sr13 3, sr14 3, sr15 3). On pages 11, 16 to 30, 32 and 33 the commodity is the title's words between its region and 'Supply and Use' (a 'by Class:' before it left out), as printed.",
   "records": [
     {
       "commodity": "Wheat",
@@ -322,6 +322,30 @@
       "report": "sr30",
       "matrix": "matrix6",
       "table": "World Soybean Oil Supply and Use  1/",
+      "report_month": "October 2026"
+    },
+    {
+      "commodity": "Meats",
+      "region": "United States",
+      "report": "sr32",
+      "matrix": "matrix1",
+      "table": "U.S. Meats Supply and Use",
+      "report_month": "October 2026"
+    },
+    {
+      "commodity": "Egg",
+      "region": "United States",
+      "report": "sr33",
+      "matrix": "matrix1",
+      "table": "U.S. Egg Supply and Use",
+      "report_month": "October 2026"
+    },
+    {
+      "commodity": "Milk",
+      "region": "United States",
+      "report": "sr33",
+      "matrix": "matrix2",
+      "table": "U.S. Milk Supply and Use",
       "report_month": "October 2026"
     }
   ]
