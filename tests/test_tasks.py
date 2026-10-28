@@ -206,7 +206,7 @@ def test_a_month_without_an_xml_file_is_refused_naming_its_formats() -> None:
     """Every month before 2010-07 has none (layout.md); built from page 0's releases."""
     october = tasks._release(without_xml(page_0()[0]))
     with pytest.raises(NotFoundError) as caught:
-        tasks._with_xml([october], "2026-10")
+        tasks._with_xml([october], "no WASDE release of 2026-10 has an XML file")
     assert str(caught.value) == (
         "no WASDE release of 2026-10 has an XML file: release 796099 (2026-10-09) has pdf, "
         "txt. Of the WASDE releases ESMIS lists, the first with an XML file is that of "
@@ -221,9 +221,9 @@ def test_a_month_answers_its_latest_release_with_an_xml_file() -> None:
     """
     september, october = page_0()[1], page_0()[0]
     later_without = [tasks._release(without_xml(october)), tasks._release(september)]
-    assert tasks._with_xml(later_without, "2026-10").id == "796054"
+    assert tasks._with_xml(later_without, "no XML in 2026-10").id == "796054"
     both = [tasks._release(october), tasks._release(september)]
-    assert tasks._with_xml(both, "2026-10").id == "796099", "the latest release time"
+    assert tasks._with_xml(both, "no XML in 2026-10").id == "796099", "the latest release time"
 
 
 @pytest.mark.anyio

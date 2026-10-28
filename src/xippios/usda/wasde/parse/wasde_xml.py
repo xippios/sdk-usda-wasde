@@ -18,7 +18,9 @@ October 2026 file uses, its counts in ``layout.md``:
   ``forecast_monthN``, ``mN_forecast_monthN``, ``wb_forecast_month_desc``;
   ``attributeN``, ``mN_attributeN``, ``attr_desc``, ``attribute``; ``attribute_groupN``
   (the class columns of page 11's wheat-by-class table). A field is named after the
-  attribute with the matrix index removed and is set by the attribute wherever it sits,
+  attribute with the matrix index removed, the spellings of one dimension across pages
+  folded into one field (``attr_desc`` into ``attribute``, ``wb_forecast_month_desc``
+  into ``forecast_month``; gap, row 195), and is set by the attribute wherever it sits,
   whatever the element is called: page 11's second matrix carries ``attribute2`` on
   ``m2_month_group`` and ``forecast_month2`` on ``m2_attribute_group``;
 - **values**: ``cell_valueN``, ``mN_cell_valueN`` and ``wb_value`` on a ``<Cell>``, one
@@ -40,10 +42,12 @@ October 2026 file uses, its counts in ``layout.md``:
 - **the page's attributes** on the page's ``<Report>``, and ``sub_report_footer`` on a
   reliability table.
 
-Any other attribute raises ``ValidationError`` naming the page, the element and the
-attribute, as does a dimension met twice on one path: a layout change upstream breaks
-the parser loudly, never silently (ADR-0020, consequences). So does a file that is not
-well-formed XML, or whose root is not ``<Report Name="wasde">``.
+Any other attribute of a page's ``<Report>`` or of an element inside it raises
+``ValidationError`` naming the page, the element and the attribute, as does a dimension
+met twice on one path: a layout change upstream breaks the parser loudly, never
+silently (ADR-0020, consequences). So does a file that is not well-formed XML, whose
+root is not ``<Report Name="wasde">`` with no other attribute, or whose ``<srNN>`` does
+not hold exactly one ``<Report>``; the attributes of ``<srNN>`` itself are not read.
 
 **Titles, subtitles and footers.** A page's titles are its ``sub_report_title``,
 ``sub_report_title2`` and ``sub_report_title3``, those present, in that order; its

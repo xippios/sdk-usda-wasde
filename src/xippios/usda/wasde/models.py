@@ -1,9 +1,18 @@
 """Pydantic models mirroring what this package returns, one ``UpstreamModel`` per record.
 
 Conventions §3 and ``/add-endpoint`` give the rules; for a file, fidelity applies to the
-file (ADR-0020): field names are the file's attribute names snake_cased with the matrix
-index removed, labels, units and footnote markers kept as text as printed, nothing
-renamed, converted or joined across files.
+file (ADR-0020): labels, units and footnote markers kept as text as printed, nothing
+renamed, converted or joined across files. A ``WasdeXmlCell`` field is named after the
+file's attribute, snake_cased with the matrix index removed (``m1_commodity1`` is
+``commodity``, ``attribute_group2`` is ``attribute_group``), with three exceptions
+(gap, row 195): the page's and the table's names are kept on the record under names of
+their own, as conventions §3 keeps sheet and table names (``report`` holds the page's
+``Name``, ``table`` its ``sub_report_title``, ``sub_report_title2`` or
+``sub_report_title3``, ``matrix`` the report item's element name); a dimension the
+pages spell several ways is folded into one field (``attr_desc`` into ``attribute``,
+``wb_forecast_month_desc`` into ``forecast_month``); and every value goes into
+``cell_value``, ``wb_value`` and the reliability statistics included, the statistic's
+name into ``statistic``.
 
 ``Release`` is ESMIS's release of WASDE, re-shaped from ``xippios-usda-esmis``'s model
 (ADR-0021); ``WasdeXmlCell`` is one value of a release's XML file, as
@@ -46,7 +55,8 @@ class Release(UpstreamModel):
             revised files only), else ``None``; the suffix every file name of the
             release carries, ``None`` when not all carry the same one.
         month: The release month, ``"YYYY-MM"``, from the printed date of
-            ``release_datetime``, e.g. ``"2026-10"``: what ``get_release`` takes.
+            ``release_datetime``, e.g. ``"2026-10"``: what Python callers pass to
+            ``get_release``.
     """
 
     id: str

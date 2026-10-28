@@ -24,9 +24,13 @@ What every task follows:
   ``meta.published_at`` the release time as above, ``meta.request`` the month given, the
   release id and the file's URL. It is a bulk task, Python only (``BULK_TASKS``).
 - A month is ``"YYYY-MM"``, matched on the printed date of ``release_datetime``. ESMIS
-  lists one release a month since 2010 but in 2010-12, 2014-01, 2018-12 and 2019-11; a
-  month WAOB reposted is one release whose files carry ``v2`` (``wasde0626v2.xml``), so
-  a revised month answers its revision (``Release.revision``).
+  lists one release a month since 2010 but in 2010-12, 2014-01, 2018-12 and 2019-11.
+  Since 2024-12 a month WAOB reposted is one release whose files carry ``v2``
+  (``wasde0626v2.xml``; ``Release.revision``) and no file of the original, so such a
+  month answers its revision. Release 95621 (2013-08) lists the original's XML,
+  ``ORIGwasde-08-12-2013.xml``, before the revision's, ``wasde-08-12-2013.xml``, and
+  esmis's ``download_release_file`` takes the first file of a format, so
+  ``get_release("2013-08")`` reads the original.
 """
 
 import calendar
@@ -118,12 +122,14 @@ def _formats(release: Release) -> str:
     return ", ".join(dict.fromkeys(file.format for file in release.files)) or "none"
 
 
-def _with_xml(releases: list[Release], month: str) -> Release:
-    """Of a month's releases, the latest that carries an XML file; none is refused.
+def _with_xml(releases: list[Release], refusal: str) -> Release:
+    """Of the releases checked, the latest that carries an XML file; none is refused.
 
     The latest by release time, the first ESMIS lists where several share it (Johannes,
     2026-10-28, G5 inside PR 3): in 2010-12 and 2014-01 a later release carries a TXT or
-    an ASC file only, and the month answers the earlier release's XML.
+    an ASC file only, and the month answers the earlier release's XML. ``refusal`` opens
+    the message by what was checked, e.g. ``"no WASDE release of 2009-06 has an XML
+    file"`` or ``"the latest WASDE release has no XML file"``.
     """
     carrying = [
         release for release in releases if any(file.format == "xml" for file in release.files)
@@ -135,8 +141,7 @@ def _with_xml(releases: list[Release], month: str) -> Release:
         for release in releases
     )
     raise NotFoundError(
-        f"no WASDE release of {month} has an XML file: {listed}. Of the WASDE releases "
-        f"ESMIS lists, {FIRST_XML_RELEASE}.",
+        f"{refusal}: {listed}. Of the WASDE releases ESMIS lists, {FIRST_XML_RELEASE}.",
         source=SOURCE,
     )
 
@@ -153,10 +158,12 @@ async def list_releases_async(
     ``since``. Without ``since`` every page is walked, 29 requests for the 703 releases
     listed on 2026-10-28 at 30 requests a minute, about a minute, and the MCP tool
     returns at most 200 rows or 64 KB: bound the call with ``since``. A release's
-    ``month`` is what ``get_release`` takes; its ``revision`` is ``"v2"`` where WAOB
-    reposted the month (2026-06, 2026-05, 2025-05, 2025-04, 2024-12). ``meta.total`` is
-    ESMIS's count of WASDE releases before the date filter, so it can exceed the rows
-    returned.
+    ``month`` is what Python callers pass to ``get_release``; its ``revision`` is
+    ``"v2"`` where WAOB reposted the month (2026-06, 2026-05, 2025-05, 2025-04, 2024-12).
+    ``meta.total`` is ESMIS's count of WASDE releases before the date filter, so it can
+    exceed the rows returned. A ``since`` after ``until`` raises ``InvalidRequestError``,
+    refused by xippios-usda-esmis before anything is sent (its ``source`` is
+    ``"usda-esmis"``).
 
     Args:
         since: The earliest release date to keep, e.g. ``2026-01-01`` (a date); ``None``
@@ -205,17 +212,25 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
     (``BULK_TASKS``). The release is the latest, or the one of ``month`` with the latest
     release time that carries an XML file, the first ESMIS lists where several share it
     (in 2010-12 and 2014-01 a later release carries a TXT or an ASC file only). Its XML
-    file is downloaded through xippios-usda-esmis's ``download_release_file`` into a
-    temporary directory, parsed with ``parse.wasde_xml.parse_wasde_xml``, and the
-    directory removed. The records are the values of printed pages 8 to 37 in page order, each
-    with the labels its page prints (``WasdeXmlCell``): 6543 for October 2026, 5913
-    table values and 630 reliability statistics. Requests: the latest release 1, or the
+    file, the release's first file in that format, is downloaded through
+    xippios-usda-esmis's ``download_release_file`` into a temporary directory, parsed with
+    ``parse.wasde_xml.parse_wasde_xml``, and the directory removed. A month reposted
+    since 2024-12 answers its revision (``wasde0626v2.xml``); 2013-08 lists the
+    original's XML first and answers the original (``ORIGwasde-08-12-2013.xml``). The
+    records are the values of printed pages 8 to 37 in page order, each with the labels
+    its page prints (``WasdeXmlCell``): 6543 for October 2026, 5913 table values and 630
+    reliability statistics. The parser knows the layout of the October 2026 file, and
+    the live test checks it against the current release nightly; an older file that
+    holds an attribute or a structure the parser does not know raises
+    ``ValidationError``. Requests: the latest release 1, or the
     month's pages of ``list_releases``, 25 releases a page from the newest back to the
-    month (1 for a month of the last two years); then the release 1 and the file 1,
-    3.4 MB for October 2026. A month without a release raises ``NotFoundError``
-    naming the latest release's month, a month whose releases carry no XML file (every
-    month before 2010-07) ``NotFoundError`` naming the formats they have and the first
-    release with one, and a month not written ``"YYYY-MM"`` ``InvalidRequestError``.
+    month (1 for a month of the last two years; all 29 for a month before 1973-09,
+    which is then refused); then the release 1 and the file 1, 3.4 MB for October 2026.
+    A month without a release raises ``NotFoundError`` naming the latest release's
+    month, a month whose releases carry no XML file (every month before 2010-07)
+    ``NotFoundError`` naming the formats they have and the first release with one, a
+    month not written ``"YYYY-MM"`` ``InvalidRequestError``, and a file the parser
+    cannot read ``ValidationError``.
 
     Args:
         month: The release month, ``"YYYY-MM"``, e.g. ``"2026-10"``, or ``"2026-06"``,
@@ -224,7 +239,7 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
     """
     if month is None:
         latest = _release((await esmis.get_latest_release_async(PUBLICATION)).data)
-        release = _with_xml([latest], latest.month)
+        release = _with_xml([latest], "the latest WASDE release has no XML file")
     else:
         since, until = _month_bounds(month)
         listed = await esmis.list_releases_async(PUBLICATION, since=since, until=until)
@@ -236,7 +251,8 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
                 f"{latest.release_datetime:%Y-%m-%d})",
                 source=SOURCE,
             )
-        release = _with_xml([_release(item) for item in listed.data], month)
+        releases = [_release(item) for item in listed.data]
+        release = _with_xml(releases, f"no WASDE release of {month} has an XML file")
     with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
         dest = Path(directory) / "release.xml"
         downloaded = await esmis.download_release_file_async(int(release.id), "xml", dest)
