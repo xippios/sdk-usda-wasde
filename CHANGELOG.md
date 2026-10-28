@@ -16,8 +16,9 @@ All notable changes to this project are documented here. The format follows
   downloads USDA report files on ESMIS.
 - Upstream documentation snapshot in `docs/upstream/`, captured by
   `scripts/refresh_upstream.py`: the ESMIS publication page and the page of the newest
-  release, WAOB's WASDE page, historical data page and FAQ (kept from USDA's CDN
-  origin, their www.usda.gov addresses, which refuse automated requests, recorded by
-  status), and WAOB's 2018 notice of the file names; `layout.md` describes the XML, XLS,
-  TXT and PDF files as observed in the October 2026 release and the file kinds and
-  names of every release ESMIS lists.
+  release, WAOB's WASDE page and the four pages its menu links (About WASDE, the FAQ,
+  Historical Changes & Revisions, the historical data page), and WAOB's 2018 notice of
+  the file names; a page www.usda.gov refuses to automated requests is kept from USDA's
+  CDN origin, its www.usda.gov address recorded by status. `layout.md` describes the
+  XML, XLS, TXT and PDF files as observed in the October 2026 release and the file kinds
+  and names of every release ESMIS lists.
