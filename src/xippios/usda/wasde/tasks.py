@@ -10,7 +10,7 @@ This package sends no request of its own: ESMIS's catalog and the download are
 What every task follows:
 
 - ``meta.source`` is this package's, ``"usda-wasde"``; ``meta.retrieved_at`` is the time
-  esmis's answer arrived, for ``get_release`` the time the file was complete.
+  esmis's answer arrived, for the tasks that read a file the time the file was complete.
 - The catalog tasks, ``list_releases`` and ``get_latest_release``, keep esmis's
   ``meta.endpoint``, the operationId they rest on (``esmis_api_release_findByIdentifier``),
   its ``meta.total`` and, for one release, its release time: ``meta.published_at`` is
@@ -31,6 +31,25 @@ What every task follows:
   ``ORIGwasde-08-12-2013.xml``, before the revision's, ``wasde-08-12-2013.xml``, and
   esmis's ``download_release_file`` takes the first file of a format, so
   ``get_release("2013-08")`` reads the original.
+- ``get_table`` and ``get_balance_sheet`` read the month's XML as ``get_release`` does,
+  one download per call and nothing kept between calls, and answer a slice of its
+  records projected without their page's labels (``WasdeTableValue``; Johannes,
+  2026-10-28, G5 inside PR 5), which ``list_tables`` states once per page, with
+  ``get_release``'s ``meta``, ``meta.request`` holding the arguments given, the release
+  id and the file's URL; they are tools, each with a cap of its own (``MCP_CAPS``). The
+  slice is checked against the packaged lists before anything is sent: a page
+  ``list_tables`` lacks, a commodity ``list_commodities`` lacks, or a region the
+  commodity's pages do not print, raises core's ``UnknownCode``, an
+  ``InvalidRequestError``, naming the closest (core's ``closest`` on the texts, whatever
+  their case). A region is matched as printed with its indent and footnote marker left
+  out (gap, row 195). A slice the month's file does not hold raises ``NotFoundError``.
+- ``read_report_text`` reads the narrative (ADR-0020 decision 4): the release's XLS,
+  sheet ``WASDE Text`` (``parse.wasde_xls``), else its PDF's narrative pages
+  (``parse.wasde_pdf``), text only, also where the XLS holds no narrative (Johannes,
+  2026-10-28, G5 inside PR 5). ``meta.endpoint`` is the file read,
+  ``meta.vintage`` the report month the XLS prints (``"October 2026"``), for a PDF the
+  ESMIS release id as esmis prints it (``"95659"``; the session, 2026-10-28, rule 7;
+  ADR-0020 decision 5), ``meta.published_at`` the release time as for ``get_release``.
 - The packaged answers: ``list_tables``, ``list_commodities`` and ``list_regions`` answer
   from ``reference/table.json``, ``commodity.json`` and ``region.json``, the lists
   ``scripts/refresh_reference.py`` read from the latest release's files, through core's
@@ -46,17 +65,21 @@ What every task follows:
 import calendar
 import re
 import tempfile
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from xippios.core import (
+    Downloaded,
     InvalidRequestError,
     NotFoundError,
     PackagedList,
     Result,
+    ResultCap,
     ResultMeta,
+    UnknownCode,
+    closest,
     matches,
     sync,
 )
@@ -65,28 +88,64 @@ from xippios.usda.esmis.models import Release as EsmisRelease
 from xippios.usda.esmis.models import ReleaseFile
 
 from xippios.usda.wasde._client import SOURCE
-from xippios.usda.wasde.models import Commodity, Region, Release, Table, WasdeXmlCell
+from xippios.usda.wasde.models import (
+    Commodity,
+    Region,
+    Release,
+    Table,
+    WasdeTableValue,
+    WasdeXmlCell,
+)
 from xippios.usda.wasde.params import PACKAGE
+from xippios.usda.wasde.parse.wasde_pdf import parse_wasde_pdf
+from xippios.usda.wasde.parse.wasde_xls import parse_wasde_xls
 from xippios.usda.wasde.parse.wasde_xml import parse_wasde_xml
 
 __all__ = [
+    "get_balance_sheet",
     "get_latest_release",
     "get_release",
+    "get_table",
     "list_commodities",
     "list_regions",
     "list_releases",
     "list_tables",
+    "read_report_text",
 ]
 
 # A task named here is Python-only: no tool, no route; the adapters skip it (ADR-0019 decision 4).
 BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 
 # MCP_CAPS, only where a tool needs a result cap of its own, keyed by the task function's
-# name (conventions §8, ADR-0016). None here: every tool keeps the default, 200 rows or
-# 64 KB. list_releases called without since answers every WASDE release (703 on
-# 2026-10-28), and its docstring tells an agent to bound it; the three packaged lists fit
-# whole, list_tables 30 rows, list_commodities 43 and list_regions 70, the largest
-# result list_tables's 29,639 bytes of compact JSON, its footnotes included (October 2026).
+# name (conventions §8, ADR-0016). The two slices answer WasdeTableValue, WasdeXmlCell
+# without the page's labels (Johannes, 2026-10-28, G5 inside PR 5), about 350 bytes a
+# value, and each has a cap of its own whose note names how to see the rest (the same
+# decision): get_table 400 rows or 128 KB, get_balance_sheet 300 rows or 128 KB. Measured
+# on the October 2026 XML through the MCP server, the tool's text in UTF-8 bytes, every
+# answer fits whole: the largest page, sr28, 364 values and 129,899 bytes, 1,173 under
+# the bound (sr19, 322 values, 118,553 bytes, the next); the largest balance sheet,
+# Meats, 280 values and 90,850 bytes, then U.S. Milk, 96 and 30,700; a world region's
+# rows, 24 to 28 values, about 11 KB at most (all 160 commodity and region answers). A
+# page that grows past the bound is cut, with the note. Every other tool keeps the
+# default, 200 rows or 64 KB, and none of them reaches it but list_releases called without
+# since, which answers every WASDE release (703 on 2026-10-28) and whose docstring tells
+# an agent to bound it with since and until, the narrowing the default note names:
+# read_report_text measured 16,436 bytes, the three packaged lists 30, 43 and 70 rows,
+# the largest result list_tables's 29,639 bytes, its footnotes included (October 2026).
+MCP_CAPS: Mapping[str, ResultCap] = {
+    "get_table": ResultCap(
+        max_rows=400,
+        max_bytes=131_072,
+        note="call get_balance_sheet for one commodity's matrix, or one region's rows of a "
+        "world page (list_commodities, list_regions); Python callers get the whole page",
+    ),
+    "get_balance_sheet": ResultCap(
+        max_rows=300,
+        max_bytes=131_072,
+        note="on the world pages a region gives one region's rows (list_regions); Python "
+        "callers get the whole matrix",
+    ),
+}
 
 PUBLICATION = "wasde"
 """WASDE's publication identifier in ESMIS, which esmis's release tasks take."""
@@ -95,7 +154,16 @@ FIRST_XML_RELEASE = "the first with an XML file is that of 2010-07-09 (release 9
 """The earliest WASDE release ESMIS lists with an XML file, as observed on 2026-10-28
 (``docs/upstream/layout.md``), for the refusal of a release without one."""
 
+WORLD = "World"
+"""The ``region`` of the world pages' matrices in the packaged commodity list."""
+
+BY_CLASS = " by Class:"
+"""What the title of a by-class table holds (page 11's ``U.S. Wheat by Class: Supply and
+Use``): a breakdown of a commodity's balance sheet by class, which ``get_table``
+answers, not the balance sheet itself."""
+
 _MONTH = re.compile(r"(\d{4})-(0[1-9]|1[0-2])")
+_MARKER = re.compile(r"(?:\s+\d+/)+$")
 _REVISION = re.compile(r"v\d+$")
 
 
@@ -146,9 +214,58 @@ def _month_bounds(month: str) -> tuple[date, date]:
     return date(year, number, 1), date(year, number, calendar.monthrange(year, number)[1])
 
 
+def _bare(region: str | None) -> str | None:
+    """A region text without its indent and footnote marker, as a region slice matches it.
+
+    ``"        European Union  5/"`` gives ``"European Union"``, ``"World  3/"`` gives
+    ``"World"``; the case and the inner spaces are kept (gap, row 195).
+    """
+    return None if region is None else _MARKER.sub("", region.strip())
+
+
+def _closest(value: str, described: Mapping[str, str]) -> list[tuple[str, str]]:
+    """Up to three of ``described``'s texts close to ``value``, each with its description.
+
+    Core's ``closest`` with each text as its own code and name: its first pass, ``value``
+    upper-cased against the texts, and its second, lower-cased against the texts
+    lower-cased, find a text whatever its case, ``"corn"`` giving ``CORN`` and ``Corn``,
+    ``"SR12"`` giving ``sr12``.
+    """
+    found = closest(value, {text: text for text in described})
+    return [(text, described[text]) for text, _ in found]
+
+
 def _formats(release: Release) -> str:
     """The release's formats in ESMIS's order, each once, e.g. ``"pdf, txt"``."""
     return ", ".join(dict.fromkeys(file.format for file in release.files)) or "none"
+
+
+def _lacking(month: str | None, what: str) -> str:
+    """How a refusal opens: what was checked lacks ``what``, e.g. ``"XML file"``."""
+    if month is None:
+        return f"the latest WASDE release has no {what}"
+    return f"no WASDE release of {month} has an {what}"
+
+
+def _carrying(
+    releases: list[Release], formats: tuple[str, ...], refusal: str, after: str = ""
+) -> Release:
+    """Of the releases checked, the latest that carries a file in one of ``formats``.
+
+    The latest by release time, the first ESMIS lists where several share it. None is
+    refused with ``NotFoundError``: ``refusal`` opens the message by what was checked
+    (``_lacking``), then every release checked with its formats, then ``after``.
+    """
+    carrying = [
+        release for release in releases if any(file.format in formats for file in release.files)
+    ]
+    if carrying:
+        return max(carrying, key=lambda release: release.release_datetime)
+    listed = "; ".join(
+        f"release {release.id} ({release.release_datetime:%Y-%m-%d}) has {_formats(release)}"
+        for release in releases
+    )
+    raise NotFoundError(f"{refusal}: {listed}.{after}", source=SOURCE)
 
 
 def _with_xml(releases: list[Release], refusal: str) -> Release:
@@ -160,19 +277,75 @@ def _with_xml(releases: list[Release], refusal: str) -> Release:
     the message by what was checked, e.g. ``"no WASDE release of 2009-06 has an XML
     file"`` or ``"the latest WASDE release has no XML file"``.
     """
-    carrying = [
-        release for release in releases if any(file.format == "xml" for file in release.files)
-    ]
-    if carrying:
-        return max(carrying, key=lambda release: release.release_datetime)
-    listed = "; ".join(
-        f"release {release.id} ({release.release_datetime:%Y-%m-%d}) has {_formats(release)}"
-        for release in releases
+    return _carrying(
+        releases, ("xml",), refusal, f" Of the WASDE releases ESMIS lists, {FIRST_XML_RELEASE}."
     )
-    raise NotFoundError(
-        f"{refusal}: {listed}. Of the WASDE releases ESMIS lists, {FIRST_XML_RELEASE}.",
+
+
+async def _releases(month: str | None) -> list[Release]:
+    """The latest release, or every release of ``month``; a month without one is refused.
+
+    Requests: the latest release 1, or the pages of ``list_releases`` from the newest back
+    to the month. ``month`` is checked before anything is sent.
+    """
+    if month is None:
+        return [_release((await esmis.get_latest_release_async(PUBLICATION)).data)]
+    since, until = _month_bounds(month)
+    listed = await esmis.list_releases_async(PUBLICATION, since=since, until=until)
+    if not listed.data:
+        latest = _release((await esmis.get_latest_release_async(PUBLICATION)).data)
+        raise NotFoundError(
+            f"ESMIS lists no WASDE release in {month}; the latest is that of "
+            f"{latest.month} (release {latest.id}, "
+            f"{latest.release_datetime:%Y-%m-%d})",
+            source=SOURCE,
+        )
+    return [_release(item) for item in listed.data]
+
+
+def _file_meta(
+    downloaded: Result[Downloaded],
+    release: Release,
+    request: dict[str, object],
+    vintage: str | None,
+) -> ResultMeta:
+    """The meta of a task that reads a release's file (conventions §4, ADR-0020 decision 5).
+
+    ``endpoint`` the file's name as ESMIS catalogs it, ``retrieved_at`` when it was
+    complete, ``published_at`` the release time as printed, naive, ``request`` the
+    arguments the task was given with the release id and the file's URL.
+    """
+    return ResultMeta(
         source=SOURCE,
+        endpoint=downloaded.meta.endpoint,
+        retrieved_at=downloaded.meta.retrieved_at,
+        published_at=downloaded.meta.published_at,
+        published_at_naive=downloaded.meta.published_at_naive,
+        vintage=vintage,
+        request={
+            **request,
+            "release_id": int(release.id),
+            "url": downloaded.meta.request["url"],
+        },
     )
+
+
+async def _read_xml(month: str | None, request: dict[str, object]) -> Result[list[WasdeXmlCell]]:
+    """Every record of the XML of the latest release or of ``month``'s, with its meta.
+
+    The release is the latest, or the month's latest that carries an XML file; its XML,
+    the release's first file in that format, is downloaded through esmis's
+    ``download_release_file`` into a temporary directory, parsed and the directory
+    removed. ``meta.vintage`` is the file's ``Report_Month``; ``request`` holds the
+    arguments the task was given.
+    """
+    release = _with_xml(await _releases(month), _lacking(month, "XML file"))
+    with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
+        dest = Path(directory) / "release.xml"
+        downloaded = await esmis.download_release_file_async(int(release.id), "xml", dest)
+        records = parse_wasde_xml(dest)
+    vintage = records[0].report_month if records else None
+    return Result(data=records, meta=_file_meta(downloaded, release, request, vintage))
 
 
 async def list_releases_async(
@@ -266,40 +439,7 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
             a month WAOB reposted, whose catalog entry lists the revised file
             (``wasde0626v2.xml``); ``None`` (the default) reads the latest release.
     """
-    if month is None:
-        latest = _release((await esmis.get_latest_release_async(PUBLICATION)).data)
-        release = _with_xml([latest], "the latest WASDE release has no XML file")
-    else:
-        since, until = _month_bounds(month)
-        listed = await esmis.list_releases_async(PUBLICATION, since=since, until=until)
-        if not listed.data:
-            latest = _release((await esmis.get_latest_release_async(PUBLICATION)).data)
-            raise NotFoundError(
-                f"ESMIS lists no WASDE release in {month}; the latest is that of "
-                f"{latest.month} (release {latest.id}, "
-                f"{latest.release_datetime:%Y-%m-%d})",
-                source=SOURCE,
-            )
-        releases = [_release(item) for item in listed.data]
-        release = _with_xml(releases, f"no WASDE release of {month} has an XML file")
-    with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
-        dest = Path(directory) / "release.xml"
-        downloaded = await esmis.download_release_file_async(int(release.id), "xml", dest)
-        records = parse_wasde_xml(dest)
-    meta = ResultMeta(
-        source=SOURCE,
-        endpoint=downloaded.meta.endpoint,
-        retrieved_at=downloaded.meta.retrieved_at,
-        published_at=downloaded.meta.published_at,
-        published_at_naive=downloaded.meta.published_at_naive,
-        vintage=records[0].report_month if records else None,
-        request={
-            "month": month,
-            "release_id": int(release.id),
-            "url": downloaded.meta.request["url"],
-        },
-    )
-    return Result(data=records, meta=meta)
+    return await _read_xml(month, {"month": month})
 
 
 def _packaged[M: (Table, Commodity, Region)](
@@ -410,7 +550,7 @@ async def list_regions_async(search: str | None = None) -> Result[list[Region]]:
     A text is kept as printed, with its indent, spacing and footnote marker, as a
     ``WasdeXmlCell``'s ``region`` holds it, so a region can have several texts:
     ``"World"``, ``"World  2/"`` and ``"World  3/"``; ``"        China"``, ``"       China"``
-    and ``"    China"``. A task that slices a table by region, to come, matches the text
+    and ``"    China"``. ``get_balance_sheet`` matches a region against the text
     stripped of its indent and its footnote marker, so an agent passes ``"Argentina"`` or
     ``"World"``. The U.S. pages 11 to 17 and 31 to 34 print none. ``meta.vintage``
     is the release's ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when
@@ -425,9 +565,303 @@ async def list_regions_async(search: str | None = None) -> Result[list[Region]]:
     return _packaged("region", Region, search, lambda row: (row.region, *row.reports))
 
 
+async def get_table_async(table: str, month: str | None = None) -> Result[list[WasdeTableValue]]:
+    """Every value of one WASDE table page, one record each, read from the release's XML file.
+
+    ``table`` is the page as the XML names it and ``list_tables`` lists it: ``"sr12"`` is
+    printed page 12, U.S. feed grains and corn, ``"sr18"`` page 18, world wheat. Each
+    record (``WasdeTableValue``) is one value with the labels of its row and column as
+    printed, its table's title and its matrix: ``get_release``'s record without the
+    page's own labels (Johannes, 2026-10-28, G5 inside PR 5). The page's subtitle and
+    footnotes, to which a footnote marker in a label refers (``"Trade 2/"``), are
+    ``list_tables``'s, stated once per page; the report month is ``meta.vintage``. 112
+    values on page 12 of October 2026, 364 on page 28, the most. The release is the
+    latest, or the one of ``month`` with the latest release time that carries an XML
+    file, read as ``get_release`` reads it: every call downloads the XML (3.4 MB for
+    October 2026) through xippios-usda-esmis into a temporary directory, parses it and
+    removes it, and nothing is kept between calls, so a Python caller wanting several
+    pages of one month calls ``get_release`` once and keeps the records of each
+    ``report``. The MCP tool returns at most 400 rows or 128 KB, which every page of
+    October 2026 fits, page 28 (129,899 bytes) with about 1 KB to spare; a page cut there
+    says to call ``get_balance_sheet`` for one matrix or region. ``meta`` is ``get_release``'s:
+    ``endpoint`` the file's name (``"wasde1026.xml"``), ``vintage`` its ``Report_Month``
+    (``"October 2026"``), ``published_at`` the release time as ESMIS prints it, naive,
+    ``request`` the arguments given with the release id and the file's URL. Requests: as
+    ``get_release``'s, the latest release 1 or the month's pages of ``list_releases``,
+    then the release 1 and the file 1. A ``table`` ``list_tables`` does not name raises
+    ``InvalidRequestError`` naming the closest pages, before anything is sent; a month
+    without a release or whose releases carry no XML file raises ``NotFoundError``, a
+    month not written ``"YYYY-MM"`` ``InvalidRequestError``, a file without the page
+    ``NotFoundError`` and a file the parser cannot read ``ValidationError``.
+
+    Args:
+        table: The page as the XML names it, ``"sr"`` and its two-digit number, e.g.
+            ``"sr12"`` (U.S. feed grains and corn), ``"sr24"`` (world rice), ``"sr08"``
+            (world and U.S. grains); ``list_tables`` lists the 30 pages, ``"sr08"`` to
+            ``"sr37"``.
+        month: The release month, ``"YYYY-MM"``, e.g. ``"2026-10"``; ``None`` (the
+            default) reads the latest release.
+    """
+    tables = PackagedList.load(PACKAGE, "table")
+    pages = {row.report: row for row in tables.parse(Table, source=SOURCE)}
+    if table not in pages:
+        raise UnknownCode(
+            "table",
+            table,
+            list_name="table",
+            fetched=tables.fetched,
+            closest=_closest(
+                table,
+                {
+                    report: f"page {row.page}: {row.sub_report_title}"
+                    for report, row in pages.items()
+                },
+            ),
+            reason="A page is named as the XML names it, 'sr' and its two-digit printed "
+            "number: page 12 is 'sr12'; list_tables lists the pages.",
+            source=SOURCE,
+        )
+    result = await _read_xml(month, {"table": table, "month": month})
+    records = [record for record in result.data if record.report == table]
+    if not records:
+        held = ", ".join(dict.fromkeys(record.report for record in result.data)) or "none"
+        raise NotFoundError(
+            f"{result.meta.endpoint} of release {result.meta.request['release_id']} holds no "
+            f"page {table}; its pages: {held}",
+            source=SOURCE,
+        )
+    return Result(data=_values(records), meta=result.meta)
+
+
+def _values(records: list[WasdeXmlCell]) -> list[WasdeTableValue]:
+    """The records without their page's labels, as the slices answer them."""
+    return [WasdeTableValue.project(record) for record in records]
+
+
+def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
+    """The packaged matrices of ``commodity``'s balance sheet for ``region``, and the slice.
+
+    The second value says whether the records are sliced by region, as on the world pages.
+    The rule is ``get_balance_sheet``'s docstring.
+
+    Raises:
+        UnknownCode: The commodity list lacks ``commodity``, or its pages print no
+            ``region``; the message names the closest.
+    """
+    listed = PackagedList.load(PACKAGE, "commodity")
+    rows = listed.parse(Commodity, source=SOURCE)
+    mine = [row for row in rows if row.commodity == commodity]
+    if not mine:
+        pages: dict[str, list[str]] = {}
+        for row in rows:
+            named = pages.setdefault(row.commodity, [])
+            if f"{row.region} {row.report}" not in named:
+                named.append(f"{row.region} {row.report}")
+        raise UnknownCode(
+            "commodity",
+            commodity,
+            list_name="commodity",
+            fetched=listed.fetched,
+            closest=_closest(commodity, {name: ", ".join(on) for name, on in pages.items()}),
+            reason="A commodity is named as list_commodities prints it, its case kept: "
+            "'CORN' is page 12's U.S. corn, 'Corn' the world corn of pages 22 and 23.",
+            source=SOURCE,
+        )
+    national = [
+        row
+        for row in mine
+        if row.region == region and row.region != WORLD and BY_CLASS not in row.table
+    ]
+    if national:
+        return national, False
+    world = [row for row in mine if row.region == WORLD]
+    regions = PackagedList.load(PACKAGE, "region")
+    printed: dict[str, list[str]] = {}
+    if world:
+        reports = [row.report for row in world]
+        for text in regions.parse(Region, source=SOURCE):
+            bare = _bare(text.region)
+            on = [report for report in text.reports if report in reports]
+            if bare and on:
+                kept = printed.setdefault(bare, [])
+                kept += [report for report in on if report not in kept]
+        if region in printed:
+            return world, True
+    # Each choice described as the corrected call answers it: a U.S. or Mexico matrix
+    # comes first, as above, and the by-class table answers no region.
+    choices: dict[str, str] = {}
+    for row in mine:
+        if row.region != WORLD and BY_CLASS not in row.table:
+            choices.setdefault(row.region, f"{row.report} {row.matrix}")
+    for bare, on in printed.items():
+        choices.setdefault(bare, f"rows of {', '.join(on)}")
+    found = _closest(region, choices)
+    raise UnknownCode(
+        "region",
+        region,
+        list_name="region",
+        fetched=regions.fetched,
+        closest=found,
+        hint=None if found else f"{commodity!r} is printed for {', '.join(choices)}.",
+        reason=f"A region of {commodity!r} is 'United States' or 'Mexico' where it has a U.S. "
+        "or Mexico matrix, else one its world pages print, as list_regions lists it, matched "
+        "without its indent and footnote marker, its case kept.",
+        source=SOURCE,
+    )
+
+
+async def get_balance_sheet_async(
+    commodity: str, region: str = "United States", month: str | None = None
+) -> Result[list[WasdeTableValue]]:
+    """One commodity's supply-and-use balance sheet in a WASDE release, from its XML file.
+
+    ``commodity`` is named as ``list_commodities`` prints it, its case kept: ``"CORN"`` is
+    page 12's U.S. corn, ``"Corn"`` the world corn of pages 22 and 23, ``"Wheat"`` both
+    page 11 and pages 18 and 19. Where the packaged commodity list has a matrix of the
+    commodity for ``region`` ``"United States"`` (the default) or ``"Mexico"``, the answer
+    is every value of that matrix: page 11's ``U.S. Wheat Supply and Use`` for ``"Wheat"``
+    (the matrices are told apart by their title: page 11's by-class table, ``U.S. Wheat
+    by Class: Supply and Use``, a breakdown, is ``get_table("sr11")``'s), page 16's
+    Mexico matrix for ``"Sugar"`` with ``"Mexico"``. Otherwise the answer is the rows of
+    the commodity's world matrices, pages 18 to 30 (two pages for wheat, coarse grain,
+    corn, rice and cotton, one page of three matrices for soybean, soybean meal and
+    soybean oil), whose region, its indent and footnote marker left out, is ``region``
+    as given, its case kept: ``"Argentina"`` matches ``"        Argentina"``, ``"World"``
+    matches ``"World  3/"``. So ``"United States"`` answers the world table's United
+    States rows for the commodities without a U.S. matrix under their name,
+    ``"Coarse Grain"``, ``"Corn"``, ``"Rice"``, ``"Soybean"``, ``"Soybean Meal"`` and
+    ``"Soybean Oil"``, and the U.S. page for ``"Wheat"`` and ``"Cotton"``. Nothing is
+    mapped onto another source's names. The matrices are the packaged list's, read from
+    the October 2026 release: a record is kept where its page, matrix and title are a
+    matrix's. Each record (``WasdeTableValue``) is one value with the labels of its row
+    and column as printed, its table's title and its matrix: ``get_release``'s record
+    without the page's own labels (Johannes, 2026-10-28, G5 inside PR 5). The page's
+    subtitle and footnotes, to which a footnote marker in a label refers (``"World  3/"``,
+    ``"Trade 2/"``), are ``list_tables``'s, stated once per page; the report month is
+    ``meta.vintage``. 60 values for ``"CORN"``, 280 for ``"Meats"``, the most, 28 for
+    wheat's rows of one region in October 2026. Every call downloads the month's XML (3.4
+    MB for October 2026) as ``get_release`` does and keeps nothing, so a Python caller
+    wanting several balance sheets of one month calls ``get_release`` once. The MCP tool
+    returns at most 300 rows or 128 KB, which every balance sheet of October 2026 fits,
+    ``"Meats"`` the largest at 90,850 bytes; one cut there says that a region narrows a
+    world page's rows. ``meta`` is ``get_release``'s, ``meta.request`` the arguments given
+    with the release id and the file's URL; the requests are ``get_release``'s. A
+    commodity ``list_commodities`` does not name, or a region its pages do not print,
+    raises ``InvalidRequestError`` naming the closest, before anything is sent; a month
+    without a release or without an XML file ``NotFoundError``, a month not written
+    ``"YYYY-MM"`` ``InvalidRequestError``, a file that holds none of the matrices under
+    the packaged titles ``NotFoundError`` (``get_table`` answers the page as that month
+    prints it).
+
+    Args:
+        commodity: The commodity as ``list_commodities`` prints it, e.g. ``"CORN"``,
+            ``"Corn"``, ``"Wheat"``, ``"SOYBEAN MEAL"``, ``"Soybean Meal"``, ``"Sugar"``,
+            ``"Meats"``.
+        region: ``"United States"`` (the default) or ``"Mexico"`` for a U.S. or Mexico
+            matrix, or a region of the commodity's world pages as ``list_regions`` prints
+            it without its indent and footnote marker, e.g. ``"Argentina"``, ``"World"``,
+            ``"European Union"``, ``"World Less China"``.
+        month: The release month, ``"YYYY-MM"``, e.g. ``"2026-10"``; ``None`` (the
+            default) reads the latest release.
+    """
+    matrices, sliced = _balance_sheet(commodity, region)
+    result = await _read_xml(month, {"commodity": commodity, "region": region, "month": month})
+    keys = {(row.report, row.matrix, row.table) for row in matrices}
+    records = [
+        record
+        for record in result.data
+        if (record.report, record.matrix, record.table) in keys
+        and (not sliced or _bare(record.region) == region)
+    ]
+    if not records:
+        named = "; ".join(f"{row.report} {row.matrix} {row.table!r}" for row in matrices)
+        raise NotFoundError(
+            f"{result.meta.endpoint} of release {result.meta.request['release_id']} holds no "
+            f"record of {commodity!r}{f' for {region!r}' if sliced else ''} in {named}, as "
+            f"the packaged list read them from {matrices[0].report_month}; get_table answers "
+            "a page as that month prints it",
+            source=SOURCE,
+        )
+    return Result(data=_values(records), meta=result.meta)
+
+
+async def _narrative(release: Release, request: dict[str, object]) -> Result[list[str]]:
+    """The release's narrative: its XLS's sheet ``WASDE Text``, else its PDF's pages.
+
+    The XLS where the release has one; its PDF where it has none, or where its XLS holds no
+    narrative and it has a PDF (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020 decision
+    4). Each file is downloaded into a temporary directory, which is removed.
+    """
+    formats = {file.format for file in release.files}
+    with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
+        if "xls" in formats:
+            dest = Path(directory) / "release.xls"
+            downloaded = await esmis.download_release_file_async(int(release.id), "xls", dest)
+            try:
+                rows = parse_wasde_xls(dest)
+            except NotFoundError as error:
+                if "pdf" not in formats:
+                    raise NotFoundError(
+                        f"{downloaded.meta.endpoint} of release {release.id} holds no "
+                        f"narrative, and the release has no PDF file (its formats: "
+                        f"{_formats(release)}): {error}",
+                        source=SOURCE,
+                    ) from None
+            else:
+                meta = _file_meta(downloaded, release, request, rows[0].report_month)
+                return Result(data=[row.text for row in rows], meta=meta)
+        dest = Path(directory) / "release.pdf"
+        downloaded = await esmis.download_release_file_async(int(release.id), "pdf", dest)
+        pages = parse_wasde_pdf(dest)
+    # A PDF prints a date, no month label: its vintage is the ESMIS release id, as esmis
+    # prints it (the session, 2026-10-28, rule 7; ADR-0020 decision 5; gap, row 202).
+    meta = _file_meta(downloaded, release, request, release.id)
+    return Result(data=[page.text for page in pages], meta=meta)
+
+
+async def read_report_text_async(month: str | None = None) -> Result[list[str]]:
+    r"""The narrative of a WASDE release, WAOB's commodity paragraphs, as text.
+
+    Read from the release's XLS file, sheet ``WASDE Text``: one string per row that holds
+    text, as printed, the first the report's number (``"WASDE - 676\r"``), then the
+    paragraphs from ``WHEAT:`` to cotton, 25 strings and 16,004 characters for October 2026.
+    A release without an XLS file, or whose XLS holds no such sheet while it has a PDF, is
+    read from its PDF instead (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020 decision 4):
+    one string per narrative page, the pages before the one headed Interagency Commodity
+    Estimates Committees (pages 1 to 5 in July 2010 and October 2026), their text as pypdf
+    extracts it; no page after that one is read, and no figure ever comes from a PDF.
+    ``meta.endpoint`` is the file read (``"wasde1026.xls"``, ``"wasde-07-09-2010.pdf"``);
+    ``meta.vintage`` for an XLS the report month its first table sheet prints in its first
+    cell (``"October 2026"``), for a PDF, whose narrative prints a date and no month label,
+    the ESMIS release id as esmis prints it (``"95659"``); ``meta.published_at`` the release
+    time as ESMIS prints it, naive; ``meta.request`` the month given, the release id and the
+    file's URL. The release is the latest, or the one of ``month`` with the latest release
+    time that carries an XLS or a PDF file; every release since 2011 but 2014-01-23 carries
+    an XLS. Every call downloads the file and keeps nothing. Requests: the latest release 1,
+    or the month's pages of ``list_releases``, 25 releases a page from the newest back to
+    the month; then the release 1 and the file 1 (346 KB for October 2026's XLS), and 2 more
+    where a PDF is read after an XLS without the sheet. A month without a release, or whose
+    releases carry neither file (those of 1995 to 1997 carry TXT files), raises
+    ``NotFoundError`` naming their formats; a month not written ``"YYYY-MM"``
+    ``InvalidRequestError``; an XLS whose narrative sheet holds anything but text in its
+    first column, or a PDF whose narrative's end cannot be told (no page headed Interagency
+    Commodity Estimates Committees, as in a scan without text), ``ValidationError``.
+
+    Args:
+        month: The release month, ``"YYYY-MM"``, e.g. ``"2026-10"``, ``"2010-07"``;
+            ``None`` (the default) reads the latest release.
+    """
+    lacking = _lacking(month, "XLS or PDF file")
+    release = _carrying(await _releases(month), ("xls", "pdf"), lacking)
+    return await _narrative(release, {"month": month})
+
+
+get_balance_sheet = sync(get_balance_sheet_async)
 get_latest_release = sync(get_latest_release_async)
 get_release = sync(get_release_async)
+get_table = sync(get_table_async)
 list_commodities = sync(list_commodities_async)
 list_regions = sync(list_regions_async)
 list_releases = sync(list_releases_async)
 list_tables = sync(list_tables_async)
+read_report_text = sync(read_report_text_async)

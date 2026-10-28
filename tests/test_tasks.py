@@ -5,12 +5,19 @@
 The tasks send through xippios-usda-esmis's tasks, so the fixtures are esmis's answers,
 recorded here on 2026-10-28 under esmis's wrapper names (ADR-0021 decision 4): WASDE's
 release page 0 (``release_find_by_identifier/wasde_page0.json``), release 796099
-(``release_find_by_id/796099.json``), and the download of its XML
-(``download_release_file/wasde1026_xml.json``), whose body is the sample
-``files/wasde_xml/sr08_sr35_sr36.xml``, so ``get_release`` replays as the parser reads
-that sample. The three list tasks answer from the packaged lists in ``reference/`` and
-send nothing. Every tool is called end to end through the MCP server; the bulk task is
-neither a tool nor a route.
+(``release_find_by_id/796099.json``) and the downloads of its XML and its XLS: two
+fixtures of the XML (``download_release_file/wasde1026_xml.json`` and
+``wasde1026_xml_sr11_sr24.json``), whose bodies are the samples
+``files/wasde_xml/sr08_sr35_sr36.xml`` and ``sr11_sr24.xml``, so ``get_release``,
+``get_table`` and ``get_balance_sheet`` replay as the parser reads those samples, and one
+of the XLS (``wasde1026_xls.json``), whose body is ``files/wasde_xls/wasde_text_page_8.xls``.
+The PDF path of ``read_report_text`` replays release 95659 of 2010-07
+(``release_find_by_id/95659.json``) and the download of its PDF, whole
+(``download_release_file/wasde-07-09-2010_pdf.json``): that release carries an XLS too, so
+the test reads it as one without, its XLS left out of the recorded release, as the tests of
+``get_release``'s refusals leave out an XML file. The three list tasks answer from the
+packaged lists in ``reference/`` and send nothing. Every tool is called end to end through
+the MCP server; the bulk task is neither a tool nor a route.
 """
 
 import json
@@ -25,7 +32,14 @@ import pytest
 import respx
 from fastapi.routing import APIRoute
 from pydantic import TypeAdapter
-from xippios.core import InvalidRequestError, NotFoundError, PackagedList, UpstreamModel
+from xippios.core import (
+    InvalidRequestError,
+    NotFoundError,
+    PackagedList,
+    ResultCap,
+    UnknownCode,
+    UpstreamModel,
+)
 from xippios.core.mcp import tool_name
 from xippios.core.testing import (
     ReplayFixture,
@@ -33,6 +47,7 @@ from xippios.core.testing import (
     assert_time_between,
     load_fixture,
     mcp_call,
+    mcp_call_text,
     sent_urls,
 )
 from xippios.usda.esmis.models import Release as EsmisRelease
@@ -42,19 +57,37 @@ from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.http import router
 from xippios.usda.wasde.mcp import server
-from xippios.usda.wasde.models import Attribute, Commodity, Region, Release, Table
+from xippios.usda.wasde.models import (
+    Attribute,
+    Commodity,
+    Region,
+    Release,
+    Table,
+    WasdeTableValue,
+    WasdeXmlCell,
+)
 from xippios.usda.wasde.params import PACKAGE, PACKAGED_LISTS
-from xippios.usda.wasde.parse import parse_wasde_xml
+from xippios.usda.wasde.parse import parse_wasde_pdf, parse_wasde_xls, parse_wasde_xml
 
 FIXTURES = Path(__file__).parent / "fixtures"
 SAMPLE = FIXTURES / "files" / "wasde_xml" / "sr08_sr35_sr36.xml"
+SR11_SR24 = FIXTURES / "files" / "wasde_xml" / "sr11_sr24.xml"
+XLS_SAMPLE = FIXTURES / "files" / "wasde_xls" / "wasde_text_page_8.xls"
+PDF_SAMPLE = FIXTURES / "files" / "wasde_pdf" / "wasde-07-09-2010.pdf"
 ESMIS = "https://esmis.nal.usda.gov"
 PAGE_0 = f"{ESMIS}/api/v1/release/findByIdentifier/wasde?page=0"
 RELEASE = f"{ESMIS}/api/v1/release/findById/796099"
+RELEASE_2010 = f"{ESMIS}/api/v1/release/findById/95659"
 XML = f"{ESMIS}/sites/default/release-files/796099/wasde1026.xml"
+XLS = f"{ESMIS}/sites/default/release-files/796099/wasde1026.xls"
+FILES_2010 = f"{ESMIS}/sites/default/release-files/3t945q76s/3n203z415"
+PDF_2010 = f"{FILES_2010}/8c97kq758/wasde-07-09-2010.pdf"
+XLS_2010 = f"{FILES_2010}/jh343s72z/wasde-07-09-2010.xls"
 RELEASES = "esmis_api_release_findByIdentifier"
 OCTOBER_PRINTED = datetime(2026, 10, 9, 12, 0)
 """The October 2026 release's ``release_datetime`` as printed, its ``+0000`` dropped."""
+JULY_2010_PRINTED = datetime(2010, 7, 9, 12, 0)
+"""The July 2010 release's ``release_datetime`` as printed, its ``+0000`` dropped."""
 PACKAGED_FETCHED = datetime(2026, 10, 28, 16, 26, 51, tzinfo=UTC)
 """The packaged lists' ``fetched``, when the refresh script's XML download was complete."""
 FILE_KEYS = {"param", "endpoint", "fetched", "note", "records"}
@@ -234,6 +267,459 @@ def test_a_month_answers_its_latest_release_with_an_xml_file() -> None:
     assert tasks._with_xml(both, "no XML in 2026-10").id == "796099", "the latest release time"
 
 
+SLICE_FIELDS = [
+    "report",
+    "table",
+    "matrix",
+    "commodity_header",
+    "region_header",
+    "commodity",
+    "region",
+    "market_year",
+    "forecast_month",
+    "attribute",
+    "attribute_group",
+    "statistic",
+    "unit",
+    "cell_value",
+    "value",
+]
+"""The fields a slice's record keeps (Johannes, 2026-10-28, G5 inside PR 5)."""
+
+
+def values(records: list[WasdeXmlCell]) -> list[WasdeTableValue]:
+    """The records as the slices answer them, without their page's labels."""
+    return [WasdeTableValue.project(record) for record in records]
+
+
+def test_a_slice_record_is_the_xml_record_without_its_pages_labels() -> None:
+    """Every field copied unchanged; the page's title, subtitle, footer and month left out."""
+    assert list(WasdeTableValue.model_fields) == SLICE_FIELDS
+    dropped = set(WasdeXmlCell.model_fields) - set(SLICE_FIELDS)
+    assert dropped == {"page_title", "sub_report_subtitle", "sub_report_footer", "report_month"}
+    assert [name for name in WasdeXmlCell.model_fields if name in SLICE_FIELDS] == SLICE_FIELDS
+    for record in parse_wasde_xml(SR11_SR24):
+        assert_projection(WasdeTableValue.project(record), record)
+
+
+def test_the_pages_labels_are_list_tables_s() -> None:
+    """What a slice leaves out is stated once per page, as the page's records carry it."""
+    tables = {table.report: table for table in tasks.list_tables().data}
+    for record in parse_wasde_xml(SR11_SR24):
+        table = tables[record.report]
+        assert record.report_month == table.report_month
+        assert record.table in {table.sub_report_title, table.sub_report_title2}
+        assert record.sub_report_subtitle in {table.sub_report_subtitle, None}
+        footers = {table.sub_report_footer, table.sub_report_footer2, table.sub_report_footer3}
+        assert record.sub_report_footer in footers
+
+
+def replay_october(replay_fixture: ReplayFixture, download: str) -> list[respx.Route]:
+    """Page 0, release 796099 and one of its downloads: the routes, in that order."""
+    return [
+        replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"]),
+        replay_fixture("release_find_by_id", "796099"),
+        replay_fixture("download_release_file", download),
+    ]
+
+
+@pytest.mark.parametrize("month", [None, "2026-10"])
+def test_get_table_answers_one_page(
+    replay_fixture: ReplayFixture,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    month: str | None,
+) -> None:
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    listed, release, download = replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
+    before = datetime.now(UTC)
+    result = tasks.get_table("sr24", month)
+    after = datetime.now(UTC)
+    page = [record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr24"]
+    assert result.data == values(page), "the page's values of the replayed body, in file order"
+    assert result.meta.endpoint == "wasde1026.xml"
+    assert result.meta.vintage == "October 2026"
+    assert (result.meta.published_at, result.meta.published_at_naive) == (OCTOBER_PRINTED, True)
+    expected = {"table": "sr24", "release_id": 796099, "url": XML}
+    assert result.meta.request == expected | ({"month": month} if month else {})
+    assert_time_between(result.meta.retrieved_at, before, after)
+    assert (sent_urls(listed), sent_urls(release), sent_urls(download)) == (
+        [PAGE_0],
+        [RELEASE],
+        [XML],
+    )
+    assert list(tmp_path.iterdir()) == [], "the temporary directory is removed"
+
+
+@pytest.mark.parametrize(
+    ("table", "first"),
+    [
+        ("SR12", "sr12 (page 12: U.S. Feed Grain and Corn Supply and Use  1/)"),
+        ("12", "sr12 (page 12: U.S. Feed Grain and Corn Supply and Use  1/)?"),
+        ("sr7", "sr37 (page 37: Reliability of United States October Projections  1/)"),
+    ],
+)
+def test_get_table_refuses_a_page_list_tables_lacks(
+    respx_mock: respx.MockRouter, table: str, first: str
+) -> None:
+    with pytest.raises(UnknownCode) as caught:
+        tasks.get_table(table)
+    message = str(caught.value)
+    assert message.startswith(
+        f"{table!r} is not a table in the packaged table list (fetched 2026-10-28). "
+        f"Did you mean {first}"
+    )
+    assert "'sr' and its two-digit printed number: page 12 is 'sr12'" in message
+    assert isinstance(caught.value, InvalidRequestError)
+    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
+
+
+def test_get_table_of_a_page_the_file_lacks(replay_fixture: ReplayFixture) -> None:
+    """The replayed body holds pages 11 and 24 only, as a month without a page would."""
+    replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
+    with pytest.raises(NotFoundError) as caught:
+        tasks.get_table("sr12")
+    assert str(caught.value) == (
+        "wasde1026.xml of release 796099 holds no page sr12; its pages: sr11, sr24"
+    )
+
+
+BALANCE_SHEETS: list[tuple[str, str, list[tuple[str, str]], bool]] = [
+    ("Wheat", "United States", [("sr11", "matrix1")], False),
+    ("Wheat", "Argentina", [("sr18", "matrix1"), ("sr18", "matrix2"), ("sr19", "matrix1")], True),
+    ("Wheat", "World", [("sr18", "matrix1"), ("sr18", "matrix2"), ("sr19", "matrix1")], True),
+    ("CORN", "United States", [("sr12", "matrix2")], False),
+    (
+        "Corn",
+        "United States",
+        [("sr22", "matrix1"), ("sr22", "matrix2"), ("sr23", "matrix1")],
+        True,
+    ),
+    ("Cotton", "United States", [("sr17", "matrix1")], False),
+    ("Cotton", "India", [("sr26", "matrix3"), ("sr26", "matrix4"), ("sr27", "matrix2")], True),
+    ("Sugar", "United States", [("sr16", "matrix1")], False),
+    ("Sugar", "Mexico", [("sr16", "matrix2")], False),
+    ("Soybean", "Paraguay", [("sr28", "matrix4"), ("sr28", "matrix5"), ("sr28", "matrix3")], True),
+    ("Meats", "United States", [("sr32", "matrix1")], False),
+    ("Milk", "United States", [("sr33", "matrix2")], False),
+]
+
+
+@pytest.mark.parametrize(("commodity", "region", "matrices", "sliced"), BALANCE_SHEETS)
+def test_a_balance_sheet_is_the_packaged_matrices_of_its_commodity_and_region(
+    respx_mock: respx.MockRouter,
+    commodity: str,
+    region: str,
+    matrices: list[tuple[str, str]],
+    sliced: bool,
+) -> None:
+    """A U.S. or Mexico matrix where the list has one, else the world pages by region."""
+    found, slices = tasks._balance_sheet(commodity, region)
+    assert [(row.report, row.matrix) for row in found] == matrices
+    assert slices is sliced
+    assert all(tasks.BY_CLASS not in row.table for row in found), "page 11's by-class table"
+    assert respx_mock.calls.call_count == 0
+
+
+def test_the_us_rows_of_a_world_table_answer_the_commodities_without_a_us_matrix() -> None:
+    """As the docstring names them: no U.S. matrix carries their name as printed."""
+    rows = tasks.list_commodities().data
+    world = {row.commodity for row in rows if row.region == "World"}
+    national = {row.commodity for row in rows if row.region == "United States"}
+    assert sorted(world - national) == [
+        "Coarse Grain",
+        "Corn",
+        "Rice",
+        "Soybean",
+        "Soybean Meal",
+        "Soybean Oil",
+    ]
+    assert sorted(world & national) == ["Cotton", "Wheat"]
+
+
+def test_get_balance_sheet_of_a_us_commodity(
+    replay_fixture: ReplayFixture, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Page 11's first matrix; its by-class table, the page's second matrix, is left out."""
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    listed, release, download = replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
+    result = tasks.get_balance_sheet("Wheat")
+    matrix = [
+        record
+        for record in parse_wasde_xml(SR11_SR24)
+        if (record.report, record.matrix) == ("sr11", "matrix1")
+    ]
+    assert result.data == values(matrix)
+    assert {record.table for record in result.data} == {"U.S. Wheat Supply and Use  1/"}
+    assert result.meta.endpoint == "wasde1026.xml"
+    assert result.meta.vintage == "October 2026"
+    assert result.meta.request == {
+        "commodity": "Wheat",
+        "region": "United States",
+        "release_id": 796099,
+        "url": XML,
+    }
+    assert (sent_urls(listed), sent_urls(release), sent_urls(download)) == (
+        [PAGE_0],
+        [RELEASE],
+        [XML],
+    )
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize(
+    ("region", "printed"),
+    [
+        ("Thailand", {"        Thailand"}),
+        ("World", {"World  3/"}),
+        ("United States", {"United States"}),
+        ("European Union", {"        European Union  6/"}),
+        ("World Less China", {"    World Less China"}),
+    ],
+)
+def test_get_balance_sheet_of_a_world_commodity_by_region(
+    replay_fixture: ReplayFixture, region: str, printed: set[str]
+) -> None:
+    """The world rice rows of the region; the replayed body holds page 24, not page 25."""
+    replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
+    result = tasks.get_balance_sheet("Rice", region, "2026-10")
+    rows = [
+        record
+        for record in parse_wasde_xml(SR11_SR24)
+        if record.report == "sr24" and tasks._bare(record.region) == region
+    ]
+    assert result.data == values(rows)
+    assert {record.region for record in result.data} == printed, "the region as printed"
+    assert result.meta.request == {
+        "commodity": "Rice",
+        "region": region,
+        "month": "2026-10",
+        "release_id": 796099,
+        "url": XML,
+    }
+
+
+@pytest.mark.parametrize(
+    ("printed", "bare"),
+    [
+        ("        European Union  5/", "European Union"),
+        ("World  3/", "World"),
+        ("    World Less China", "World Less China"),
+        ("        Southeast Asia 5/", "Southeast Asia"),
+        ("        N. Afr & Mideast  7/", "N. Afr & Mideast"),
+        ("U.S.", "U.S."),
+        (None, None),
+    ],
+)
+def test_a_region_is_matched_without_its_indent_and_footnote_marker(
+    printed: str | None, bare: str | None
+) -> None:
+    assert tasks._bare(printed) == bare
+
+
+@pytest.mark.parametrize(
+    ("commodity", "region", "message"),
+    [
+        (
+            "corn",
+            "United States",
+            "'corn' is not a commodity in the packaged commodity list (fetched 2026-10-28). "
+            "Did you mean CORN (United States sr12), Corn (World sr22, World sr23), ",
+        ),
+        (
+            "Wheat",
+            "argentina",
+            "'argentina' is not a region in the packaged region list (fetched 2026-10-28). "
+            "Did you mean Argentina (rows of sr18, sr19)?",
+        ),
+        (
+            "CORN",
+            "World",
+            "'World' is not a region in the packaged region list (fetched 2026-10-28). "
+            "'CORN' is printed for United States.",
+        ),
+        (
+            "Wheat",
+            "united states",
+            "'united states' is not a region in the packaged region list (fetched 2026-10-28). "
+            "Did you mean United States (sr11 matrix1)? A region of 'Wheat' is 'United "
+            "States' or 'Mexico' where it has a U.S. or Mexico matrix, else one its world "
+            "pages print",
+        ),
+        (
+            "Sugar",
+            "Mexco",
+            "'Mexco' is not a region in the packaged region list (fetched 2026-10-28). "
+            "Did you mean Mexico (sr16 matrix2)?",
+        ),
+    ],
+)
+def test_get_balance_sheet_refuses_a_near_miss_naming_the_closest(
+    respx_mock: respx.MockRouter, commodity: str, region: str, message: str
+) -> None:
+    with pytest.raises(UnknownCode) as caught:
+        tasks.get_balance_sheet(commodity, region)
+    assert str(caught.value).startswith(message)
+    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
+
+
+def test_a_balance_sheet_the_file_lacks_is_not_found(replay_fixture: ReplayFixture) -> None:
+    """The replayed body holds pages 11 and 24, not the world corn pages 22 and 23."""
+    replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
+    with pytest.raises(NotFoundError) as caught:
+        tasks.get_balance_sheet("Corn", "Argentina")
+    assert str(caught.value) == (
+        "wasde1026.xml of release 796099 holds no record of 'Corn' for 'Argentina' in sr22 "
+        "matrix1 'World Corn Supply and Use  1/'; sr22 matrix2 'World Corn Supply and Use  "
+        "1/'; sr23 matrix1 \"World Corn Supply and Use  1/  (Cont'd.)\", as the packaged list "
+        "read them from October 2026; get_table answers a page as that month prints it"
+    )
+
+
+@pytest.mark.parametrize("month", [None, "2026-10"])
+def test_read_report_text_reads_the_xls_sheet(
+    replay_fixture: ReplayFixture,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    month: str | None,
+) -> None:
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    listed, release, download = replay_october(replay_fixture, "wasde1026_xls")
+    before = datetime.now(UTC)
+    result = tasks.read_report_text(month)
+    after = datetime.now(UTC)
+    assert result.data == [row.text for row in parse_wasde_xls(XLS_SAMPLE)]
+    assert result.data[0] == "WASDE - 676\r"
+    assert result.meta.endpoint == "wasde1026.xls", "the file read"
+    assert result.meta.vintage == "October 2026", "the month Page 8 prints"
+    assert (result.meta.published_at, result.meta.published_at_naive) == (OCTOBER_PRINTED, True)
+    expected = {"release_id": 796099, "url": XLS} | ({"month": month} if month else {})
+    assert result.meta.request == expected
+    assert_time_between(result.meta.retrieved_at, before, after)
+    assert (sent_urls(listed), sent_urls(release), sent_urls(download)) == (
+        [PAGE_0],
+        [RELEASE],
+        [XLS],
+    )
+    assert list(tmp_path.iterdir()) == []
+
+
+def july_2010() -> EsmisRelease:
+    """Release 95659, 2010-07, as recorded: TXT, XML, PDF and XLS."""
+    fixture = load_fixture(FIXTURES / "release_find_by_id" / "95659.json")
+    body = json.loads(fixture.response.content)
+    (release,) = TypeAdapter(ReleaseResults).validate_python(body).results
+    return release
+
+
+def leaving_out(release: EsmisRelease, format: str) -> Release:
+    """The recorded release with its files of ``format`` left out, re-shaped."""
+    files = [url for url in release.files if not url.endswith(f".{format}")]
+    return tasks._release(release.model_copy(update={"files": files}))
+
+
+@pytest.mark.anyio
+async def test_a_release_without_an_xls_is_read_from_its_pdf(
+    replay_fixture: ReplayFixture, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Every release before 2010-07 carries none; release 95659 read as one of them."""
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    release = replay_fixture("release_find_by_id", "95659")
+    download = replay_fixture("download_release_file", "wasde-07-09-2010_pdf")
+    july = leaving_out(july_2010(), "xls")
+    assert tasks._carrying([july], ("xls", "pdf"), "no XLS or PDF").id == "95659"
+    result = await tasks._narrative(july, {"month": "2010-07"})
+    assert result.data == [page.text for page in parse_wasde_pdf(PDF_SAMPLE)]
+    assert len(result.data) == 5, "pages 1 to 5, the narrative of July 2010"
+    assert result.meta.endpoint == "wasde-07-09-2010.pdf"
+    assert result.meta.vintage == "95659", "the PDF prints a date: the ESMIS release id"
+    assert (result.meta.published_at, result.meta.published_at_naive) == (JULY_2010_PRINTED, True)
+    assert result.meta.request == {"month": "2010-07", "release_id": 95659, "url": PDF_2010}
+    assert (sent_urls(release), sent_urls(download)) == ([RELEASE_2010], [PDF_2010])
+    assert list(tmp_path.iterdir()) == []
+
+
+def no_narrative(path: Path) -> list[Any]:
+    """``parse_wasde_xls`` on a workbook without the sheet, as its own refusal reads."""
+    raise NotFoundError(
+        "wasde.xls: the workbook has no sheet 'WASDE Text', which holds the narrative; its "
+        "sheets: Revisions",
+        source=SOURCE,
+    )
+
+
+@pytest.mark.anyio
+async def test_an_xls_without_the_narrative_gives_way_to_the_pdf(
+    replay_fixture: ReplayFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The XLS is downloaded and read first; the recorded XLS answer is served at its URL."""
+    monkeypatch.setattr(tasks, "parse_wasde_xls", no_narrative)
+    release = replay_fixture("release_find_by_id", "95659")
+    xls = replay_fixture("download_release_file", "wasde1026_xls", url=XLS_2010)
+    pdf = replay_fixture("download_release_file", "wasde-07-09-2010_pdf")
+    result = await tasks._narrative(tasks._release(july_2010()), {})
+    assert result.meta.endpoint == "wasde-07-09-2010.pdf"
+    assert result.data == [page.text for page in parse_wasde_pdf(PDF_SAMPLE)]
+    assert sent_urls(release) == [RELEASE_2010, RELEASE_2010], "one per download"
+    assert (sent_urls(xls), sent_urls(pdf)) == ([XLS_2010], [PDF_2010])
+
+
+@pytest.mark.anyio
+async def test_an_xls_without_the_narrative_and_no_pdf_is_not_found(
+    replay_fixture: ReplayFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(tasks, "parse_wasde_xls", no_narrative)
+    replay_fixture("release_find_by_id", "95659")
+    replay_fixture("download_release_file", "wasde1026_xls", url=XLS_2010)
+    pdf = replay_fixture("download_release_file", "wasde-07-09-2010_pdf")
+    with pytest.raises(NotFoundError) as caught:
+        await tasks._narrative(leaving_out(july_2010(), "pdf"), {})
+    assert str(caught.value) == (
+        "wasde-07-09-2010.xls of release 95659 holds no narrative, and the release has no PDF "
+        "file (its formats: txt, xml, xls): wasde.xls: the workbook has no sheet 'WASDE "
+        "Text', which holds the narrative; its sheets: Revisions"
+    )
+    assert sent_urls(pdf) == []
+
+
+def test_a_month_without_an_xls_or_a_pdf_is_refused_naming_its_formats() -> None:
+    """As 1995 to 1997 are, TXT only (layout.md); built from page 0's releases."""
+    october = page_0()[0]
+    txt = october.model_copy(
+        update={"files": [url for url in october.files if url.endswith(".txt")]}
+    )
+    with pytest.raises(NotFoundError) as caught:
+        tasks._carrying(
+            [tasks._release(txt)], ("xls", "pdf"), tasks._lacking("1996-05", "XLS or PDF file")
+        )
+    assert str(caught.value) == (
+        "no WASDE release of 1996-05 has an XLS or PDF file: release 796099 (2026-10-09) has txt."
+    )
+    assert tasks._lacking(None, "XML file") == "the latest WASDE release has no XML file"
+
+
+def test_the_slices_have_caps_of_their_own() -> None:
+    """Each note says how to see the rest (Johannes, 2026-10-28, G5 inside PR 5).
+
+    Every other tool keeps the default; none of them is cut but ``list_releases`` called
+    without ``since``, whose filters the default note's narrowing names.
+    """
+    assert dict(tasks.MCP_CAPS) == {
+        "get_table": ResultCap(
+            max_rows=400,
+            max_bytes=131_072,
+            note="call get_balance_sheet for one commodity's matrix, or one region's rows of a "
+            "world page (list_commodities, list_regions); Python callers get the whole page",
+        ),
+        "get_balance_sheet": ResultCap(
+            max_rows=300,
+            max_bytes=131_072,
+            note="on the world pages a region gives one region's rows (list_regions); Python "
+            "callers get the whole matrix",
+        ),
+    }
+
+
 @pytest.mark.anyio
 async def test_the_bulk_task_is_no_tool_and_no_route() -> None:
     bulk = tasks.BULK_TASKS
@@ -250,17 +736,27 @@ async def test_the_bulk_task_is_no_tool_and_no_route() -> None:
         "usda_wasde_list_tables",
         "usda_wasde_list_commodities",
         "usda_wasde_list_regions",
+        "usda_wasde_get_table",
+        "usda_wasde_get_balance_sheet",
+        "usda_wasde_read_report_text",
     }
-    assert len(routes) == 5
+    assert len(routes) == 8
 
 
-type McpCase = tuple[str, dict[str, Any], list[str], Callable[..., bool]]
-"""A tool's task name, its arguments, the URLs it sends, a check of its answer."""
+type McpCase = tuple[str, dict[str, Any], list[str], list[str], Callable[..., bool]]
+"""A tool's task name, its arguments, the download fixture it replays beside page 0 and
+release 796099 (none, or one), the URLs it sends to page 0, a check of its answer."""
+
+SR24 = values([record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr24"])
+"""Page 24's values in the replayed body, world rice."""
+SR11 = values([record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr11"])
+"""Page 11's values in the replayed body, U.S. wheat and wheat by class."""
 
 MCP_CASES: list[McpCase] = [
     (
         "list_releases",
         {"since": "2026-01-01"},
+        [],
         [PAGE_0],
         lambda payload: (
             [release["month"] for release in payload["data"]][:2] == ["2026-10", "2026-09"]
@@ -272,6 +768,7 @@ MCP_CASES: list[McpCase] = [
     (
         "get_latest_release",
         {},
+        [],
         [PAGE_0],
         lambda payload: (
             payload["data"]["id"] == payload["meta"]["vintage"] == "796099"
@@ -283,6 +780,7 @@ MCP_CASES: list[McpCase] = [
     (
         "list_tables",
         {"search": "wheat"},
+        [],
         [],
         lambda payload: (
             [table["report"] for table in payload["data"]] == ["sr11", "sr18", "sr19"]
@@ -296,6 +794,7 @@ MCP_CASES: list[McpCase] = [
         "list_commodities",
         {"search": "sr12"},
         [],
+        [],
         lambda payload: (
             [row["commodity"] for row in payload["data"]] == ["FEED GRAINS", "CORN"]
             and [row["matrix"] for row in payload["data"]] == ["matrix1", "matrix2"]
@@ -305,6 +804,7 @@ MCP_CASES: list[McpCase] = [
     (
         "list_regions",
         {},
+        [],
         [],
         lambda payload: (
             len(payload["data"]) == 70
@@ -317,25 +817,91 @@ MCP_CASES: list[McpCase] = [
             and "note" not in payload
         ),
     ),
+    (
+        "get_table",
+        {"table": "sr24"},
+        ["wasde1026_xml_sr11_sr24"],
+        [PAGE_0],
+        lambda payload: (
+            payload["data"] == [record.model_dump(mode="json") for record in SR24]
+            and list(payload["data"][0]) == SLICE_FIELDS
+            and "note" not in payload
+            and payload["meta"]["vintage"] == "October 2026"
+            and payload["meta"]["request"] == {"table": "sr24", "release_id": 796099, "url": XML}
+        ),
+    ),
+    (
+        "get_balance_sheet",
+        {"commodity": "Rice", "region": "Thailand"},
+        ["wasde1026_xml_sr11_sr24"],
+        [PAGE_0],
+        lambda payload: (
+            {row["region"] for row in payload["data"]} == {"        Thailand"}
+            and {row["report"] for row in payload["data"]} == {"sr24"}
+            and list(payload["data"][0]) == SLICE_FIELDS
+            and "note" not in payload
+            and payload["meta"]["endpoint"] == "wasde1026.xml"
+            and payload["meta"]["request"]
+            == {"commodity": "Rice", "region": "Thailand", "release_id": 796099, "url": XML}
+        ),
+    ),
+    (
+        "read_report_text",
+        {},
+        ["wasde1026_xls"],
+        [PAGE_0],
+        lambda payload: (
+            payload["data"] == [row.text for row in parse_wasde_xls(XLS_SAMPLE)]
+            and payload["data"][0] == "WASDE - 676\r"
+            and "note" not in payload
+            and payload["meta"]["endpoint"] == "wasde1026.xls"
+            and payload["meta"]["vintage"] == "October 2026"
+            and payload["meta"]["published_at"] == "2026-10-09T12:00:00"
+        ),
+    ),
 ]
 
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-    ("task", "arguments", "urls", "check"), MCP_CASES, ids=[case[0] for case in MCP_CASES]
+    ("task", "arguments", "downloads", "urls", "check"),
+    MCP_CASES,
+    ids=[case[0] for case in MCP_CASES],
 )
 async def test_every_tool_end_to_end(
     replay_fixture: ReplayFixture,
     task: str,
     arguments: dict[str, Any],
+    downloads: list[str],
     urls: list[str],
     check: Callable[[Any], bool],
 ) -> None:
     route = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
+    for download in downloads:
+        replay_fixture("release_find_by_id", "796099")
+        replay_fixture("download_release_file", download)
     payload = await mcp_call(server, f"usda_wasde_{task}", arguments)
     assert payload["meta"]["source"] == SOURCE
     assert check(payload), payload["meta"]
     assert sent_urls(route) == urls
+
+
+@pytest.mark.anyio
+async def test_get_table_answers_a_page_within_its_cap_whole(
+    replay_fixture: ReplayFixture,
+) -> None:
+    """Page 11, U.S. wheat and wheat by class, fits 400 rows and 128 KB."""
+    replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
+    payload = await mcp_call(server, "usda_wasde_get_table", {"table": "sr11"})
+    assert "note" not in payload
+    assert payload["data"] == [record.model_dump(mode="json") for record in SR11]
+
+
+@pytest.mark.anyio
+async def test_a_refusal_reaches_the_agent_as_text(respx_mock: respx.MockRouter) -> None:
+    text = await mcp_call_text(server, "usda_wasde_get_balance_sheet", {"commodity": "corn"})
+    assert text.startswith("error: UnknownCode: 'corn' is not a commodity")
+    assert respx_mock.calls.call_count == 0
 
 
 def test_every_task_is_tested_through_the_mcp_server_or_is_bulk() -> None:

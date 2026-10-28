@@ -16,7 +16,7 @@ the family rules every source shares are in `.claude/family.md`, which the next 
 | Credentials | none; the API is open |
 | Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; ADR-0010), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
 | Write tools | no, this package is read-only |
-| Files | a release carries XML, XLS, TXT and PDF since 2016-10 (`docs/upstream/layout.md`); parsed in `parse/`, one module per file kind: the XML with the standard library's `xml.etree.ElementTree` (`parse/wasde_xml.py`); the XLS with xlrd, a dependency, of which the refresh script reads the block titles of pages 12 to 15 for now (`_vocabulary.py`), its parser and the PDF's narrative (pypdf) to follow; the parser tests read the samples under `tests/fixtures/files/`, their provenance in its `README.md` (ADR-0020) |
+| Files | a release carries XML, XLS, TXT and PDF since 2016-10 (`docs/upstream/layout.md`); parsed in `parse/`, one module per file kind: the XML with the standard library's `xml.etree.ElementTree` (`parse/wasde_xml.py`); the XLS's narrative, sheet `WASDE Text`, with xlrd, a dependency (`parse/wasde_xls.py`), whose block titles of pages 12 to 15 the refresh script reads as well (`_vocabulary.py`); the PDF's narrative pages with pypdf, a dependency, text only (`parse/wasde_pdf.py`; ADR-0020 decision 4); the TXT is not read; the parser tests read the samples under `tests/fixtures/files/`, their provenance in its `README.md` (ADR-0020) |
 | Depends on | `xippios-usda-esmis~=0.1.0`: the task layer and its models only, never `api/` or `_client`; this package's servers serve its own tasks, and an agent that wants a dependency's tools runs that package's server (ADR-0021); used to list WASDE's releases in ESMIS's catalog and to download their files |
 
 The snapshot listed in `docs/upstream/FETCHED.md` is the reference for names, parameters and semantics.
@@ -32,12 +32,16 @@ src/xippios/usda/wasde/
                    upstream's documented error shapes
   errors.py        the package's own error classes, where conventions §5 calls for one
   models.py        pydantic models (UpstreamModel): Release, esmis's release re-shaped,
-                   WasdeXmlCell, one value of a release's XML file, and Table, Commodity,
-                   Region and Attribute, the records of the four packaged lists
+                   WasdeXmlCell, one value of a release's XML file, WasdeTableValue, its
+                   projection without the page's labels that the slices answer,
+                   WasdeXlsText and WasdePdfPage, a paragraph of its XLS's narrative and a
+                   narrative page of its PDF, and Table, Commodity, Region and Attribute,
+                   the records of the four packaged lists
   api/             empty: the package wraps no endpoint of its own; ESMIS's catalog and the
                    download are xippios-usda-esmis's tasks (ADR-0021)
   parse/           file parsers, one module per file kind: parse_<file_kind>(path) -> list[Model];
-                   wasde_xml.py, parse_wasde_xml
+                   wasde_xml.py, parse_wasde_xml; wasde_xls.py, parse_wasde_xls (the
+                   narrative sheet); wasde_pdf.py, parse_wasde_pdf (the narrative pages)
   _vocabulary.py   the rules that build the four packaged lists from a release's XML records
                    and its XLS's block titles (xlrd); the refresh script and the live tests
                    call them, no task does
@@ -53,8 +57,10 @@ scripts/
   refresh_reference.py   downloads the latest release's XML and XLS through esmis (five
                          requests), builds the four lists with _vocabulary and writes them
                          with PackagedList.write; --keep and --from rebuild from kept files
-  cut_sample.py          downloads one release's XML through esmis once, writes the samples
-                         under tests/fixtures/files/wasde_xml/ and the download fixture
+  cut_sample.py          downloads one file of one release through esmis once (--format xml,
+                         xls or pdf), writes its samples under tests/fixtures/files/wasde_<format>/
+                         (XML pages cut verbatim, XLS sheets copied cell by cell with xlwt, a
+                         PDF whole) and, if asked, the download fixture
   refresh_upstream.py    captures docs/upstream/ and writes FETCHED.md (/refresh-upstream): the
                          ESMIS and WAOB pages, www.usda.gov first, USDA's CDN origin where
                          www.usda.gov refuses
@@ -62,18 +68,21 @@ tests/
   conftest.py      enables xippios.core.testing.plugin, which keeps the run offline
   fixtures/        recorded responses, never hand-written: esmis's catalog answers under
                    esmis's wrapper names (release_find_by_identifier/, release_find_by_id/),
-                   the XML download under the task that sends it (download_release_file/)
+                   the XML, XLS and PDF downloads under the task that sends them
+                   (download_release_file/)
   fixtures/files/  a sample of each file kind, <file_kind>/<case>.<ext>; README.md, their provenance
   test_family.py   core's family check, one line: namespace levels, py.typed, __version__,
                    the adapters serving exactly the tasks, task shapes and docstrings, the
                    README status table, the template tag, the core bound
-  test_parse.py    the parser's tests on the samples
+  test_parse.py    the XML parser's tests on the samples
+  test_parse_xls.py, test_parse_pdf.py  the narrative parsers' tests on the XLS and PDF
+                   samples, their refusals on workbooks and PDFs written in the test
   test_tasks.py    per-task replay tests, every tool through the MCP server, the list tasks
                    on the packaged files
   test_reference.py  the packaged lists against the samples, the list rules and refusals
-  test_live.py     @pytest.mark.live smoke tests, one per task, the live parser test on the
-                   latest XML, and the packaged lists against the latest XML and XLS, which
-                   one session fixture fetches once
+  test_live.py     @pytest.mark.live smoke tests, one per task, the live parser tests on the
+                   latest XML, XLS and PDF, and the packaged lists against the latest XML and
+                   XLS, which one session fixture fetches once with the PDF
 docs/upstream/     documentation snapshot and FETCHED.md
 .github/workflows/ ci.yml (the required ci check, with the CHANGELOG and fixture-size steps),
                    publish.yml (the release train: tag, build, PyPI), live.yml (nightly live
@@ -153,14 +162,65 @@ The API needs no key, so the workflow uses no secret.
   group of a matrix, each with its text, and keeps no trace of which the page prints,
   and a unit on a value's path is its column's share of a unit printed across columns;
   the XLS and the TXT print the unit rows in place.
+- **The slices** (Johannes, 2026-10-28, G5). `get_table(table, month)` answers the
+  values of one page, `get_balance_sheet(commodity, region, month)` those of one
+  commodity's supply-and-use matrix; both read the month's XML through `get_release`'s
+  lookup and read (`_releases`, `_read_xml`), one download per call and nothing kept,
+  and answer its `meta` with the arguments given. Their records are `WasdeTableValue`,
+  `WasdeXmlCell` projected with `UpstreamModel.project` without the page's labels,
+  `page_title`, `sub_report_subtitle`, `sub_report_footer` and `report_month`
+  (Johannes, 2026-10-28, G5 inside PR 5): `list_tables` states the page's titles,
+  subtitles and footnotes once, to which a marker in a label (`Trade 2/`) refers, and
+  the month is `meta.vintage`; `get_release` keeps the full record. The page, the commodity and the
+  region are checked against the packaged lists before anything is sent, case kept; a
+  near miss raises core's `UnknownCode` naming the closest (core's `closest` on the
+  texts, so `"corn"` names `CORN` and `Corn`). A balance sheet is the U.S. or Mexico
+  matrix the commodity list names for `"United States"` (the default) or `"Mexico"`,
+  told apart from page 11's by-class table by its title (`BY_CLASS`, left to
+  `get_table`); else the rows of the commodity's world matrices whose region, stripped of
+  indent and footnote marker (`_bare`), is the one given, so `"United States"` answers
+  the world table's U.S. rows for Coarse Grain, Corn, Rice, Soybean, Soybean Meal and
+  Soybean Oil, which have no U.S. matrix under that name. A record is kept where its
+  page, matrix and title are a packaged matrix's: a month's file that holds none raises
+  `NotFoundError`. The MCP caps (`MCP_CAPS`; ADR-0016; Johannes, 2026-10-28, G5 inside
+  PR 5): `get_table` 400 rows or 128 KB, its note naming `get_balance_sheet` for one
+  matrix or region and Python for the whole page; `get_balance_sheet` 300 rows or 128
+  KB, its note naming a region on the world pages and Python for the whole matrix;
+  every other tool the default, whose note's narrowing only `list_releases` (`since`,
+  `until`) can need. A value is about 350 bytes of the tool's JSON, so every answer of
+  October 2026 fits whole: the largest page, sr28, 364 values and 129,899 bytes, 1,173
+  under the bound; the largest balance sheet, Meats, 280 values and 90,850 bytes; the
+  measured sizes are in the comment above `MCP_CAPS`.
+- **The narrative** (Johannes, 2026-10-28, G5). `read_report_text(month)` reads the
+  release's XLS, sheet `WASDE Text` (`parse/wasde_xls.py`): one string per row with
+  text, verbatim (25 for October 2026, the first `WASDE - 676\r`), `meta.vintage` the
+  month cell (0, 0) of the first `Page N` sheet prints (`October 2026`). A release
+  without an XLS, or whose XLS has no such sheet or no text in it while it has a PDF,
+  is read from the PDF (`parse/wasde_pdf.py`, pypdf; the fallback kept by Johannes,
+  2026-10-28, G5 inside PR 5): one string per page from page 1
+  up to the first page that prints `Interagency Commodity Estimates Committees` on a
+  line of its own, after its running header (`WASDE-484-6`, `WASDE-676-6`): pages 1 to
+  5 in July 2010 and October 2026; no later page is read, no figure comes from a PDF
+  (ADR-0020 decision 4), and `meta.vintage` is the ESMIS release id as esmis prints it
+  (`"95659"`), since the narrative prints a date, not a month label (the session,
+  2026-10-28, rule 7; ADR-0020 decision 5; gap, row 202). The release is the month's latest that carries an XLS or a
+  PDF; a month whose releases carry neither is refused naming their formats. ESMIS
+  lists revision workbooks as the XLS of some releases of 2001 to 2008, and which older
+  report workbooks hold the sheet is unknown: hence the fallback.
 - **Samples and fixtures.** Six samples under `tests/fixtures/files/wasde_xml/`, each a
-  verbatim cut of whole pages of the October 2026 file under 256 KiB, written by
-  `scripts/cut_sample.py` from one download, provenance in its `README.md`. The
-  download's replay fixture `download_release_file/wasde1026_xml.json` is the recorded
-  exchange with the sample `sr08_sr35_sr36.xml` as its body, marked `truncated` with the
-  whole file's `original_bytes` and `sha256`, rewritten in the script's own step
-  (ADR-0024); detect-secrets reads that sha256 as a secret, and `.secrets.baseline`
-  holds it audited, `is_secret: false` (gap, row 124). `.gitattributes` marks
+  verbatim cut of whole pages of the October 2026 file under 256 KiB, one under
+  `wasde_xls/`, the October 2026 XLS's sheets `WASDE Text` and `Page 8` copied cell by
+  cell with xlwt (a dev dependency), and one under `wasde_pdf/`, the July 2010 PDF
+  whole (release 95659), all written by `scripts/cut_sample.py`, one download each,
+  provenance in its `README.md`. The download's replay fixtures under
+  `download_release_file/` are the recorded exchanges, `wasde1026_xml.json` with the
+  sample `sr08_sr35_sr36.xml` as its body, `wasde1026_xml_sr11_sr24.json` with
+  `sr11_sr24.xml` and `wasde1026_xls.json` with the XLS sample (base64), each marked
+  `truncated` with the whole file's `original_bytes` and `sha256`, rewritten in the
+  script's own step (ADR-0024), and `wasde-07-09-2010_pdf.json` with the whole PDF
+  (base64); detect-secrets reads those sha256 values and base64 bodies as secrets, and
+  `.secrets.baseline` holds them audited, `is_secret: false` (gap, row 124). Release
+  95659 carries an XLS too, so the PDF path replays it with its XLS left out. `.gitattributes` marks
   `tests/fixtures/files/**` `-text`, so no checkout converts the samples' CRLF (gap,
   row 189). The catalog fixtures are esmis's
   answers recorded here through core's recorder with esmis's client (ADR-0021).
@@ -189,8 +249,8 @@ The API needs no key, so the workflow uses no secret.
   for the Nth item, and the script refuses to write when a page's counts differ;
   elsewhere it is the title's words between its region and `Supply and Use`; `region`
   is `United States` for a `U.S.` title, `Mexico` and `World` as printed. Region texts
-  stay as printed, with indents and footnote markers; a task that slices a table by
-  region (to come) matches the text stripped of both (gap row 195). The rules are
+  stay as printed, with indents and footnote markers; `get_balance_sheet` matches a
+  region against the text stripped of both (gap row 195). The rules are
   `_vocabulary.py`'s docstring. Nothing is generated into `enums.py` (no value list) and
   `params.PACKAGED_LISTS` names the four files, as the template's
   `/refresh-reference-data` expects; the script replaces the template's `LISTS`,
@@ -203,11 +263,15 @@ The API needs no key, so the workflow uses no secret.
   the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (decided by Johannes on 2026-10-28): one session fixture runs `get_release()` and
-  keeps the XML for the live parser test, then downloads the release's XLS once for the
-  block titles; the live tests of the three list tasks build the lists from those files
-  and compare them with the packaged ones, every field but `report_month`, with the
-  month word of the reliability titles masked (`Reliability of <Month> Projections`,
-  pages 35 to 37: every release names its own month; gap row 195) and each table footer,
-  `sub_report_footer` to `sub_report_footer3`, compared only for whether it is set on
-  both sides, never its text, which changes every release (the session, 2026-10-28,
-  rule 7; gap row 195), a difference naming the rows. Eight keyless requests, two of them downloads, about 3.7 MiB.
+  keeps the XML for the live parser test, then downloads the release's XLS and PDF once
+  each, for the block titles and the narrative parsers' live tests; the live tests of
+  the three list tasks build the lists from those files and compare them with the
+  packaged ones, every field but `report_month`, with the month word of the reliability
+  titles masked (`Reliability of <Month> Projections`, pages 35 to 37: every release
+  names its own month; gap row 195) and each table footer, `sub_report_footer` to
+  `sub_report_footer3`, compared only for whether it is set on both sides, never its
+  text, which changes every release (the session, 2026-10-28, rule 7; gap row 195), a
+  difference naming the rows. `get_table`,
+  `get_balance_sheet` and `read_report_text` run live through the fixture `served`,
+  their lookups live, core's `AsyncClient.download` copying the session's file. Sixteen
+  keyless requests, three of them downloads, about 4.7 MB.

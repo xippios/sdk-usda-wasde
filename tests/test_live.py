@@ -7,8 +7,13 @@ session-scoped fixture, ``latest`` (decided by Johannes on 2026-10-28): it runs
 ``get_release()`` once, which downloads the latest XML through xippios-usda-esmis, and
 keeps a copy of the file in a temporary directory for the live parser test, which
 checks shape, page names and fields, never values (ADR-0020 decision 6); then it
-downloads the release's XLS once through esmis's ``download_release_file``, for the
-block titles of the commodity list; the PDF joins the same fixture later. The three
+downloads the release's XLS and its PDF once each through esmis's
+``download_release_file``, for the block titles of the commodity list and the live
+parser tests of the narrative. ``get_table``, ``get_balance_sheet`` and
+``read_report_text`` run live through the fixture ``served``, which hands their
+downloads the session's copy of the file instead of fetching it again: each still asks
+ESMIS for the latest release and for the release, so its lookups are live, and core's
+``AsyncClient.download`` copies the file of the format its URL names. The three
 list tasks send nothing: their live tests build the lists from the latest files with
 the refresh script's rules (``_vocabulary``) and compare them with the packaged ones,
 every field but ``report_month``, the month word of the reliability titles masked
@@ -24,29 +29,35 @@ the lists are refreshed
 (``scripts/refresh_reference.py``). Keyless requests, paced by
 esmis's client at 30 a minute: the reachability check 1, ``list_releases`` 1 (page 0),
 ``get_latest_release`` 1, the fixture's ``get_release`` 3 (the latest release, the
-release, the file, about 3.4 MB) and its XLS 2 (the release, the file, about 346 KB):
-eight. Assertions read shapes, counts and the rows' names, never a raw payload or a
+release, the file, about 3.4 MB), its XLS 2 and its PDF 2 (the release, the file, about
+346 KB and 917 KB), and ``read_report_text``, ``get_table`` and ``get_balance_sheet``
+2 each (the latest release, the release): sixteen, three of them downloads, about
+4.7 MB. Assertions read shapes, counts and the rows' names, never a raw payload or a
 value, as every live run takes ``--tb=short``.
 """
 
-import calendar
 import re
 import shutil
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
+from os import PathLike
 from pathlib import Path
+from typing import Any
 
 import httpx
 import pytest
-from xippios.core import Result, UpstreamModel
+from pypdf import PdfReader
+from xippios.core import AsyncClient, Downloaded, Result, UpstreamModel
 from xippios.usda.esmis import tasks as esmis
 
 from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import BASE_URL, config
 from xippios.usda.wasde.models import Table, WasdeXmlCell
-from xippios.usda.wasde.parse import parse_wasde_xml
+from xippios.usda.wasde.parse import parse_wasde_pdf, parse_wasde_xls, parse_wasde_xml
+from xippios.usda.wasde.parse.wasde_pdf import HEADING
+from xippios.usda.wasde.parse.wasde_xls import MONTH_NAMES
 
 pytestmark = [pytest.mark.live, pytest.mark.anyio]
 
@@ -63,6 +74,7 @@ STATISTICS = {
     "above_final",
 }
 MONTH = re.compile(r"\d{4}-(0[1-9]|1[0-2])")
+REPORT_MONTH = re.compile(rf"(?:{'|'.join(MONTH_NAMES)}) \d{{4}}")
 
 
 @dataclass(frozen=True)
@@ -73,16 +85,18 @@ class Latest:
         release: What ``get_release()`` answered.
         xml: A copy of the XML file it parsed.
         xls: The same release's XLS file.
+        pdf: The same release's PDF file.
     """
 
     release: Result[list[WasdeXmlCell]]
     xml: Path
     xls: Path
+    pdf: Path
 
 
 @pytest.fixture(scope="session")
 def latest(tmp_path_factory: pytest.TempPathFactory) -> Latest:
-    """``get_release()`` once, keeping a copy of the file its parser reads, and the XLS."""
+    """``get_release()`` once, keeping a copy of the file its parser reads; the XLS, the PDF."""
     directory = tmp_path_factory.mktemp("latest")
     kept = directory / "wasde.xml"
 
@@ -93,9 +107,36 @@ def latest(tmp_path_factory: pytest.TempPathFactory) -> Latest:
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr("xippios.usda.wasde.tasks.parse_wasde_xml", keep_and_parse)
         release = tasks.get_release()
-    xls = directory / "wasde.xls"
-    esmis.download_release_file(release.meta.request["release_id"], "xls", xls)
-    return Latest(release=release, xml=kept, xls=xls)
+    files = {format: directory / f"wasde.{format}" for format in ("xls", "pdf")}
+    for format, path in files.items():
+        esmis.download_release_file(release.meta.request["release_id"], format, path)
+    return Latest(release=release, xml=kept, xls=files["xls"], pdf=files["pdf"])
+
+
+@pytest.fixture
+def served(latest: Latest, monkeypatch: pytest.MonkeyPatch) -> Latest:
+    """The tasks' downloads served from the session's files; their lookups stay live.
+
+    Core's ``AsyncClient.download`` copies the session's file of the format the URL's
+    extension names, instead of fetching it again, and answers as the download would.
+    """
+    files = {"xml": latest.xml, "xls": latest.xls, "pdf": latest.pdf}
+
+    async def copy(self: AsyncClient, url: str, dest: str | PathLike[str], **_: Any) -> Downloaded:
+        source = files[url.rsplit(".", 1)[-1].lower()]
+        shutil.copyfile(source, dest)
+        return Downloaded(
+            path=Path(dest),
+            bytes=source.stat().st_size,
+            content_type=None,
+            filename=None,
+            etag=None,
+            last_modified=None,
+            retrieved_at=datetime.now(UTC),
+        )
+
+    monkeypatch.setattr(AsyncClient, "download", copy)
+    return latest
 
 
 async def test_upstream_answers() -> None:
@@ -195,7 +236,7 @@ def differences(
 
 
 RELIABILITY_TITLE = re.compile(
-    rf"(Reliability of (?:United States )?)(?:{'|'.join(calendar.month_name[1:])})( Projections)"
+    rf"(Reliability of (?:United States )?)(?:{'|'.join(MONTH_NAMES)})( Projections)"
 )
 """A reliability page's title, its month word the release's own: ``Reliability of October
 Projections 1/`` (page 35), ``Reliability of United States October Projections  1/`` (37)."""
@@ -277,3 +318,60 @@ async def test_list_regions_live(latest: Latest) -> None:
     current = vocabulary.regions(parse_wasde_xml(latest.xml))
     assert not differences(result.data, current, by_region)
     assert result.meta.vintage
+
+
+def test_parse_wasde_xls_live(latest: Latest) -> None:
+    """The current XLS still holds its narrative sheet and the month of its first page."""
+    rows = parse_wasde_xls(latest.xls)
+    assert rows
+    assert rows[0].text.startswith("WASDE -")
+    assert [row.row for row in rows] == sorted({row.row for row in rows})
+    assert {row.sheet for row in rows} == {"WASDE Text"}
+    assert {row.report_month for row in rows} == {latest.release.data[0].report_month}
+
+
+def test_parse_wasde_pdf_live(latest: Latest) -> None:
+    """The current PDF's narrative still ends before the committees' page."""
+    pages = parse_wasde_pdf(latest.pdf)
+    reader = PdfReader(latest.pdf)
+    assert [page.page for page in pages] == list(range(1, len(pages) + 1))
+    assert len(pages) < len(reader.pages)
+    assert all(page.text.strip() for page in pages), "every narrative page has a text layer"
+    after = reader.pages[len(pages)].extract_text()
+    assert HEADING.casefold() in [line.strip().casefold() for line in after.splitlines()]
+
+
+async def test_read_report_text_live(served: Latest) -> None:
+    result = await tasks.read_report_text_async()
+    assert result.data
+    assert result.data[0].startswith("WASDE -")
+    assert result.meta.endpoint.endswith(".xls")
+    assert result.meta.request["url"].endswith(f"/{result.meta.endpoint}")
+    assert result.meta.vintage is not None
+    assert REPORT_MONTH.fullmatch(result.meta.vintage)
+    assert result.meta.vintage == served.release.meta.vintage, "the XML's Report_Month"
+    assert result.meta.published_at_naive
+
+
+async def test_get_table_live(served: Latest) -> None:
+    result = await tasks.get_table_async("sr12")
+    packaged = {table.report: table for table in tasks.list_tables().data}
+    assert result.data
+    assert {record.report for record in result.data} == {"sr12"}
+    assert list(dict.fromkeys(record.matrix for record in result.data)) == (
+        packaged["sr12"].matrices
+    )
+    for field in ("attribute", "market_year", "forecast_month"):
+        assert any(getattr(record, field) is not None for record in result.data), field
+    assert result.meta.endpoint.endswith(".xml")
+    assert result.meta.request["table"] == "sr12"
+
+
+async def test_get_balance_sheet_live(served: Latest) -> None:
+    result = await tasks.get_balance_sheet_async("CORN")
+    assert result.data
+    assert {(record.report, record.matrix) for record in result.data} == {("sr12", "matrix2")}
+    for field in ("attribute", "market_year", "cell_value"):
+        assert all(getattr(record, field) is not None for record in result.data), field
+    assert result.meta.request["commodity"] == "CORN"
+    assert result.meta.vintage == served.release.meta.vintage

@@ -18,6 +18,7 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
+  "pypdf>=6.21",
   "xippios-core~=0.3.0",
   "xippios-usda-esmis~=0.1.0",
   "xlrd>=2.0.2",
@@ -52,6 +53,9 @@ dev = [
   # reads its types; the two pins move together.
   "markdownify==1.2.3",
   "types-xlrd>=2.0.0.20260518",
+  # Writes the XLS sample in scripts/cut_sample.py and the small workbooks of the parser
+  # tests; it ships no types, so mypy reads it as Any (tool.mypy.overrides below).
+  "xlwt>=1.3.0",
 ]
 
 [build-system]
@@ -102,6 +106,10 @@ mypy_path = "src"
 namespace_packages = true
 explicit_package_bases = true
 warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["xlwt"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers --import-mode=importlib"
