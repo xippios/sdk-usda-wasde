@@ -16,7 +16,10 @@ name into ``statistic``.
 
 ``Release`` is ESMIS's release of WASDE, re-shaped from ``xippios-usda-esmis``'s model
 (ADR-0021); ``WasdeXmlCell`` is one value of a release's XML file, as
-``parse.wasde_xml.parse_wasde_xml`` reads it. ``Table``, ``Commodity``, ``Region`` and
+``parse.wasde_xml.parse_wasde_xml`` reads it; ``WasdeXlsText`` one paragraph of the
+narrative in its XLS file and ``WasdePdfPage`` one narrative page of its PDF, as
+``parse.wasde_xls.parse_wasde_xls`` and ``parse.wasde_pdf.parse_wasde_pdf`` read them, text
+only (ADR-0020 decision 4). ``Table``, ``Commodity``, ``Region`` and
 ``Attribute`` are the records of the four packaged lists under ``reference/``, which
 ``scripts/refresh_reference.py`` writes from the latest release's files (conventions §3,
 ADR-0022): labels as the files print them, each record with the ``report_month`` of the
@@ -30,7 +33,16 @@ from pydantic import AwareDatetime
 from xippios.core import UpstreamModel
 from xippios.usda.esmis.models import ReleaseFile
 
-__all__ = ["Attribute", "Commodity", "Region", "Release", "Table", "WasdeXmlCell"]
+__all__ = [
+    "Attribute",
+    "Commodity",
+    "Region",
+    "Release",
+    "Table",
+    "WasdePdfPage",
+    "WasdeXlsText",
+    "WasdeXmlCell",
+]
 
 
 class Release(UpstreamModel):
@@ -149,6 +161,51 @@ class WasdeXmlCell(UpstreamModel):
     unit: str | None
     cell_value: str
     value: Decimal | None
+
+
+class WasdeXlsText(UpstreamModel):
+    r"""One paragraph of a WASDE release's narrative: a row of its XLS file's sheet ``WASDE Text``.
+
+    One record per row of the sheet whose cell holds text, in sheet order, as
+    ``parse.wasde_xls.parse_wasde_xls`` reads it with xlrd; ``docs/upstream/layout.md``
+    describes the workbook. The text is the narrative the PDF prints on its first pages,
+    one paragraph a row, as printed: line breaks, spaces and the carriage return after
+    the report's number kept.
+
+    Attributes:
+        sheet: The sheet's name as printed, ``"WASDE Text"``.
+        row: The row in the sheet, counted from 0 as xlrd and ``layout.md`` count, e.g.
+            ``0`` for ``"WASDE - 676\r"``, ``2`` for the first paragraph.
+        text: The cell's text as printed, e.g. ``"WASDE - 676\r"``, ``"WHEAT: The outlook
+            for 2026/27 U.S. wheat this month is for higher supplies, ..."``.
+        report_month: The report month the workbook's first table sheet prints in its
+            first cell (``Page 8``: ``"October 2026"``), as printed, the same on every
+            record; ``None`` where that cell holds no ``<Month> <year>`` text.
+    """
+
+    sheet: str
+    row: int
+    text: str
+    report_month: str | None
+
+
+class WasdePdfPage(UpstreamModel):
+    r"""One page of a WASDE release's narrative, as the text layer of its PDF file holds it.
+
+    One record per narrative page, from page 1 up to the page headed Interagency
+    Commodity Estimates Committees, as ``parse.wasde_pdf.parse_wasde_pdf`` reads it with
+    pypdf: text only, never a number read as a figure (ADR-0020 decision 4).
+
+    Attributes:
+        page: The page's number in the file, counted from 1, e.g. ``1``; the narrative
+            pages print the same number in their running header (``WASDE-484-2``).
+        text: The page's text as pypdf extracts it, its lines broken where pypdf breaks
+            them, e.g. ``"WASDE-484-2 \n \nCOARSE GRAINS:   Projected U.S. feed grain
+            supplies ..."``; ``""`` for a page without a text layer.
+    """
+
+    page: int
+    text: str
 
 
 class Table(UpstreamModel):
