@@ -11,9 +11,10 @@ All notable changes to this project are documented here. The format follows
 ### Added
 
 - Scaffold from [sdk-template](https://github.com/xippios/sdk-template): configured
-  client for USDA WAOB World Agricultural Supply and Demand Estimates, empty task layer, MCP server and FastAPI router
-  wired to it, test harness with core's family check, CI, the nightly live tests and
-  the release train, in which a release PR's merge tags and publishes.
+  client for USDA WAOB World Agricultural Supply and Demand Estimates, MCP server and
+  FastAPI router wired to the task layer, test harness with core's family check, CI,
+  the nightly live tests and the release train, in which a release PR's merge tags and
+  publishes.
 - Depends on `xippios-usda-esmis` 0.1.0 (`~=0.1.0`), the package that finds and
   downloads USDA report files on ESMIS.
 - Upstream documentation snapshot in `docs/upstream/`, captured by
