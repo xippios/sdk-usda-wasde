@@ -28,16 +28,23 @@ semantics the package relies on.
 ## How this is captured
 
 The two ESMIS pages, the publication page of the World Agricultural Supply and Demand
-Estimates and the page of its newest release, are converted to Markdown, and so are the
-three pages of the World Agricultural Outlook Board (WAOB). The newest release is the
-first row of the publication page's release list, read from its View link on every run;
-the run stops when that row is not the page's Latest Release. www.usda.gov answers 403
-Access Denied at its CDN edge to an automated request, so each of WAOB's pages is
-recorded by its status at its canonical www.usda.gov URL and kept from
-https://usda.azureedge.us, the CDN origin that www.usda.gov fronts, which serves the
-same Drupal site; the canonical URL is the www.usda.gov one, and each Markdown file
-names both. The 2018 notice of the file names is kept byte for byte as a PDF; the script
-does not read its text, so a change to it shows in its sha256.
+Estimates and the page of its newest release, are converted to Markdown, and so are five
+pages of the World Agricultural Outlook Board (WAOB): its WASDE page and the four pages
+that page's menu links, About WASDE, the FAQ, Historical Changes & Revisions and the
+historical data page. The newest release is the first row of the publication page's
+release list, read from its View link on every run; the run stops when that row is not
+the page's Latest Release. www.usda.gov answers 403 Access Denied at its CDN edge to an
+automated request for some of WAOB's pages. The script asks www.usda.gov first: a page
+it serves is kept from there, and a page it refuses is recorded by its status at its
+www.usda.gov URL and kept from https://usda.azureedge.us, the CDN origin that
+www.usda.gov fronts, which serves the same Drupal site at the same paths; the canonical
+URL is the www.usda.gov one, and each Markdown file kept from the CDN origin names both.
+The 2018 notice of the file names is kept byte for byte as a PDF; the script does not
+read its text, so a change to it shows in its sha256. In this run www.usda.gov served
+`pages/about-wasde.md` itself and refused `pages/wasde-report.md`,
+`pages/wasde-faqs.md`, `pages/historical-changes-revisions.md`,
+`pages/historical-wasde-report-data.md`, `New_WASDE_Filename_Format.pdf`, which are kept
+from the CDN origin.
 
 The Markdown is `markdownify`'s rendering of the page's `<main>` element, with headings
 in ATX style. Breadcrumbs, menus and the other navigation, forms (the release list's
@@ -72,17 +79,20 @@ most once, identified as `xippios-usda-wasde refresh_upstream
 
 | File | URL | Fetched | HTTP | Bytes | sha256 | ETag | Last-Modified | Note |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| pages/publication-wasde.md | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates | 2026-10-28T14:04:02Z | 200 | 88591 | b449d8498333c5663fed74de0a8b2186a6f8874e4dd27263122c2aa02298de64 | "1793194413" | 2026-10-28T13:33:33Z | converted to Markdown; Bytes and sha256 are the HTML page's; the first page of the release list, which changes with every release; the next row is its first row's View link |
-| pages/release-wasde.md | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates/2026-10-09 | 2026-10-28T14:04:02Z | 200 | 21833 | bd29f72c9b1d5ee631f543a61173679b579e7819375e810843d61bcdcdcd57aa | "1793196245" | 2026-10-28T14:04:05Z | converted to Markdown; Bytes and sha256 are the HTML page's; the page of the newest release, the first row of the publication page's release list, so the URL changes with every release |
-| (no file) | https://www.usda.gov/oce/commodity/wasde | 2026-10-28T14:04:02Z | 403 | - | - | - | - | WAOB's WASDE page; 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
-| pages/wasde-report.md | https://usda.azureedge.us/oce/commodity/wasde | 2026-10-28T14:04:02Z | 200 | 160677 | 2347bd720dfeada00845178bf4fb5945b3fe260a6370235f4aa9679f5fc324bf | W/"1793193093-gzip" | 2026-10-28T13:11:33Z | redirected (301) to https://usda.azureedge.us/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report; converted to Markdown; Bytes and sha256 are the HTML page's; the page above, from USDA's CDN origin |
-| (no file) | https://www.usda.gov/sites/default/files/documents/New_WASDE_Filename_Format.pdf | 2026-10-28T14:04:02Z | 403 | - | - | - | - | WAOB's notice of the file names (2018); 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
-| New_WASDE_Filename_Format.pdf | https://usda.azureedge.us/sites/default/files/documents/New_WASDE_Filename_Format.pdf | 2026-10-28T14:04:02Z | 200 | 66531 | 1102df7ce8cf98f8ae1052a051fb75f02f11f08c8b45c250a4fc5ef9907f601b | "103e3-5a83567f3dac4" | 2020-06-16T15:43:34Z | verbatim, byte for byte; the document above, from USDA's CDN origin |
-| (no file) | https://www.usda.gov/node/42884 | 2026-10-28T14:04:02Z | 403 | - | - | - | - | WAOB's historical data page; 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
-| pages/historical-wasde-report-data.md | https://usda.azureedge.us/node/42884 | 2026-10-28T14:04:02Z | 200 | 161274 | b30c61edacdc0871414817d469e17e6cc7629035da0469eb10d96bbe7f0993fb | W/"1793184904-gzip" | 2026-10-28T10:55:04Z | redirected (301) to https://usda.azureedge.us/historical-wasde-report-data-3; converted to Markdown; Bytes and sha256 are the HTML page's; the page above, from USDA's CDN origin; the data files it links are not fetched |
-| (no file) | https://www.usda.gov/node/33540 | 2026-10-28T14:04:02Z | 403 | - | - | - | - | WAOB's WASDE FAQ; 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
-| pages/wasde-faqs.md | https://usda.azureedge.us/node/33540 | 2026-10-28T14:04:02Z | 200 | 162669 | 00e6a6a4faa4f1b7231cb6ca184d30058d9c839e25c2dd279640c74017a764b8 | W/"1793193101-gzip" | 2026-10-28T13:11:41Z | redirected (301) to https://usda.azureedge.us/oce/commodity-markets/wasde/faqs; converted to Markdown; Bytes and sha256 are the HTML page's; the page above, from USDA's CDN origin |
-| (no file) | http://www.usda.gov/oce/commodity/wasde/WASDE-Schema.xsd | 2026-10-28T14:04:02Z | 404 | - | - | - | - | redirected (301) to https://www.usda.gov/oce/commodity/wasde/WASDE-Schema.xsd; the XML schema the July 2010 XML file names in `xsi:schemaLocation`; www.usda.gov's page-not-found page, status only |
+| pages/publication-wasde.md | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates | 2026-10-28T14:13:35Z | 200 | 88591 | b449d8498333c5663fed74de0a8b2186a6f8874e4dd27263122c2aa02298de64 | "1793194413" | 2026-10-28T13:33:33Z | converted to Markdown; Bytes and sha256 are the HTML page's; the first page of the release list, which changes with every release; the next row is its first row's View link |
+| pages/release-wasde.md | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates/2026-10-09 | 2026-10-28T14:13:35Z | 200 | 21833 | bd29f72c9b1d5ee631f543a61173679b579e7819375e810843d61bcdcdcd57aa | "1793196245" | 2026-10-28T14:04:05Z | converted to Markdown; Bytes and sha256 are the HTML page's; the page of the newest release, the first row of the publication page's release list, so the URL changes with every release |
+| (no file) | https://www.usda.gov/oce/commodity/wasde | 2026-10-28T14:13:35Z | 403 | - | - | - | - | WAOB's WASDE page; 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
+| pages/wasde-report.md | https://usda.azureedge.us/oce/commodity/wasde | 2026-10-28T14:13:35Z | 200 | 160718 | 5a65083316b3d7ff6d1c3a26995a957aacc289de830533785cec397715d81536 | W/"1793130388-gzip" | 2026-10-27T19:46:28Z | redirected (301) to https://usda.azureedge.us/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report; converted to Markdown; Bytes and sha256 are the HTML page's; the page above, from USDA's CDN origin |
+| pages/about-wasde.md | https://www.usda.gov/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report/about-wasde | 2026-10-28T14:13:35Z | 200 | 153592 | eb88b536e7088def722565d9cb785a31f00b663981da18ef6c290cc94d55b5e3 | "1793196559-gzip" | 2026-10-28T14:09:19Z | converted to Markdown; Bytes and sha256 are the HTML page's; About WASDE, from the WASDE page's menu, served by www.usda.gov itself, so no CDN-origin row |
+| (no file) | https://www.usda.gov/node/33540 | 2026-10-28T14:13:35Z | 403 | - | - | - | - | WAOB's WASDE FAQ; 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
+| pages/wasde-faqs.md | https://usda.azureedge.us/node/33540 | 2026-10-28T14:13:35Z | 200 | 162669 | c7aee8f8bf9b6a1fd736ca4aff8c14b22f7f2e176303be7ea23ab5c553b5b86f | W/"1793196834-gzip" | 2026-10-28T14:13:54Z | redirected (301) to https://usda.azureedge.us/oce/commodity-markets/wasde/faqs; converted to Markdown; Bytes and sha256 are the HTML page's; the page above, from USDA's CDN origin |
+| (no file) | https://www.usda.gov/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report/historical-changes-revisions | 2026-10-28T14:13:35Z | 403 | - | - | - | - | redirected (301) to https://www.usda.gov/historical-changes-revisions; Historical Changes & Revisions, from the WASDE page's menu; 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
+| pages/historical-changes-revisions.md | https://usda.azureedge.us/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report/historical-changes-revisions | 2026-10-28T14:13:35Z | 200 | 171340 | f205a4349199ced4fca482d317cb554f4c703102e53a51874b5efc7670edc1e3 | W/"1793196556-gzip" | 2026-10-28T14:09:16Z | redirected (301) to https://usda.azureedge.us/historical-changes-revisions; converted to Markdown; Bytes and sha256 are the HTML page's; the page above, from USDA's CDN origin; the files it links are not fetched |
+| (no file) | https://www.usda.gov/node/42884 | 2026-10-28T14:13:35Z | 403 | - | - | - | - | WAOB's historical data page; 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
+| pages/historical-wasde-report-data.md | https://usda.azureedge.us/node/42884 | 2026-10-28T14:13:35Z | 200 | 161315 | e1193fe0174d396070f102a09198c8bccca932e74efd86a46724acc0f5fd8a67 | W/"1793114521-gzip" | 2026-10-27T15:22:01Z | redirected (301) to https://usda.azureedge.us/historical-wasde-report-data-3; converted to Markdown; Bytes and sha256 are the HTML page's; the page above, from USDA's CDN origin; the address WAOB's pages link, /oce/commodity-markets/wasde/historical-wasde-report-data, led to the same page on USDA's CDN origin on 2026-10-28; the data files it links are not fetched |
+| (no file) | https://www.usda.gov/sites/default/files/documents/New_WASDE_Filename_Format.pdf | 2026-10-28T14:13:35Z | 403 | - | - | - | - | WAOB's notice of the file names (2018); 403 Access Denied at the CDN edge; the body carries a per-request reference, so status only; kept from USDA's CDN origin in the next row |
+| New_WASDE_Filename_Format.pdf | https://usda.azureedge.us/sites/default/files/documents/New_WASDE_Filename_Format.pdf | 2026-10-28T14:13:35Z | 200 | 66531 | 1102df7ce8cf98f8ae1052a051fb75f02f11f08c8b45c250a4fc5ef9907f601b | "103e3-5a83567f3dac4" | 2020-06-16T15:43:34Z | verbatim, byte for byte; the document above, from USDA's CDN origin |
+| (no file) | http://www.usda.gov/oce/commodity/wasde/WASDE-Schema.xsd | 2026-10-28T14:13:35Z | 404 | - | - | - | - | redirected (301) to https://www.usda.gov/oce/commodity/wasde/WASDE-Schema.xsd; the XML schema the July 2010 XML file names in `xsi:schemaLocation`; www.usda.gov's page-not-found page, status only |
 | layout.md | - | - | - | - | - | - | - | written by hand from release files, not fetched: the file layouts as observed, not documented (ADR-0020 decision 2); the file says what it was written from |
 
 Regenerate: `uv run scripts/refresh_upstream.py`
