@@ -6,24 +6,33 @@ The nightly run fetches the latest release only, each file kind once, through on
 session-scoped fixture, ``latest`` (decided by Johannes on 2026-10-28): it runs
 ``get_release()`` once, which downloads the latest XML through xippios-usda-esmis, and
 keeps a copy of the file in a temporary directory for the live parser test, which
-checks shape, page names and fields, never values (ADR-0020 decision 6); later file
-kinds join the same fixture. Keyless requests, paced by esmis's client at 30 a minute:
-the reachability check 1, ``list_releases`` 1 (page 0), ``get_latest_release`` 1, and
-the fixture's ``get_release`` 3 (the latest release, the release, the file, about
-3.4 MB). Assertions read shapes and counts, never a raw payload, as every live run
-takes ``--tb=short``.
+checks shape, page names and fields, never values (ADR-0020 decision 6); then it
+downloads the release's XLS once through esmis's ``download_release_file``, for the
+block titles of the commodity list; the PDF joins the same fixture later. The three
+list tasks send nothing: their live tests build the lists from the latest files with
+the refresh script's rules (``_vocabulary``) and compare them with the packaged ones,
+every field but ``report_month``; a difference fails, naming the rows, so the packaged
+lists are refreshed (``scripts/refresh_reference.py``). Keyless requests, paced by
+esmis's client at 30 a minute: the reachability check 1, ``list_releases`` 1 (page 0),
+``get_latest_release`` 1, the fixture's ``get_release`` 3 (the latest release, the
+release, the file, about 3.4 MB) and its XLS 2 (the release, the file, about 346 KB):
+eight. Assertions read shapes, counts and the rows' names, never a raw payload or a
+value, as every live run takes ``--tb=short``.
 """
 
 import re
 import shutil
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
 
 import httpx
 import pytest
-from xippios.core import Result
+from xippios.core import Result, UpstreamModel
+from xippios.usda.esmis import tasks as esmis
 
+from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import BASE_URL, config
 from xippios.usda.wasde.models import WasdeXmlCell
@@ -53,16 +62,19 @@ class Latest:
     Attributes:
         release: What ``get_release()`` answered.
         xml: A copy of the XML file it parsed.
+        xls: The same release's XLS file.
     """
 
     release: Result[list[WasdeXmlCell]]
     xml: Path
+    xls: Path
 
 
 @pytest.fixture(scope="session")
 def latest(tmp_path_factory: pytest.TempPathFactory) -> Latest:
-    """``get_release()`` once, keeping a copy of the file its parser reads."""
-    kept = tmp_path_factory.mktemp("latest") / "wasde.xml"
+    """``get_release()`` once, keeping a copy of the file its parser reads, and the XLS."""
+    directory = tmp_path_factory.mktemp("latest")
+    kept = directory / "wasde.xml"
 
     def keep_and_parse(path: Path) -> list[WasdeXmlCell]:
         shutil.copyfile(path, kept)
@@ -71,7 +83,9 @@ def latest(tmp_path_factory: pytest.TempPathFactory) -> Latest:
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr("xippios.usda.wasde.tasks.parse_wasde_xml", keep_and_parse)
         release = tasks.get_release()
-    return Latest(release=release, xml=kept)
+    xls = directory / "wasde.xls"
+    esmis.download_release_file(release.meta.request["release_id"], "xls", xls)
+    return Latest(release=release, xml=kept, xls=xls)
 
 
 async def test_upstream_answers() -> None:
@@ -143,3 +157,76 @@ def test_parse_wasde_xml_live(latest: Latest) -> None:
     assert {record.statistic for record in on_tables} == {None}
     numbers = sum(record.value is not None for record in records)
     assert numbers > 0.9 * len(records), "most values are numbers as printed"
+
+
+def differences(
+    packaged: Sequence[UpstreamModel],
+    current: Sequence[UpstreamModel],
+    name: Callable[[UpstreamModel], str],
+) -> list[str]:
+    """The rows of the packaged list that the current release's differs in, by name only.
+
+    Every field is compared but ``report_month``, which names the release the list was
+    read from; a row missing, added, changed or moved is named, never its values.
+    """
+
+    def fields(row: UpstreamModel) -> dict[str, object]:
+        return row.model_dump(exclude={"report_month"})
+
+    before = {name(row): fields(row) for row in packaged}
+    after = {name(row): fields(row) for row in current}
+    found = [f"missing now: {key}" for key in before if key not in after]
+    found += [f"new: {key}" for key in after if key not in before]
+    found += [f"changed: {key}" for key in before if key in after and before[key] != after[key]]
+    shared = [key for key in before if key in after]
+    if shared != [key for key in after if key in before]:
+        found.append("the order of the rows changed")
+    return found
+
+
+def by_report(row: UpstreamModel) -> str:
+    return str(getattr(row, "report", ""))
+
+
+def by_matrix(row: UpstreamModel) -> str:
+    return f"{getattr(row, 'report', '')} {getattr(row, 'matrix', '')}"
+
+
+def by_region(row: UpstreamModel) -> str:
+    return repr(getattr(row, "region", ""))
+
+
+def test_block_titles_live(latest: Latest) -> None:
+    """The positional match still holds: each page of 12 to 15 has a title per matrix."""
+    titles = vocabulary.block_titles(latest.xls)
+    records = parse_wasde_xml(latest.xml)
+    packaged = tasks.list_commodities().data
+    for page in vocabulary.BLOCK_PAGES:
+        report = vocabulary.report_name(page)
+        matrices = list(dict.fromkeys(cell.matrix for cell in records if cell.report == report))
+        assert len(titles[report]) == len(matrices), report
+        assert titles[report] == [row.commodity for row in packaged if row.report == report], (
+            f"{report}: the block titles changed; refresh the packaged lists"
+        )
+
+
+async def test_list_tables_live(latest: Latest) -> None:
+    result = await tasks.list_tables_async()
+    current = vocabulary.tables(latest.xml)
+    assert not differences(result.data, current, by_report)
+    assert result.meta.endpoint.endswith(".xml")
+
+
+async def test_list_commodities_live(latest: Latest) -> None:
+    result = await tasks.list_commodities_async()
+    records = parse_wasde_xml(latest.xml)
+    current = vocabulary.commodities(records, vocabulary.block_titles(latest.xls))
+    assert not differences(result.data, current, by_matrix)
+    assert result.meta.vintage
+
+
+async def test_list_regions_live(latest: Latest) -> None:
+    result = await tasks.list_regions_async()
+    current = vocabulary.regions(parse_wasde_xml(latest.xml))
+    assert not differences(result.data, current, by_region)
+    assert result.meta.vintage
