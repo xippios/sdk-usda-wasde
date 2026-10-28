@@ -16,7 +16,9 @@ name into ``statistic``.
 
 ``Release`` is ESMIS's release of WASDE, re-shaped from ``xippios-usda-esmis``'s model
 (ADR-0021); ``WasdeXmlCell`` is one value of a release's XML file, as
-``parse.wasde_xml.parse_wasde_xml`` reads it; ``WasdeXlsText`` one paragraph of the
+``parse.wasde_xml.parse_wasde_xml`` reads it, and ``WasdeTableValue`` its projection
+without the page's labels, which ``get_table`` and ``get_balance_sheet`` answer;
+``WasdeXlsText`` one paragraph of the
 narrative in its XLS file and ``WasdePdfPage`` one narrative page of its PDF, as
 ``parse.wasde_xls.parse_wasde_xls`` and ``parse.wasde_pdf.parse_wasde_pdf`` read them, text
 only (ADR-0020 decision 4). ``Table``, ``Commodity``, ``Region`` and
@@ -40,6 +42,7 @@ __all__ = [
     "Release",
     "Table",
     "WasdePdfPage",
+    "WasdeTableValue",
     "WasdeXlsText",
     "WasdeXmlCell",
 ]
@@ -148,6 +151,67 @@ class WasdeXmlCell(UpstreamModel):
     table: str
     sub_report_subtitle: str | None
     sub_report_footer: str | None
+    matrix: str
+    commodity_header: str | None
+    region_header: str | None
+    commodity: str | None
+    region: str | None
+    market_year: str | None
+    forecast_month: str | None
+    attribute: str | None
+    attribute_group: str | None
+    statistic: str | None
+    unit: str | None
+    cell_value: str
+    value: Decimal | None
+
+
+class WasdeTableValue(UpstreamModel):
+    r"""One value of a WASDE table with the labels of its row and column: a slice's record.
+
+    A projection of ``WasdeXmlCell`` built with ``UpstreamModel.project`` (conventions §3;
+    Johannes, 2026-10-28, G5 inside PR 5): the fields that label the value and the value,
+    copied unchanged under their names, in ``WasdeXmlCell``'s order. Left out are the
+    page's own labels, the same on every value of a page: ``page_title``,
+    ``sub_report_subtitle`` and ``sub_report_footer``, which ``list_tables`` states once
+    per page with its titles (``reference/table.json``), and ``report_month``, the
+    answer's ``meta.vintage``. A footnote marker in a label (``"Trade 2/"``, ``"World  3/"``)
+    refers to the page's footnotes, ``list_tables``'s ``sub_report_footer`` to
+    ``sub_report_footer3``. ``get_table`` and ``get_balance_sheet`` answer with it,
+    ``get_release`` with the full ``WasdeXmlCell``. Named after what it holds, one value
+    of a table: not a row, since a printed row holds several values, and not a cell,
+    ``WasdeXmlCell``'s name for the XML's ``<Cell>`` with every label of its page.
+
+    Attributes:
+        report: The page's ``Name``, e.g. ``"sr12"`` (printed page 12): ``list_tables``'s
+            ``report``.
+        table: The title of the value's table as printed, e.g. ``"U.S. Feed Grain and
+            Corn Supply and Use  1/"``.
+        matrix: The report item the value sits in, e.g. ``"matrix2"``.
+        commodity_header: ``commodity_headerN`` of the item, e.g. ``"World"``.
+        region_header: ``region_headerN`` of the item, e.g. ``"2026/27 Proj."``.
+        commodity: The value's commodity label as printed, e.g. ``"Wheat"``, ``"Beef"``.
+        region: The value's region as printed, indent and footnote marker kept, e.g.
+            ``"        Argentina"``, ``"World  3/"``.
+        market_year: The value's year as printed, e.g. ``"2026/27 Proj."``, ``"2025"``.
+        forecast_month: The value's month or quarter as printed, e.g. ``"Oct"``,
+            ``"IV"``, or ``""`` where the page leaves it empty.
+        attribute: The value's row label as printed, e.g. ``"Area Planted"``,
+            ``"Total\r\nSupply"``, ``"Trade 2/"``.
+        attribute_group: The class column of page 11's wheat-by-class table, e.g.
+            ``"Hard Red\r\nWinter"``; ``None`` elsewhere.
+        statistic: On the reliability pages the statistic's name, e.g.
+            ``"root_mean_square_error"``; ``None`` on pages 8 to 34.
+        unit: What the file states for the row or the page, as ``WasdeXmlCell``'s
+            ``unit``: the table's subtitle on pages 8 to 10 and 18 to 30, e.g.
+            ``"(Million Metric Tons)"``; ``None`` on the U.S. pages.
+        cell_value: The value as printed, e.g. ``"2,141"``, ``"10.45 *"``, ``"3/"``.
+        value: ``cell_value`` as a number, e.g. ``Decimal("2141")``; ``None`` where the
+            text is not one.
+    """
+
+    report: str
+    table: str
     matrix: str
     commodity_header: str | None
     region_header: str | None

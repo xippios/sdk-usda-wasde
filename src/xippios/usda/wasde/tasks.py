@@ -33,17 +33,20 @@ What every task follows:
   ``get_release("2013-08")`` reads the original.
 - ``get_table`` and ``get_balance_sheet`` read the month's XML as ``get_release`` does,
   one download per call and nothing kept between calls, and answer a slice of its
-  records with ``get_release``'s ``meta``, ``meta.request`` holding the arguments given,
-  the release id and the file's URL; they are tools, ``get_table`` with a cap of its own
-  (``MCP_CAPS``). The slice is checked against the packaged lists before anything is
-  sent: a page ``list_tables`` lacks, a commodity ``list_commodities`` lacks, or a region
-  the commodity's pages do not print, raises core's ``UnknownCode``, an
+  records projected without their page's labels (``WasdeTableValue``; Johannes,
+  2026-10-28, G5 inside PR 5), which ``list_tables`` states once per page, with
+  ``get_release``'s ``meta``, ``meta.request`` holding the arguments given, the release
+  id and the file's URL; they are tools, each with a cap of its own (``MCP_CAPS``). The
+  slice is checked against the packaged lists before anything is sent: a page
+  ``list_tables`` lacks, a commodity ``list_commodities`` lacks, or a region the
+  commodity's pages do not print, raises core's ``UnknownCode``, an
   ``InvalidRequestError``, naming the closest (core's ``closest`` on the texts, whatever
   their case). A region is matched as printed with its indent and footnote marker left
   out (gap, row 195). A slice the month's file does not hold raises ``NotFoundError``.
 - ``read_report_text`` reads the narrative (ADR-0020 decision 4): the release's XLS,
   sheet ``WASDE Text`` (``parse.wasde_xls``), else its PDF's narrative pages
-  (``parse.wasde_pdf``), text only. ``meta.endpoint`` is the file read,
+  (``parse.wasde_pdf``), text only, also where the XLS holds no narrative (Johannes,
+  2026-10-28, G5 inside PR 5). ``meta.endpoint`` is the file read,
   ``meta.vintage`` the report month the XLS prints (``"October 2026"``), ``None`` for a
   PDF, ``meta.published_at`` the release time as for ``get_release``.
 - The packaged answers: ``list_tables``, ``list_commodities`` and ``list_regions`` answer
@@ -84,7 +87,14 @@ from xippios.usda.esmis.models import Release as EsmisRelease
 from xippios.usda.esmis.models import ReleaseFile
 
 from xippios.usda.wasde._client import SOURCE
-from xippios.usda.wasde.models import Commodity, Region, Release, Table, WasdeXmlCell
+from xippios.usda.wasde.models import (
+    Commodity,
+    Region,
+    Release,
+    Table,
+    WasdeTableValue,
+    WasdeXmlCell,
+)
 from xippios.usda.wasde.params import PACKAGE
 from xippios.usda.wasde.parse.wasde_pdf import parse_wasde_pdf
 from xippios.usda.wasde.parse.wasde_xls import parse_wasde_xls
@@ -106,28 +116,33 @@ __all__ = [
 BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 
 # MCP_CAPS, only where a tool needs a result cap of its own, keyed by the task function's
-# name (conventions §8, ADR-0016). get_table answers a whole page, and its cap is 400 rows
-# or 128 KB with a note of its own (Johannes, 2026-10-28, G5). Measured on the October 2026
-# XML as the tool serialises it (compact JSON, UTF-8): a WasdeXmlCell is about 1 KB, its
-# page's titles and footnotes repeated on every record, so 8 of the 30 pages fit whole
-# (pages 9 to 12, 17, 31, 33 and 34, at most 130,369 bytes) and the others are cut with
-# the note; the most records, page 28's 364, measure 340,655 bytes, the most bytes, page
-# 19's 322 records, 438,621. Every other tool keeps the default, 200 rows or 64 KB.
-# get_balance_sheet's answers measured up to 245,130 bytes: of the 23 U.S. and Mexico
-# matrices, U.S. Sugar (88 records, 106,826 bytes), Meats (280, 245,130) and the three U.S.
-# rice matrices (40 to 60, 67,838 to 101,457) are cut, CORN's 60 records measure 65,329
-# bytes; a world region's rows, 24 to 28 records, at most 38,726. read_report_text's
-# answer measured 16,436 bytes. list_releases called without since answers every WASDE
-# release (703 on 2026-10-28), and its docstring tells an agent to bound it; the three
-# packaged lists fit whole, list_tables 30 rows, list_commodities 43 and list_regions 70,
-# the largest result list_tables's 29,639 bytes of compact JSON, its footnotes included
-# (October 2026).
+# name (conventions §8, ADR-0016). The two slices answer WasdeTableValue, WasdeXmlCell
+# without the page's labels (Johannes, 2026-10-28, G5 inside PR 5), about 350 bytes a
+# value, and each has a cap of its own whose note names how to see the rest (the same
+# decision): get_table 400 rows or 128 KB, get_balance_sheet 300 rows or 128 KB. Measured
+# on the October 2026 XML through the MCP server, the tool's text in UTF-8 bytes, every
+# answer fits whole: the largest page, sr28, 364 values and 129,899 bytes, 1,173 under
+# the bound (sr19, 322 values, 118,553 bytes, the next); the largest balance sheet,
+# Meats, 280 values and 90,850 bytes, then U.S. Milk, 96 and 30,700; a world region's
+# rows, 24 to 28 values, about 11 KB at most (all 160 commodity and region answers). A
+# page that grows past the bound is cut, with the note. Every other tool keeps the
+# default, 200 rows or 64 KB, and none of them reaches it but list_releases called without
+# since, which answers every WASDE release (703 on 2026-10-28) and whose docstring tells
+# an agent to bound it with since and until, the narrowing the default note names:
+# read_report_text measured 16,436 bytes, the three packaged lists 30, 43 and 70 rows,
+# the largest result list_tables's 29,639 bytes, its footnotes included (October 2026).
 MCP_CAPS: Mapping[str, ResultCap] = {
     "get_table": ResultCap(
         max_rows=400,
         max_bytes=131_072,
-        note="get_balance_sheet answers one commodity's matrix, sliced by region on the "
-        "world pages (list_commodities, list_regions); Python callers get the whole page",
+        note="call get_balance_sheet for one commodity's matrix, or one region's rows of a "
+        "world page (list_commodities, list_regions); Python callers get the whole page",
+    ),
+    "get_balance_sheet": ResultCap(
+        max_rows=300,
+        max_bytes=131_072,
+        note="on the world pages a region gives one region's rows (list_regions); Python "
+        "callers get the whole matrix",
     ),
 }
 
@@ -549,33 +564,34 @@ async def list_regions_async(search: str | None = None) -> Result[list[Region]]:
     return _packaged("region", Region, search, lambda row: (row.region, *row.reports))
 
 
-async def get_table_async(table: str, month: str | None = None) -> Result[list[WasdeXmlCell]]:
+async def get_table_async(table: str, month: str | None = None) -> Result[list[WasdeTableValue]]:
     """Every value of one WASDE table page, one record each, read from the release's XML file.
 
     ``table`` is the page as the XML names it and ``list_tables`` lists it: ``"sr12"`` is
-    printed page 12, U.S. feed grains and corn, ``"sr18"`` page 18, world wheat. The
-    records are ``get_release``'s for that page (``WasdeXmlCell``): each value with the
-    labels its page prints, as printed, its titles and footnotes repeated on every record;
-    112 on page 12 of October 2026, 364 on page 28, the most. The release is the latest,
-    or the one of ``month`` with the latest release time that carries an XML file, read
-    as ``get_release`` reads it: every call downloads the XML (3.4 MB for October 2026)
-    through xippios-usda-esmis into a temporary directory, parses it and removes it, and
-    nothing is kept between calls, so a Python caller wanting several pages of one month
-    calls ``get_release`` once and keeps the records of each ``report``. The MCP tool
-    returns at most 400 rows or 128 KB: a record runs to about 1 KB, so 8 of October
-    2026's 30 pages come whole (pages 9 to 12, 17, 31, 33 and 34) and the others are cut,
-    with a note, the world pages after about 100 rows; ``get_balance_sheet`` answers one
-    commodity's matrix, sliced by region on the world pages. ``meta`` is
-    ``get_release``'s: ``endpoint`` the file's name (``"wasde1026.xml"``), ``vintage`` its
-    ``Report_Month`` (``"October 2026"``), ``published_at`` the release time as ESMIS
-    prints it, naive, ``request`` the arguments given with the release id and the file's
-    URL. Requests: as ``get_release``'s, the latest release 1 or the month's pages of
-    ``list_releases``, then the release 1 and the file 1. A ``table`` ``list_tables`` does
-    not name raises ``InvalidRequestError`` naming the closest pages, before anything is
-    sent; a month without a release or whose releases carry no XML file raises
-    ``NotFoundError``, a month not written ``"YYYY-MM"`` ``InvalidRequestError``, a file
-    without the page ``NotFoundError`` and a file the parser cannot read
-    ``ValidationError``.
+    printed page 12, U.S. feed grains and corn, ``"sr18"`` page 18, world wheat. Each
+    record (``WasdeTableValue``) is one value with the labels of its row and column as
+    printed, its table's title and its matrix: ``get_release``'s record without the
+    page's own labels (Johannes, 2026-10-28, G5 inside PR 5). The page's subtitle and
+    footnotes, to which a footnote marker in a label refers (``"Trade 2/"``), are
+    ``list_tables``'s, stated once per page; the report month is ``meta.vintage``. 112
+    values on page 12 of October 2026, 364 on page 28, the most. The release is the
+    latest, or the one of ``month`` with the latest release time that carries an XML
+    file, read as ``get_release`` reads it: every call downloads the XML (3.4 MB for
+    October 2026) through xippios-usda-esmis into a temporary directory, parses it and
+    removes it, and nothing is kept between calls, so a Python caller wanting several
+    pages of one month calls ``get_release`` once and keeps the records of each
+    ``report``. The MCP tool returns at most 400 rows or 128 KB, which every page of
+    October 2026 fits, page 28 (129,899 bytes) with about 1 KB to spare; a page cut there
+    says to call ``get_balance_sheet`` for one matrix or region. ``meta`` is ``get_release``'s:
+    ``endpoint`` the file's name (``"wasde1026.xml"``), ``vintage`` its ``Report_Month``
+    (``"October 2026"``), ``published_at`` the release time as ESMIS prints it, naive,
+    ``request`` the arguments given with the release id and the file's URL. Requests: as
+    ``get_release``'s, the latest release 1 or the month's pages of ``list_releases``,
+    then the release 1 and the file 1. A ``table`` ``list_tables`` does not name raises
+    ``InvalidRequestError`` naming the closest pages, before anything is sent; a month
+    without a release or whose releases carry no XML file raises ``NotFoundError``, a
+    month not written ``"YYYY-MM"`` ``InvalidRequestError``, a file without the page
+    ``NotFoundError`` and a file the parser cannot read ``ValidationError``.
 
     Args:
         table: The page as the XML names it, ``"sr"`` and its two-digit number, e.g.
@@ -613,7 +629,12 @@ async def get_table_async(table: str, month: str | None = None) -> Result[list[W
             f"page {table}; its pages: {held}",
             source=SOURCE,
         )
-    return Result(data=records, meta=result.meta)
+    return Result(data=_values(records), meta=result.meta)
+
+
+def _values(records: list[WasdeXmlCell]) -> list[WasdeTableValue]:
+    """The records without their page's labels, as the slices answer them."""
+    return [WasdeTableValue.project(record) for record in records]
 
 
 def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
@@ -686,7 +707,7 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
 
 async def get_balance_sheet_async(
     commodity: str, region: str = "United States", month: str | None = None
-) -> Result[list[WasdeXmlCell]]:
+) -> Result[list[WasdeTableValue]]:
     """One commodity's supply-and-use balance sheet in a WASDE release, from its XML file.
 
     ``commodity`` is named as ``list_commodities`` prints it, its case kept: ``"CORN"`` is
@@ -707,21 +728,25 @@ async def get_balance_sheet_async(
     ``"Soybean Oil"``, and the U.S. page for ``"Wheat"`` and ``"Cotton"``. Nothing is
     mapped onto another source's names. The matrices are the packaged list's, read from
     the October 2026 release: a record is kept where its page, matrix and title are a
-    matrix's. The records are ``get_release``'s (``WasdeXmlCell``), each value with the
-    labels its page prints, as printed: 60 for ``"CORN"``, 280 for ``"Meats"``, 28 for
+    matrix's. Each record (``WasdeTableValue``) is one value with the labels of its row
+    and column as printed, its table's title and its matrix: ``get_release``'s record
+    without the page's own labels (Johannes, 2026-10-28, G5 inside PR 5). The page's
+    subtitle and footnotes, to which a footnote marker in a label refers (``"World  3/"``,
+    ``"Trade 2/"``), are ``list_tables``'s, stated once per page; the report month is
+    ``meta.vintage``. 60 values for ``"CORN"``, 280 for ``"Meats"``, the most, 28 for
     wheat's rows of one region in October 2026. Every call downloads the month's XML (3.4
     MB for October 2026) as ``get_release`` does and keeps nothing, so a Python caller
     wanting several balance sheets of one month calls ``get_release`` once. The MCP tool
-    returns at most 200 rows or 64 KB, which cut five of October 2026's U.S. matrices,
-    ``"Meats"``, ``"Sugar"``, ``"TOTAL RICE"``, ``"LONG-GRAIN RICE"`` and ``"MEDIUM &
-    SHORT-GRAIN RICE"``, with a note; Python callers get them whole. ``meta`` is
-    ``get_release``'s, ``meta.request`` the arguments given with the release id and the
-    file's URL; the requests are ``get_release``'s. A commodity ``list_commodities`` does
-    not name, or a region its pages do not print, raises ``InvalidRequestError`` naming
-    the closest, before anything is sent; a month without a release or without an XML
-    file ``NotFoundError``, a month not written ``"YYYY-MM"`` ``InvalidRequestError``, a
-    file that holds none of the matrices under the packaged titles ``NotFoundError``
-    (``get_table`` answers the page as that month prints it).
+    returns at most 300 rows or 128 KB, which every balance sheet of October 2026 fits,
+    ``"Meats"`` the largest at 90,850 bytes; one cut there says that a region narrows a
+    world page's rows. ``meta`` is ``get_release``'s, ``meta.request`` the arguments given
+    with the release id and the file's URL; the requests are ``get_release``'s. A
+    commodity ``list_commodities`` does not name, or a region its pages do not print,
+    raises ``InvalidRequestError`` naming the closest, before anything is sent; a month
+    without a release or without an XML file ``NotFoundError``, a month not written
+    ``"YYYY-MM"`` ``InvalidRequestError``, a file that holds none of the matrices under
+    the packaged titles ``NotFoundError`` (``get_table`` answers the page as that month
+    prints it).
 
     Args:
         commodity: The commodity as ``list_commodities`` prints it, e.g. ``"CORN"``,
@@ -752,15 +777,15 @@ async def get_balance_sheet_async(
             "a page as that month prints it",
             source=SOURCE,
         )
-    return Result(data=records, meta=result.meta)
+    return Result(data=_values(records), meta=result.meta)
 
 
 async def _narrative(release: Release, request: dict[str, object]) -> Result[list[str]]:
     """The release's narrative: its XLS's sheet ``WASDE Text``, else its PDF's pages.
 
     The XLS where the release has one; its PDF where it has none, or where its XLS holds no
-    narrative and it has a PDF. Each file is downloaded into a temporary directory, which
-    is removed.
+    narrative and it has a PDF (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020 decision
+    4). Each file is downloaded into a temporary directory, which is removed.
     """
     formats = {file.format for file in release.files}
     with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
@@ -794,7 +819,8 @@ async def read_report_text_async(month: str | None = None) -> Result[list[str]]:
     text, as printed, the first the report's number (``"WASDE - 676\r"``), then the
     paragraphs from ``WHEAT:`` to cotton, 25 strings and 16,004 characters for October
     2026. A release without an XLS file, or whose XLS holds no such sheet while it has a
-    PDF, is read from its PDF instead: one string per narrative page, the pages before
+    PDF, is read from its PDF instead (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020
+    decision 4): one string per narrative page, the pages before
     the one headed Interagency Commodity Estimates Committees (pages 1 to 5 in July 2010
     and October 2026), their text as pypdf extracts it; no page after that one is read,
     and no figure ever comes from a PDF. ``meta.endpoint`` is the file read

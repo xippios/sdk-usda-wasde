@@ -57,7 +57,15 @@ from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.http import router
 from xippios.usda.wasde.mcp import server
-from xippios.usda.wasde.models import Attribute, Commodity, Region, Release, Table
+from xippios.usda.wasde.models import (
+    Attribute,
+    Commodity,
+    Region,
+    Release,
+    Table,
+    WasdeTableValue,
+    WasdeXmlCell,
+)
 from xippios.usda.wasde.params import PACKAGE, PACKAGED_LISTS
 from xippios.usda.wasde.parse import parse_wasde_pdf, parse_wasde_xls, parse_wasde_xml
 
@@ -259,6 +267,53 @@ def test_a_month_answers_its_latest_release_with_an_xml_file() -> None:
     assert tasks._with_xml(both, "no XML in 2026-10").id == "796099", "the latest release time"
 
 
+SLICE_FIELDS = [
+    "report",
+    "table",
+    "matrix",
+    "commodity_header",
+    "region_header",
+    "commodity",
+    "region",
+    "market_year",
+    "forecast_month",
+    "attribute",
+    "attribute_group",
+    "statistic",
+    "unit",
+    "cell_value",
+    "value",
+]
+"""The fields a slice's record keeps (Johannes, 2026-10-28, G5 inside PR 5)."""
+
+
+def values(records: list[WasdeXmlCell]) -> list[WasdeTableValue]:
+    """The records as the slices answer them, without their page's labels."""
+    return [WasdeTableValue.project(record) for record in records]
+
+
+def test_a_slice_record_is_the_xml_record_without_its_pages_labels() -> None:
+    """Every field copied unchanged; the page's title, subtitle, footer and month left out."""
+    assert list(WasdeTableValue.model_fields) == SLICE_FIELDS
+    dropped = set(WasdeXmlCell.model_fields) - set(SLICE_FIELDS)
+    assert dropped == {"page_title", "sub_report_subtitle", "sub_report_footer", "report_month"}
+    assert [name for name in WasdeXmlCell.model_fields if name in SLICE_FIELDS] == SLICE_FIELDS
+    for record in parse_wasde_xml(SR11_SR24):
+        assert_projection(WasdeTableValue.project(record), record)
+
+
+def test_the_pages_labels_are_list_tables_s() -> None:
+    """What a slice leaves out is stated once per page, as the page's records carry it."""
+    tables = {table.report: table for table in tasks.list_tables().data}
+    for record in parse_wasde_xml(SR11_SR24):
+        table = tables[record.report]
+        assert record.report_month == table.report_month
+        assert record.table in {table.sub_report_title, table.sub_report_title2}
+        assert record.sub_report_subtitle in {table.sub_report_subtitle, None}
+        footers = {table.sub_report_footer, table.sub_report_footer2, table.sub_report_footer3}
+        assert record.sub_report_footer in footers
+
+
 def replay_october(replay_fixture: ReplayFixture, download: str) -> list[respx.Route]:
     """Page 0, release 796099 and one of its downloads: the routes, in that order."""
     return [
@@ -281,7 +336,7 @@ def test_get_table_answers_one_page(
     result = tasks.get_table("sr24", month)
     after = datetime.now(UTC)
     page = [record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr24"]
-    assert result.data == page, "the page's records of the replayed body, in file order"
+    assert result.data == values(page), "the page's values of the replayed body, in file order"
     assert result.meta.endpoint == "wasde1026.xml"
     assert result.meta.vintage == "October 2026"
     assert (result.meta.published_at, result.meta.published_at_naive) == (OCTOBER_PRINTED, True)
@@ -394,7 +449,7 @@ def test_get_balance_sheet_of_a_us_commodity(
         for record in parse_wasde_xml(SR11_SR24)
         if (record.report, record.matrix) == ("sr11", "matrix1")
     ]
-    assert result.data == matrix
+    assert result.data == values(matrix)
     assert {record.table for record in result.data} == {"U.S. Wheat Supply and Use  1/"}
     assert result.meta.endpoint == "wasde1026.xml"
     assert result.meta.vintage == "October 2026"
@@ -433,7 +488,7 @@ def test_get_balance_sheet_of_a_world_commodity_by_region(
         for record in parse_wasde_xml(SR11_SR24)
         if record.report == "sr24" and tasks._bare(record.region) == region
     ]
-    assert result.data == rows
+    assert result.data == values(rows)
     assert {record.region for record in result.data} == printed, "the region as printed"
     assert result.meta.request == {
         "commodity": "Rice",
@@ -635,15 +690,25 @@ def test_a_month_without_an_xls_or_a_pdf_is_refused_naming_its_formats() -> None
     assert tasks._lacking(None, "XML file") == "the latest WASDE release has no XML file"
 
 
-def test_get_table_has_a_cap_of_its_own() -> None:
-    """400 rows or 128 KB with a note naming get_balance_sheet; every other tool the default."""
+def test_the_slices_have_caps_of_their_own() -> None:
+    """Each note says how to see the rest (Johannes, 2026-10-28, G5 inside PR 5).
+
+    Every other tool keeps the default; none of them is cut but ``list_releases`` called
+    without ``since``, whose filters the default note's narrowing names.
+    """
     assert dict(tasks.MCP_CAPS) == {
         "get_table": ResultCap(
             max_rows=400,
             max_bytes=131_072,
-            note="get_balance_sheet answers one commodity's matrix, sliced by region on the "
-            "world pages (list_commodities, list_regions); Python callers get the whole page",
-        )
+            note="call get_balance_sheet for one commodity's matrix, or one region's rows of a "
+            "world page (list_commodities, list_regions); Python callers get the whole page",
+        ),
+        "get_balance_sheet": ResultCap(
+            max_rows=300,
+            max_bytes=131_072,
+            note="on the world pages a region gives one region's rows (list_regions); Python "
+            "callers get the whole matrix",
+        ),
     }
 
 
@@ -674,10 +739,10 @@ type McpCase = tuple[str, dict[str, Any], list[str], list[str], Callable[..., bo
 """A tool's task name, its arguments, the download fixture it replays beside page 0 and
 release 796099 (none, or one), the URLs it sends to page 0, a check of its answer."""
 
-SR24 = [record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr24"]
-"""Page 24's records in the replayed body, world rice: more than get_table's cap keeps."""
-SR11 = [record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr11"]
-"""Page 11's records in the replayed body, U.S. wheat and wheat by class: within the cap."""
+SR24 = values([record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr24"])
+"""Page 24's values in the replayed body, world rice."""
+SR11 = values([record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr11"])
+"""Page 11's values in the replayed body, U.S. wheat and wheat by class."""
 
 MCP_CASES: list[McpCase] = [
     (
@@ -750,16 +815,9 @@ MCP_CASES: list[McpCase] = [
         ["wasde1026_xml_sr11_sr24"],
         [PAGE_0],
         lambda payload: (
-            0 < len(payload["data"]) < len(SR24)
-            and payload["data"]
-            == [record.model_dump(mode="json") for record in SR24][: len(payload["data"])]
-            and payload["note"]
-            == (
-                f"showing {len(payload['data'])} of {len(SR24)} rows (cap: 400 rows or 131072 "
-                "bytes); get_balance_sheet answers one commodity's matrix, sliced by region on "
-                "the world pages (list_commodities, list_regions); Python callers get the "
-                "whole page"
-            )
+            payload["data"] == [record.model_dump(mode="json") for record in SR24]
+            and list(payload["data"][0]) == SLICE_FIELDS
+            and "note" not in payload
             and payload["meta"]["vintage"] == "October 2026"
             and payload["meta"]["request"] == {"table": "sr24", "release_id": 796099, "url": XML}
         ),
@@ -772,6 +830,7 @@ MCP_CASES: list[McpCase] = [
         lambda payload: (
             {row["region"] for row in payload["data"]} == {"        Thailand"}
             and {row["report"] for row in payload["data"]} == {"sr24"}
+            and list(payload["data"][0]) == SLICE_FIELDS
             and "note" not in payload
             and payload["meta"]["endpoint"] == "wasde1026.xml"
             and payload["meta"]["request"]
