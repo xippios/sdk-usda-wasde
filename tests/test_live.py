@@ -11,8 +11,13 @@ downloads the release's XLS once through esmis's ``download_release_file``, for 
 block titles of the commodity list; the PDF joins the same fixture later. The three
 list tasks send nothing: their live tests build the lists from the latest files with
 the refresh script's rules (``_vocabulary``) and compare them with the packaged ones,
-every field but ``report_month``; a difference fails, naming the rows, so the packaged
-lists are refreshed (``scripts/refresh_reference.py``). Keyless requests, paced by
+every field but ``report_month``, the month word of the reliability titles masked
+(``Reliability of <Month> Projections``, pages 35 to 37), since every release names its
+own month there and the lists carry the release they came from (ADR-0022 decision 1;
+gap row 195). The packaged lists are refreshed before each release, in the release
+train's refresh PR (D15, conventions §12), so a difference between releases is a change
+upstream made: it fails, naming the rows, and the lists are refreshed
+(``scripts/refresh_reference.py``). Keyless requests, paced by
 esmis's client at 30 a minute: the reachability check 1, ``list_releases`` 1 (page 0),
 ``get_latest_release`` 1, the fixture's ``get_release`` 3 (the latest release, the
 release, the file, about 3.4 MB) and its XLS 2 (the release, the file, about 346 KB):
@@ -20,6 +25,7 @@ eight. Assertions read shapes, counts and the rows' names, never a raw payload o
 value, as every live run takes ``--tb=short``.
 """
 
+import calendar
 import re
 import shutil
 from collections.abc import Callable, Sequence
@@ -35,7 +41,7 @@ from xippios.usda.esmis import tasks as esmis
 from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import BASE_URL, config
-from xippios.usda.wasde.models import WasdeXmlCell
+from xippios.usda.wasde.models import Table, WasdeXmlCell
 from xippios.usda.wasde.parse import parse_wasde_xml
 
 pytestmark = [pytest.mark.live, pytest.mark.anyio]
@@ -184,6 +190,25 @@ def differences(
     return found
 
 
+RELIABILITY_TITLE = re.compile(
+    rf"(Reliability of (?:United States )?)(?:{'|'.join(calendar.month_name[1:])})( Projections)"
+)
+"""A reliability page's title, its month word the release's own: ``Reliability of October
+Projections 1/`` (page 35), ``Reliability of United States October Projections  1/`` (37)."""
+
+
+def month_masked(table: Table) -> Table:
+    """The table with the month word of a reliability title replaced by ``<month>``."""
+    titles = ("sub_report_title", "sub_report_title2", "sub_report_title3")
+    return table.model_copy(
+        update={
+            name: RELIABILITY_TITLE.sub(r"\1<month>\2", text)
+            for name in titles
+            if (text := getattr(table, name)) is not None
+        }
+    )
+
+
 def by_report(row: UpstreamModel) -> str:
     return str(getattr(row, "report", ""))
 
@@ -211,9 +236,12 @@ def test_block_titles_live(latest: Latest) -> None:
 
 
 async def test_list_tables_live(latest: Latest) -> None:
+    """The packaged tables are the latest release's, the reliability titles' month masked."""
     result = await tasks.list_tables_async()
-    current = vocabulary.tables(latest.xml)
-    assert not differences(result.data, current, by_report)
+    packaged = [month_masked(table) for table in result.data]
+    assert sum(table != month for table, month in zip(result.data, packaged, strict=True)) == 3
+    current = [month_masked(table) for table in vocabulary.tables(latest.xml)]
+    assert not differences(packaged, current, by_report)
     assert result.meta.endpoint.endswith(".xml")
 
 
