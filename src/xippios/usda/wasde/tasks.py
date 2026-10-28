@@ -404,7 +404,9 @@ async def list_regions_async(search: str | None = None) -> Result[list[Region]]:
     A text is kept as printed, with its indent, spacing and footnote marker, as a
     ``WasdeXmlCell``'s ``region`` holds it, so a region can have several texts:
     ``"World"``, ``"World  2/"`` and ``"World  3/"``; ``"        China"``, ``"       China"``
-    and ``"    China"``. The U.S. pages 11 to 17 and 31 to 34 print none. ``meta.vintage``
+    and ``"    China"``. A task that slices a table by region, to come, matches the text
+    stripped of its indent and its footnote marker, so an agent passes ``"Argentina"`` or
+    ``"World"``. The U.S. pages 11 to 17 and 31 to 34 print none. ``meta.vintage``
     is the release's ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when
     the XML was downloaded and ``meta.endpoint`` the XML.
 
