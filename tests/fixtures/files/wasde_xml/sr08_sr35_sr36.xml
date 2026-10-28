@@ -1,0 +1,2687 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report Name="wasde">
+  <sr08>
+    <Report Name="sr08" Report_Month="October 2026" page_title=" WASDE - 676 - 8" sub_report_title="World and U.S. Supply and Use for Grains  1/" sub_report_subtitle="Million Metric Tons" sub_report_footer="1/ Aggregate of local marketing years. 2/ Based on export estimate. See individual commodity tables for treatment of export/import imbalances. 3/ Total use for the United States is equal to domestic consumption only (excludes exports). 4/ Wheat, coarse grains, and milled rice. 5/ Corn, sorghum, barley, oats, rye, millet, and mixed grains (for U.S. excludes millet and mixed grains).    ">
+      <matrix1 commodity_header1="World">
+        <m1_commodity_group_Collection>
+          <m1_commodity_group commodity1="Total Grains 4/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2024/25">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="2858.26" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="3653.72" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="500.21" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="2877.67" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="776.05" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Total Grains 4/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2025/26 (Est.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="3018.84" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="3794.89" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="551.44" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="2970.69" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="824.20" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Total Grains 4/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Sep">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="2944.15" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="3760.04" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="527.85" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="2981.72" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="778.32" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Total Grains 4/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Oct">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="2944.32" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="3768.52" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="524.23" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="2980.67" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="787.84" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Wheat">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2024/25">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="799.06" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1068.82" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="210.88" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="808.43" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="260.40" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Wheat">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2025/26 (Est.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="844.06" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1104.45" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="226.91" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="822.90" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="281.55" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Wheat">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Sep">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="822.43" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1103.04" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="211.77" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="826.75" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="276.29" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Wheat">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Oct">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="822.39" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1103.94" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="208.97" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="827.90" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="276.04" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Coarse Grains 5/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2024/25">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="1517.05" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1862.33" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="227.90" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="1538.31" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="324.03" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Coarse Grains 5/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2025/26 (Est.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="1629.13" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1953.15" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="265.99" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="1614.72" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="338.43" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Coarse Grains 5/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Sep">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="1587.87" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1920.41" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="253.46" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="1615.36" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="305.04" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Coarse Grains 5/">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Oct">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="1588.85" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="1927.28" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="253.91" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="1613.97" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="313.31" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Rice, milled">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2024/25">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="542.16" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="722.57" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="61.43" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="530.94" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="191.63" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Rice, milled">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2025/26 (Est.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="545.65" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="737.28" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="58.53" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="533.06" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="204.22" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Rice, milled">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Sep">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="533.85" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="736.59" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="62.62" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="539.61" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="196.99" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+          <m1_commodity_group commodity1="Rice, milled">
+            <m1_year_group_Collection>
+              <m1_year_group market_year1="2026/27 (Proj.) ">
+                <m1_month_group_Collection>
+                  <m1_month_group forecast_month1="Oct">
+                    <m1_attribute_group_Collection>
+                      <m1_attribute_group>
+                        <s3 attribute1="Output">
+                          <s4>
+                            <Cell cell_value1="533.08" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Supply">
+                          <s4>
+                            <Cell cell_value1="737.30" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Trade 2/">
+                          <s4>
+                            <Cell cell_value1="61.35" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                          <s4>
+                            <Cell cell_value1="538.80" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                      <m1_attribute_group>
+                        <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                          <s4>
+                            <Cell cell_value1="198.50" />
+                          </s4>
+                        </s3>
+                      </m1_attribute_group>
+                    </m1_attribute_group_Collection>
+                    <m1_value_group_Collection>
+                      <m1_value_group>
+                        <m1_attribute_group_Collection>
+                          <m1_attribute_group>
+                            <s3 attribute1="Output">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Supply">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Trade 2/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Total&#xD;&#xA;Use 3/">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                          <m1_attribute_group>
+                            <s3 attribute1="Ending&#xD;&#xA;Stocks">
+                              <s4>
+                                <Cell Textbox73="filler" />
+                              </s4>
+                            </s3>
+                          </m1_attribute_group>
+                        </m1_attribute_group_Collection>
+                      </m1_value_group>
+                    </m1_value_group_Collection>
+                  </m1_month_group>
+                </m1_month_group_Collection>
+              </m1_year_group>
+            </m1_year_group_Collection>
+          </m1_commodity_group>
+        </m1_commodity_group_Collection>
+      </matrix1>
+      <matrix2 commodity_header2="United States">
+        <m2_commodity_group_Collection>
+          <m2_commodity_group commodity2="Total Grains 4/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2024/25">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="452.42" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="528.34" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="101.10" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="359.89" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="67.34" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Total Grains 4/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2025/26 (Est.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="507.12" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="581.55" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="119.89" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="378.73" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="82.93" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Total Grains 4/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Sep">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="459.56" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="545.79" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="111.05" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="371.82" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="62.92" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Total Grains 4/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Oct">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="465.17" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="556.06" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="110.92" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="374.37" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="70.77" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Wheat">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2024/25">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="53.85" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="76.88" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="22.56" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="31.06" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="23.26" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Wheat">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2025/26 (Est.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="54.14" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="80.80" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="24.71" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="31.05" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="25.04" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Wheat">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Sep">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="41.66" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="70.51" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="21.09" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="29.91" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="19.51" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Wheat">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Oct">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="41.74" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="70.73" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="20.41" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="30.18" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="20.14" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Coarse Grains 5/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2024/25">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="391.51" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="441.58" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="75.68" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="323.53" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="42.37" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Coarse Grains 5/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2025/26 (Est.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="446.42" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="491.12" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="92.63" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="342.46" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="56.03" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Coarse Grains 5/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Sep">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="412.88" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="466.82" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="87.48" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="337.21" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="42.13" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Coarse Grains 5/">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Oct">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="418.42" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="476.88" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="88.03" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="339.48" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="49.37" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Rice, milled">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2024/25">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="7.05" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="9.88" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="2.87" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="5.31" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="1.71" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Rice, milled">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2025/26 (Est.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="6.56" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="9.63" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="2.56" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="5.22" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="1.86" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Rice, milled">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Sep">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="5.02" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="8.46" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="2.48" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="4.70" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="1.28" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+          <m2_commodity_group commodity2="Rice, milled">
+            <m2_year_group_Collection>
+              <m2_year_group market_year2="2026/27 (Proj.) ">
+                <m2_month_group_Collection>
+                  <m2_month_group forecast_month2="Oct">
+                    <m2_attribute_group_Collection>
+                      <m2_attribute_group attribute2="Output">
+                        <s3>
+                          <Cell cell_value2="5.01" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                        <s3>
+                          <Cell cell_value2="8.45" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Trade 2/">
+                        <s3>
+                          <Cell cell_value2="2.48" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                        <s3>
+                          <Cell cell_value2="4.70" />
+                        </s3>
+                      </m2_attribute_group>
+                      <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                        <s3>
+                          <Cell cell_value2="1.27" />
+                        </s3>
+                      </m2_attribute_group>
+                    </m2_attribute_group_Collection>
+                    <m2_value_group_Collection>
+                      <m2_value_group>
+                        <m2_attribute_group_Collection>
+                          <m2_attribute_group attribute2="Output">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Supply">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Trade 2/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Total&#xD;&#xA;Use 3/">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                          <m2_attribute_group attribute2="Ending&#xD;&#xA;Stocks">
+                            <s3>
+                              <Cell Textbox4="filler" />
+                            </s3>
+                          </m2_attribute_group>
+                        </m2_attribute_group_Collection>
+                      </m2_value_group>
+                    </m2_value_group_Collection>
+                  </m2_month_group>
+                </m2_month_group_Collection>
+              </m2_year_group>
+            </m2_year_group_Collection>
+          </m2_commodity_group>
+        </m2_commodity_group_Collection>
+      </matrix2>
+    </Report>
+  </sr08>
+  <sr35>
+    <Report Name="sr35" Report_Month="October 2026" page_title=" WASDE - 676 - 35" sub_report_title="Reliability of October Projections 1/">
+      <table1 sub_report_footer=" Note: Tables on pages 35-37 present a record of the October projection and the final Estimate. Using world wheat production as an example, the &quot;root mean square error&quot; means that chances are 2 out of 3 that the current forecast will not be above or below the final estimate by more than 1.6 percent.  Chances are 9 out of 10 (90% confidence level) that the difference will not exceed 2.8 percent. The average difference between the October projection and the final estimate is 7.5 million tons, ranging from 0.1 million to 27.8 million tons. The October projection has been below the estimate 32 times and above 11 times.  ">
+        <commodity_group_Collection>
+          <commodity_group commodity="WHEAT" commodity_attribute2="Percent">
+            <attribute_group_Collection>
+              <attribute_group attribute="Production">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="1.6" confidence_interval="2.8" average="7.5" smallest="0.1" largest="27.8" below_final="32" above_final="11" />
+                  <region_group region="U.S." root_mean_square_error="0.7" confidence_interval="1.2" average="0.2" smallest="0.0" largest="1.6" below_final="13" above_final="17" />
+                  <region_group region="Foreign" root_mean_square_error="1.8" confidence_interval="3.1" average="7.4" smallest="0.1" largest="26.8" below_final="32" above_final="11" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Exports">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="5.6" confidence_interval="9.4" average="6.6" smallest="0.0" largest="19.3" below_final="34" above_final="8" />
+                  <region_group region="U.S." root_mean_square_error="7.9" confidence_interval="13.3" average="2.0" smallest="0.2" largest="10.0" below_final="20" above_final="23" />
+                  <region_group region="Foreign" root_mean_square_error="6.6" confidence_interval="11.1" average="6.2" smallest="0.5" largest="17.3" below_final="36" above_final="7" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Domestic Use">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="1.5" confidence_interval="2.6" average="7.1" smallest="0.5" largest="29.9" below_final="26" above_final="17" />
+                  <region_group region="U.S." root_mean_square_error="5.8" confidence_interval="9.8" average="1.5" smallest="0.1" largest="3.6" below_final="11" above_final="32" />
+                  <region_group region="Foreign" root_mean_square_error="1.6" confidence_interval="2.7" average="7.1" smallest="0.2" largest="29.9" below_final="27" above_final="16" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Ending Stocks">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="7.6" confidence_interval="12.9" average="10.1" smallest="0.4" largest="32.5" below_final="32" above_final="11" />
+                  <region_group region="U.S." root_mean_square_error="11.0" confidence_interval="18.6" average="2.0" smallest="0.0" largest="6.8" below_final="27" above_final="16" />
+                  <region_group region="Foreign" root_mean_square_error="8.1" confidence_interval="13.6" average="8.7" smallest="0.0" largest="29.3" below_final="32" above_final="11" />
+                </region_group_Collection>
+              </attribute_group>
+            </attribute_group_Collection>
+          </commodity_group>
+          <commodity_group commodity="COARSE GRAINS 2/" commodity_attribute2="">
+            <attribute_group_Collection>
+              <attribute_group attribute="Production">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="1.9" confidence_interval="3.2" average="16.5" smallest="0.8" largest="56.3" below_final="33" above_final="10" />
+                  <region_group region="U.S." root_mean_square_error="2.6" confidence_interval="4.4" average="4.9" smallest="0.1" largest="17.9" below_final="25" above_final="18" />
+                  <region_group region="Foreign" root_mean_square_error="2.5" confidence_interval="4.1" average="15.4" smallest="0.6" largest="61.4" below_final="33" above_final="10" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Exports">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="6.9" confidence_interval="11.7" average="7.4" smallest="0.1" largest="28.9" below_final="30" above_final="13" />
+                  <region_group region="U.S." root_mean_square_error="15.8" confidence_interval="26.6" average="7.0" smallest="0.7" largest="19.3" below_final="20" above_final="23" />
+                  <region_group region="Foreign" root_mean_square_error="12.3" confidence_interval="20.7" average="7.4" smallest="0.6" largest="21.4" below_final="29" above_final="14" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Domestic Use">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="1.5" confidence_interval="2.6" average="12.7" smallest="0.2" largest="44.4" below_final="28" above_final="15" />
+                  <region_group region="U.S." root_mean_square_error="3.5" confidence_interval="5.8" average="5.5" smallest="0.0" largest="17.0" below_final="23" above_final="20" />
+                  <region_group region="Foreign" root_mean_square_error="1.8" confidence_interval="3.0" average="11.3" smallest="0.0" largest="42.1" below_final="29" above_final="14" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Ending Stocks">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="12.9" confidence_interval="21.7" average="17.3" smallest="0.2" largest="170.0" below_final="34" above_final="9" />
+                  <region_group region="U.S." root_mean_square_error="24.2" confidence_interval="40.8" average="8.8" smallest="0.5" largest="29.1" below_final="23" above_final="20" />
+                  <region_group region="Foreign" root_mean_square_error="15.8" confidence_interval="26.6" average="15.5" smallest="0.7" largest="153.5" below_final="36" above_final="7" />
+                </region_group_Collection>
+              </attribute_group>
+            </attribute_group_Collection>
+          </commodity_group>
+          <commodity_group commodity="RICE, milled" commodity_attribute2="">
+            <attribute_group_Collection>
+              <attribute_group attribute="Production">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="2.2" confidence_interval="3.6" average="6.1" smallest="0.0" largest="20.9" below_final="34" above_final="8" />
+                  <region_group region="U.S." root_mean_square_error="3.1" confidence_interval="5.2" average="0.1" smallest="0.0" largest="0.5" below_final="23" above_final="20" />
+                  <region_group region="Foreign" root_mean_square_error="2.2" confidence_interval="3.7" average="6.1" smallest="0.1" largest="21.0" below_final="34" above_final="9" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Exports">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="9.0" confidence_interval="15.1" average="1.9" smallest="0.1" largest="6.3" below_final="31" above_final="12" />
+                  <region_group region="U.S." root_mean_square_error="10.6" confidence_interval="17.8" average="0.2" smallest="0.0" largest="0.8" below_final="20" above_final="21" />
+                  <region_group region="Foreign" root_mean_square_error="10.2" confidence_interval="17.2" average="1.9" smallest="0.0" largest="6.3" below_final="31" above_final="12" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Domestic Use">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="1.7" confidence_interval="2.9" average="4.3" smallest="0.3" largest="20.3" below_final="32" above_final="11" />
+                  <region_group region="U.S." root_mean_square_error="7.5" confidence_interval="12.6" average="0.2" smallest="0.0" largest="0.6" below_final="22" above_final="20" />
+                  <region_group region="Foreign" root_mean_square_error="1.8" confidence_interval="3.0" average="4.3" smallest="0.1" largest="20.7" below_final="32" above_final="11" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Ending Stocks">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="10.8" confidence_interval="18.2" average="5.9" smallest="0.2" largest="26.6" below_final="35" above_final="8" />
+                  <region_group region="U.S." root_mean_square_error="22.6" confidence_interval="38.1" average="0.2" smallest="0.0" largest="0.8" below_final="22" above_final="20" />
+                  <region_group region="Foreign" root_mean_square_error="11.3" confidence_interval="19.0" average="6.0" smallest="0.1" largest="26.6" below_final="36" above_final="7" />
+                </region_group_Collection>
+              </attribute_group>
+            </attribute_group_Collection>
+          </commodity_group>
+        </commodity_group_Collection>
+      </table1>
+    </Report>
+  </sr35>
+  <sr36>
+    <Report Name="sr36" Report_Month="October 2026" page_title=" WASDE - 676 - 36" sub_report_title="Reliability of October Projections  (Continued) 1/">
+      <table1 sub_report_footer="1/ Marketing years 1981/82 through 2025/26 for grains, soybeans (U.S. only), and cotton. There was no WASDE published in October 2013 or October 2025, due to a partial government shutdown, so no 2013/14 or 2025/26 forecasts in that month were published for grains, soybeans, and cotton, and no 2013 or 2025 forecast was published in that month for animal products. Final for grains, soybeans, and cotton is defined as the first November estimate following the marketing year for 1981/82 through 2024/25, and for 2025/26 the last month’s estimate. 2/ Includes corn, sorghum, barley, oats, rye, millet, and mixed grain.  ">
+        <commodity_group_Collection>
+          <commodity_group commodity="SOYBEANS" Textbox41="Percent" commodity_label="Million Metric Tons">
+            <attribute_group_Collection>
+              <attribute_group attribute="Production">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="4.4" confidence_interval="7.4" average="7.3" smallest="0.1" largest="31.9" below_final="20" above_final="23" />
+                  <region_group region="U.S." root_mean_square_error="2.7" confidence_interval="4.6" average="1.5" smallest="0.0" largest="4.0" below_final="18" above_final="25" />
+                  <region_group region="Foreign" root_mean_square_error="7.1" confidence_interval="11.9" average="7.2" smallest="0.0" largest="31.5" below_final="19" above_final="24" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Exports">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="7.5" confidence_interval="12.6" average="4.3" smallest="0.3" largest="19.7" below_final="26" above_final="17" />
+                  <region_group region="U.S." root_mean_square_error="10.9" confidence_interval="18.3" average="2.7" smallest="0.1" largest="8.6" below_final="25" above_final="18" />
+                  <region_group region="Foreign" root_mean_square_error="17.2" confidence_interval="29.0" average="3.9" smallest="0.1" largest="21.2" below_final="21" above_final="22" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Domestic Use">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="3.0" confidence_interval="5.1" average="4.8" smallest="0.0" largest="16.9" below_final="23" above_final="19" />
+                  <region_group region="U.S." root_mean_square_error="3.7" confidence_interval="6.2" average="1.4" smallest="0.0" largest="4.5" below_final="26" above_final="16" />
+                  <region_group region="Foreign" root_mean_square_error="3.8" confidence_interval="6.3" average="4.5" smallest="0.1" largest="16.4" below_final="26" above_final="17" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Ending Stocks">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="16.5" confidence_interval="27.8" average="5.0" smallest="0.3" largest="18.6" below_final="25" above_final="18" />
+                  <region_group region="U.S." root_mean_square_error="42.5" confidence_interval="71.6" average="2.2" smallest="0.0" largest="6.6" below_final="11" above_final="32" />
+                  <region_group region="Foreign" root_mean_square_error="18.1" confidence_interval="30.4" average="4.6" smallest="0.3" largest="19.9" below_final="23" above_final="20" />
+                </region_group_Collection>
+              </attribute_group>
+            </attribute_group_Collection>
+          </commodity_group>
+          <commodity_group commodity="COTTON" Textbox41="" commodity_label="Million 480-Pound Bales">
+            <attribute_group_Collection>
+              <attribute_group attribute="Production">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="4.3" confidence_interval="7.3" average="2.9" smallest="0.0" largest="10.9" below_final="23" above_final="19" />
+                  <region_group region="U.S." root_mean_square_error="5.4" confidence_interval="9.0" average="0.7" smallest="0.0" largest="2.4" below_final="24" above_final="19" />
+                  <region_group region="Foreign" root_mean_square_error="4.9" confidence_interval="8.2" average="2.6" smallest="0.0" largest="10.5" below_final="21" above_final="21" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Exports">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="8.0" confidence_interval="13.5" average="2.2" smallest="0.1" largest="8.5" below_final="25" above_final="18" />
+                  <region_group region="U.S." root_mean_square_error="16.6" confidence_interval="27.9" average="1.1" smallest="0.1" largest="3.1" below_final="25" above_final="18" />
+                  <region_group region="Foreign" root_mean_square_error="11.0" confidence_interval="18.5" average="1.7" smallest="0.1" largest="8.3" below_final="22" above_final="21" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Domestic Use">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="4.8" confidence_interval="8.0" average="3.5" smallest="0.1" largest="19.5" below_final="19" above_final="24" />
+                  <region_group region="U.S." root_mean_square_error="10.2" confidence_interval="17.2" average="0.3" smallest="0.0" largest="1.2" below_final="19" above_final="23" />
+                  <region_group region="Foreign" root_mean_square_error="4.8" confidence_interval="8.1" average="3.4" smallest="0.0" largest="18.6" below_final="19" above_final="24" />
+                </region_group_Collection>
+              </attribute_group>
+              <attribute_group attribute="Ending Stocks">
+                <region_group_Collection>
+                  <region_group region="World" root_mean_square_error="12.8" confidence_interval="21.5" average="5.1" smallest="0.0" largest="15.8" below_final="25" above_final="17" />
+                  <region_group region="U.S." root_mean_square_error="36.5" confidence_interval="61.5" average="1.2" smallest="0.0" largest="4.3" below_final="15" above_final="27" />
+                  <region_group region="Foreign" root_mean_square_error="13.6" confidence_interval="23.0" average="4.7" smallest="0.2" largest="15.6" below_final="29" above_final="14" />
+                </region_group_Collection>
+              </attribute_group>
+            </attribute_group_Collection>
+          </commodity_group>
+        </commodity_group_Collection>
+      </table1>
+    </Report>
+  </sr36>
+</Report>

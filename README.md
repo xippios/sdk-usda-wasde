@@ -14,20 +14,38 @@ uv add "xippios-usda-wasde[mcp]"     # + MCP server
 uv add "xippios-usda-wasde[http]"    # + FastAPI router
 ```
 
-It depends on `xippios-usda-esmis`, installed with it. <!-- what it uses each for, one line (ADR-0021 decision 6) -->
+It depends on `xippios-usda-esmis`, installed with it, to list WASDE's releases in ESMIS's
+catalog and to download their files; this package's server serves its own tools only.
 
 No API key is needed.
 
 ## 30-second example
 
 ```python
-from xippios.usda.wasde import tasks
+from datetime import date
 
-# result = tasks.<task>(...)
-# result.data, result.meta.retrieved_at, result.meta.request
+from xippios.usda.wasde import get_latest_release, get_release, list_releases
+
+latest = get_latest_release()  # the newest WASDE release in ESMIS
+latest.data.id, latest.data.month  # "796099", "2026-10"
+latest.meta.published_at  # 2026-10-09 12:00:00: ESMIS's printed time, no zone (ADR-0022)
+
+releases = list_releases(since=date(2026, 1, 1))  # bound it: without since, 29 requests
+[release.month for release in releases.data if release.revision]  # ["2026-06", "2026-05"]
+
+october = get_release("2026-10")  # Python only: downloads the XML, parses it, removes it
+october.meta.endpoint, october.meta.vintage  # "wasde1026.xml", "October 2026"
+corn = [cell for cell in october.data if cell.report == "sr12" and cell.matrix == "matrix2"]
+corn[0].attribute, corn[0].market_year, corn[0].cell_value  # "Area Planted", "2024/25", "90.9"
 ```
 
-Task functions are listed in the status table below as they are added.
+Each record of `get_release` is one value of the release's tables with the labels its
+page prints, as printed (`WasdeXmlCell`): 6543 for October 2026, pages 8 to 37. `unit`
+is what the file states: the subtitle of the world and summary pages (8 to 10, 18 to 30),
+the label of a reliability table for its average, smallest and largest; on the U.S.
+pages it is `None`, since the XML does not say which of its repeated unit rows the page
+shows (the XLS and the TXT print them in place). Task functions are listed in the status
+table below.
 
 ## MCP
 
@@ -56,7 +74,9 @@ exactly tasks.__all__. -->
 
 | Upstream operation | Task function | MCP tool | Status |
 | --- | --- | --- | --- |
-| (none yet) | | | |
+| ESMIS `esmis_api_release_findByIdentifier` for `wasde`, through xippios-usda-esmis's `list_releases`, pages walked newest first | `list_releases(since=None, until=None)` | `usda_wasde_list_releases` | alpha |
+| ESMIS `esmis_api_release_findByIdentifier` for `wasde`, page 0, through xippios-usda-esmis's `get_latest_release` | `get_latest_release()` | `usda_wasde_get_latest_release` | alpha |
+| the release's XML file, downloaded through xippios-usda-esmis's `download_release_file`, parsed by `parse_wasde_xml` | `get_release(month=None)`, a bulk task | none, Python only | alpha |
 
 ## Upstream terms and attribution
 
