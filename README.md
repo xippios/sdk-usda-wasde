@@ -50,10 +50,13 @@ pages it is `None`, since the XML does not say which of its repeated unit rows t
 shows (the XLS and the TXT print them in place). `list_tables`, `list_commodities` and
 `list_regions` answer from lists packaged with the package, read from the October 2026
 release's files by `scripts/refresh_reference.py` (`reference/README.md`) and refreshed
-before each release: its 30 table pages, the 43 supply-and-use matrices of pages 11 to
-30, 32 and 33 with their commodities (the XML names none of them; on pages 12 to 15
-they are the XLS's block titles) and its 70 region texts, as printed. Task functions are
-listed in the status table below.
+before each release: its 30 table pages with their titles, subtitles and footnotes, the
+43 supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, and its
+70 region texts, as printed. The XML names none of these matrices' commodities as a
+whole: on pages 12 to 15 they are the XLS's block titles; only page 32's records carry a
+`commodity`, one per row (`Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`),
+while the list names its matrix `Meats`, so `list_commodities(search="beef")` answers
+nothing. Task functions are listed in the status table below.
 
 ## MCP
 
@@ -85,7 +88,7 @@ exactly tasks.__all__. -->
 | ESMIS `esmis_api_release_findByIdentifier` for `wasde`, through xippios-usda-esmis's `list_releases`, pages walked newest first | `list_releases(since=None, until=None)` | `usda_wasde_list_releases` | alpha |
 | ESMIS `esmis_api_release_findByIdentifier` for `wasde`, page 0, through xippios-usda-esmis's `get_latest_release` | `get_latest_release()` | `usda_wasde_get_latest_release` | alpha |
 | the release's XML file, downloaded through xippios-usda-esmis's `download_release_file`, parsed by `parse_wasde_xml` | `get_release(month=None)`, a bulk task | none, Python only | alpha |
-| the XML's pages, their titles, subtitles and matrices, packaged from the latest release (`reference/table.json`), no request | `list_tables(search=None)` | `usda_wasde_list_tables` | alpha |
+| the XML's pages, their titles, subtitles, footnotes and matrices, packaged from the latest release (`reference/table.json`), no request | `list_tables(search=None)` | `usda_wasde_list_tables` | alpha |
 | the XML's supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, on pages 12 to 15 the XLS's block titles, packaged (`reference/commodity.json`), no request | `list_commodities(search=None)` | `usda_wasde_list_commodities` | alpha |
 | the XML's region texts with their pages, packaged (`reference/region.json`), no request | `list_regions(search=None)` | `usda_wasde_list_regions` | alpha |
 

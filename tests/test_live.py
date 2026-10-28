@@ -15,7 +15,7 @@ every field but ``report_month``, the month word of the reliability titles maske
 (``Reliability of <Month> Projections``, pages 35 to 37), since every release names its
 own month there and the lists carry the release they came from (ADR-0022 decision 1;
 gap row 195). The packaged lists are refreshed before each release, in the release
-train's refresh PR (D15, conventions §12), so a difference between releases is a change
+train's refresh PR (conventions §12), so a difference between releases is a change
 upstream made: it fails, naming the rows, and the lists are refreshed
 (``scripts/refresh_reference.py``). Keyless requests, paced by
 esmis's client at 30 a minute: the reachability check 1, ``list_releases`` 1 (page 0),

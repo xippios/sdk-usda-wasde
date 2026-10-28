@@ -4,7 +4,10 @@
 writes what they return to ``reference/`` with ``PackagedList.write``; the live tests
 call them on the current release and compare it with the packaged lists. No task calls
 them: the list tasks answer from the packaged files, and the package reads no XLS at
-call time.
+call time. So ``block_titles`` reads the XLS and ``tables`` the XML's page headers here,
+beside ``parse/``, which ADR-0020 decision 1 names for the file kinds a task returns:
+these read only what the refresh script and the live tests need (the session,
+2026-10-28, rule 7; gap row 195).
 
 - ``tables``: one ``Table`` per page element of the XML, ``sr08`` to ``sr37``, from the
   attributes of the page's ``<Report>`` (``Name``, ``Report_Month``, the number that ends
@@ -19,9 +22,12 @@ call time.
   2026-10-28, G5; pages 32 and 33 by the session, 2026-10-28, rule 7). Its ``table`` is
   the title ``parse_wasde_xml`` gives the item; its ``region`` the region that title
   starts with, ``U.S.`` read as ``"United States"`` (as the world pages' rows print it),
-  ``Mexico`` and ``World`` as printed (Johannes, 2026-10-28, G5). Its ``commodity``, which
-  the XML holds for none of these items, is on pages 12 to 15 the XLS's block title by
-  position
+  ``Mexico`` and ``World`` as printed (Johannes, 2026-10-28, G5). Its ``commodity`` names
+  the matrix as a whole, which the XML does for none of these items: only page 32's
+  records carry a ``commodity``, one per row (``Beef``, ``Pork``, ``Broiler``,
+  ``Turkey``, ``Red Meat & Poultry``), and its matrix is ``Meats`` here, so a search
+  for a row's commodity finds nothing in this list. The commodity is on pages 12 to 15
+  the XLS's block title by position
   (``block_titles``): sheet ``Page N`` prints one in column 0 of each block's header row,
   in the order of the page's report items, and the Nth title goes to the Nth item. On
   the other pages it is the title's words between its region and ``Supply and Use`` (a

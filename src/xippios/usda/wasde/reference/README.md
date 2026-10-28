@@ -23,7 +23,10 @@ the parameter the list serves:
   in 0.1.0.
 
 **The commodity on pages 12 to 15 is matched by position.** The XML names the commodity
-of no matrix on the U.S. pages; pages 11, 16, 17, 32 and 33 name it in their titles
+of no matrix on the U.S. pages as a whole: only page 32's records carry a `commodity`,
+one per row (`Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`), while the list
+names its matrix `Meats`, so `list_commodities(search="beef")` answers nothing. Pages
+11, 16, 17, 32 and 33 name the matrix's commodity in their titles
 (`U.S. Wheat Supply and Use  1/`, `U.S. Milk Supply and Use`), but the titles of pages 12
 to 15 name several
 (`U.S. Feed Grain and Corn Supply and Use  1/`). There the XLS's sheet `Page N` prints a
@@ -37,7 +40,7 @@ commodity is the title's words between its region and `Supply and Use`, as print
 `U.S.`, `Mexico` and `World` as printed. Each file's `note` states its rule.
 
 **When they are refreshed.** Before each release, in the release train's refresh PR of
-its own (D15, conventions §12): a release ships the lists of the latest WASDE, whose
+its own (conventions §12): a release ships the lists of the latest WASDE, whose
 `Report_Month` is their vintage (ADR-0022 decision 1). Between releases the nightly live
 tests compare the packaged tables, commodities and regions with the latest release's,
 every field but `report_month`, with the month word of the reliability titles masked

@@ -215,7 +215,10 @@ class Commodity(UpstreamModel):
 
     One record per report item of the supply-and-use pages, the U.S. pages 11 to 17, 32
     and 33 and the world pages 18 to 30 (``reference/commodity.json``). The XML names the
-    commodity of none of them: on pages 12 to 15 it is the XLS's block title, the Nth of
+    commodity of none of them as a whole: only page 32's records carry a ``commodity``, one
+    per row (``Beef``, ``Pork``, ``Broiler``, ``Turkey``, ``Red Meat & Poultry``), and its
+    matrix is ``Meats`` here, so a search for a row's commodity finds nothing in this
+    list. On pages 12 to 15 the commodity is the XLS's block title, the Nth of
     sheet ``Page N`` for the page's Nth report item (``FEED GRAINS``, ``CORN``); on the
     other pages it is the commodity the item's title names. Pages 8 to 10 (the world and
     U.S. aggregates), 31 (quarterly production and prices), 34 (dairy prices) and 35 to 37
