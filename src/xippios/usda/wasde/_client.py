@@ -1,4 +1,9 @@
-"""The package's one configured ``AsyncClient`` and its error mapping (conventions §6)."""
+"""The package's one configured ``AsyncClient`` and its error mapping (conventions §6).
+
+In 0.1.0 it sends nothing: every request this package makes goes through
+``xippios-usda-esmis``'s tasks (ADR-0021), paced by esmis's client. ``SOURCE`` names
+this package in every ``ResultMeta``.
+"""
 
 import httpx
 from xippios.core import AsyncClient, ClientConfig, RateLimit, XippiosError
