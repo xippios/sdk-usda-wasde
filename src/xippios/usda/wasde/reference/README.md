@@ -49,8 +49,8 @@ rows = commodities.parse(Commodity, source="usda-wasde")
 ```
 
 No enum is generated from them (`enums.py` holds none): they are tables of several
-fields, no value list. One row per file, which the script rewrites: Origin is the file it
-was read from, Fetched the UTC time that file was complete.
+fields, no value list. One row per file, which the script rewrites: Origin is the files it
+was read from, Fetched the file's `fetched`, the UTC time the XML was complete.
 
 | File | Origin | Fetched |
 | --- | --- | --- |
