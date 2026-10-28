@@ -20,6 +20,7 @@ classifiers = [
 dependencies = [
   "xippios-core~=0.3.0",
   "xippios-usda-esmis~=0.1.0",
+  "xlrd>=2.0.2",
 ]
 
 [project.optional-dependencies]
@@ -50,6 +51,7 @@ dev = [
   # Pinned to the `# /// script` block of scripts/refresh_upstream.py, so that mypy --strict
   # reads its types; the two pins move together.
   "markdownify==1.2.3",
+  "types-xlrd>=2.0.0.20260518",
 ]
 
 [build-system]

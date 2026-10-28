@@ -1,0 +1,687 @@
+{
+  "param": "region",
+  "endpoint": "wasde1026.xml",
+  "fetched": "2026-10-28T16:26:51Z",
+  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z: every distinct region text of the XML's records as printed, in the order of its first appearance, with the pages (Name) that print it.",
+  "records": [
+    {
+      "region": "World",
+      "reports": [
+        "sr09",
+        "sr26",
+        "sr27",
+        "sr35",
+        "sr36"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "United States",
+      "reports": [
+        "sr09",
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25",
+        "sr26",
+        "sr27",
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "Foreign  4/",
+      "reports": [
+        "sr09"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "World  3/",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "    World Less China",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25",
+        "sr26",
+        "sr27",
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "Total Foreign",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25",
+        "sr26",
+        "sr27",
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "    Major Exporters  4/",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Argentina",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Australia",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Canada",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        European Union  5/",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Russia",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Ukraine",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "    Major Importers  6/",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Bangladesh",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Brazil",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25",
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        China",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25",
+        "sr28",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Japan",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        N. Africa  7/",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Nigeria",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Sel. Mideast  8/",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Southeast Asia  9/",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        India",
+      "reports": [
+        "sr18",
+        "sr19",
+        "sr24",
+        "sr25",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Kazakhstan",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        United Kingdom",
+      "reports": [
+        "sr18",
+        "sr19"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "    Major Importers  5/",
+      "reports": [
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        European Union  6/",
+      "reports": [
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Mexico",
+      "reports": [
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25",
+        "sr28",
+        "sr29"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        N. Afr & Mideast  7/",
+      "reports": [
+        "sr20",
+        "sr21"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Saudi Arabia",
+      "reports": [
+        "sr20",
+        "sr21"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Southeast Asia  8/",
+      "reports": [
+        "sr20",
+        "sr21"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        South Korea",
+      "reports": [
+        "sr20",
+        "sr21",
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        South Africa",
+      "reports": [
+        "sr22",
+        "sr23"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Egypt",
+      "reports": [
+        "sr22",
+        "sr23",
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Southeast Asia  7/",
+      "reports": [
+        "sr22",
+        "sr23"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Burma",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Pakistan",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Thailand",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Vietnam",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Indonesia",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Philippines",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Sel. Mideast  7/",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        C. Amer & Carib  8/",
+      "reports": [
+        "sr24",
+        "sr25"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "   Major Exporters  4/",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Central Asia  5/",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Afr. Fr. Zone  6/",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       S. Hemis.  7/",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "           Australia",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "           Brazil",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       India",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "   Major Importers  8/",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Mexico",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       China",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       European Union  9/",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Turkey",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Pakistan",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Indonesia",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Thailand",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Bangladesh",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "       Vietnam",
+      "reports": [
+        "sr26",
+        "sr27"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "World  2/",
+      "reports": [
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "    Major Exporters  3/",
+      "reports": [
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Paraguay",
+      "reports": [
+        "sr28"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "    Major Importers  4/",
+      "reports": [
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        European Union",
+      "reports": [
+        "sr28",
+        "sr29",
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        Southeast Asia 5/",
+      "reports": [
+        "sr28",
+        "sr29"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "    China",
+      "reports": [
+        "sr29"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "        North Africa 5/",
+      "reports": [
+        "sr30"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "U.S.",
+      "reports": [
+        "sr35",
+        "sr36"
+      ],
+      "report_month": "October 2026"
+    },
+    {
+      "region": "Foreign",
+      "reports": [
+        "sr35",
+        "sr36"
+      ],
+      "report_month": "October 2026"
+    }
+  ]
+}

@@ -8,7 +8,8 @@ release page 0 (``release_find_by_identifier/wasde_page0.json``), release 796099
 (``release_find_by_id/796099.json``), and the download of its XML
 (``download_release_file/wasde1026_xml.json``), whose body is the sample
 ``files/wasde_xml/sr08_sr35_sr36.xml``, so ``get_release`` replays as the parser reads
-that sample. Both tools are called end to end through the MCP server; the bulk task is
+that sample. The three list tasks answer from the packaged lists in ``reference/`` and
+send nothing. Every tool is called end to end through the MCP server; the bulk task is
 neither a tool nor a route.
 """
 
@@ -16,13 +17,15 @@ import json
 import tempfile
 from collections.abc import Callable
 from datetime import UTC, date, datetime
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
 import pytest
+import respx
 from fastapi.routing import APIRoute
 from pydantic import TypeAdapter
-from xippios.core import InvalidRequestError, NotFoundError
+from xippios.core import InvalidRequestError, NotFoundError, PackagedList, UpstreamModel
 from xippios.core.mcp import tool_name
 from xippios.core.testing import (
     ReplayFixture,
@@ -39,7 +42,8 @@ from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.http import router
 from xippios.usda.wasde.mcp import server
-from xippios.usda.wasde.models import Release
+from xippios.usda.wasde.models import Attribute, Commodity, Region, Release, Table
+from xippios.usda.wasde.params import PACKAGE, PACKAGED_LISTS
 from xippios.usda.wasde.parse import parse_wasde_xml
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -51,6 +55,10 @@ XML = f"{ESMIS}/sites/default/release-files/796099/wasde1026.xml"
 RELEASES = "esmis_api_release_findByIdentifier"
 OCTOBER_PRINTED = datetime(2026, 10, 9, 12, 0)
 """The October 2026 release's ``release_datetime`` as printed, its ``+0000`` dropped."""
+PACKAGED_FETCHED = datetime(2026, 10, 28, 16, 26, 51, tzinfo=UTC)
+"""The packaged lists' ``fetched``, when the refresh script's XML download was complete."""
+FILE_KEYS = {"param", "endpoint", "fetched", "note", "records"}
+"""The keys a packaged file may hold (ADR-0022, amendment point 8)."""
 
 
 def page_0() -> list[EsmisRelease]:
@@ -236,8 +244,14 @@ async def test_the_bulk_task_is_no_tool_and_no_route() -> None:
         served = name not in bulk
         assert (tool_name(SOURCE, getattr(tasks, name)) in tools) is served, name
         assert (f"/{SOURCE}/{name}" in routes) is served, name
-    assert tools == {"usda_wasde_list_releases", "usda_wasde_get_latest_release"}
-    assert len(routes) == 2
+    assert tools == {
+        "usda_wasde_list_releases",
+        "usda_wasde_get_latest_release",
+        "usda_wasde_list_tables",
+        "usda_wasde_list_commodities",
+        "usda_wasde_list_regions",
+    }
+    assert len(routes) == 5
 
 
 type McpCase = tuple[str, dict[str, Any], list[str], Callable[..., bool]]
@@ -264,6 +278,43 @@ MCP_CASES: list[McpCase] = [
             and payload["data"]["files"][3]["name"] == "wasde1026.xml"
             and payload["meta"]["published_at"] == "2026-10-09T12:00:00"
             and payload["meta"]["published_at_naive"] is True
+        ),
+    ),
+    (
+        "list_tables",
+        {"search": "wheat"},
+        [],
+        lambda payload: (
+            [table["report"] for table in payload["data"]] == ["sr11", "sr18", "sr19"]
+            and payload["meta"]["vintage"] == "October 2026"
+            and payload["meta"]["endpoint"] == "wasde1026.xml"
+            and payload["meta"]["retrieved_at"] == "2026-10-28T16:26:51Z"
+            and payload["meta"]["request"] == {"search": "wheat"}
+        ),
+    ),
+    (
+        "list_commodities",
+        {"search": "sr12"},
+        [],
+        lambda payload: (
+            [row["commodity"] for row in payload["data"]] == ["FEED GRAINS", "CORN"]
+            and [row["matrix"] for row in payload["data"]] == ["matrix1", "matrix2"]
+            and payload["meta"]["vintage"] == "October 2026"
+        ),
+    ),
+    (
+        "list_regions",
+        {},
+        [],
+        lambda payload: (
+            len(payload["data"]) == 70
+            and payload["data"][0]
+            == {
+                "region": "World",
+                "reports": ["sr09", "sr26", "sr27", "sr35", "sr36"],
+                "report_month": "October 2026",
+            }
+            and "note" not in payload
         ),
     ),
 ]
@@ -304,3 +355,114 @@ def test_release_keeps_the_time_as_printed() -> None:
     assert isinstance(release, Release)
     assert release.release_datetime.utcoffset() is not None
     assert release.model_dump(mode="json")["release_datetime"] == "2026-10-09T12:00:00Z"
+
+
+type Packaged = tuple[str, Callable[..., Any], type[UpstreamModel], int]
+"""A list task, the packaged list it answers from, its record model and its row count."""
+
+PACKAGED: list[Packaged] = [
+    ("table", tasks.list_tables, Table, 30),
+    ("commodity", tasks.list_commodities, Commodity, 43),
+    ("region", tasks.list_regions, Region, 70),
+]
+
+
+def packaged_file(name: str) -> dict[str, Any]:
+    """``reference/<name>.json`` as written, read as JSON, not through ``PackagedList``."""
+    text = resources.files(PACKAGE).joinpath("reference", f"{name}.json").read_text("utf-8")
+    payload: dict[str, Any] = json.loads(text)
+    return payload
+
+
+@pytest.mark.parametrize(("name", "task", "model", "rows"), PACKAGED, ids=[p[0] for p in PACKAGED])
+def test_a_list_task_answers_its_packaged_list_without_a_request(
+    respx_mock: respx.MockRouter,
+    name: str,
+    task: Callable[..., Any],
+    model: type[UpstreamModel],
+    rows: int,
+) -> None:
+    packaged = PackagedList.load(PACKAGE, name)
+    result = task()
+    assert len(result.data) == len(packaged.records) == rows, "the counts the docstring names"
+    assert result.data == packaged.parse(model, source=SOURCE), "the file's order"
+    assert result.meta.source == SOURCE
+    assert result.meta.endpoint == "wasde1026.xml", "the file the list came from"
+    assert result.meta.retrieved_at == packaged.fetched == PACKAGED_FETCHED
+    assert result.meta.vintage == "October 2026", "the release's Report_Month"
+    assert result.meta.request == {}, "search left None is omitted"
+    assert (result.meta.published_at, result.meta.total) == (None, None)
+    assert not result.meta.published_at_naive
+    assert respx_mock.calls.call_count == 0
+
+
+def key(row: Any) -> str:
+    """What names a row in the search cases: a table's report, a commodity, a region text."""
+    if isinstance(row, Table):
+        return row.report
+    if isinstance(row, Commodity):
+        return row.commodity
+    assert isinstance(row, Region)
+    return row.region
+
+
+SEARCHES: list[tuple[Callable[..., Any], str, list[str]]] = [
+    (tasks.list_tables, "wheat", ["sr11", "sr18", "sr19"]),
+    (tasks.list_tables, "RELIABILITY", ["sr35", "sr36", "sr37"]),
+    (tasks.list_tables, "matrix6", ["sr29", "sr30"]),
+    (tasks.list_tables, "Million 480-lb", ["sr09"]),
+    (tasks.list_commodities, "sr13", ["SORGHUM", "BARLEY", "OATS"]),
+    (tasks.list_commodities, "mexico", ["Sugar"]),
+    (tasks.list_commodities, "sr33", ["Egg", "Milk"]),
+    (tasks.list_commodities, "grain rice", ["LONG-GRAIN RICE", "MEDIUM & SHORT-GRAIN RICE"]),
+    (
+        tasks.list_regions,
+        "china",
+        ["    World Less China", "        China", "       China", "    China"],
+    ),
+    (tasks.list_regions, "u.s.", ["U.S."]),
+]
+
+
+@pytest.mark.parametrize(("task", "search", "keys"), SEARCHES)
+def test_search_keeps_the_rows_where_the_text_occurs_in_a_field(
+    respx_mock: respx.MockRouter, task: Callable[..., Any], search: str, keys: list[str]
+) -> None:
+    result = task(search=search)
+    assert [key(row) for row in result.data] == keys
+    assert result.meta.request == {"search": search}
+    assert result.meta.vintage == "October 2026"
+    assert respx_mock.calls.call_count == 0
+
+
+def test_search_matches_each_field_on_its_own() -> None:
+    """A text spanning two fields matches neither (core's ``matches``)."""
+    assert tasks.list_commodities(search="CORN United States").data == []
+    assert len(tasks.list_regions(search="sr24").data) == 23, "a page among the reports"
+    assert tasks.list_tables(search="12").data[0].report == "sr12", "the page number as text"
+
+
+def test_the_packaged_files_hold_the_four_keys_and_a_note() -> None:
+    reference = Path(tasks.__file__).parent / "reference"
+    assert sorted(path.stem for path in reference.glob("*.json")) == sorted(PACKAGED_LISTS)
+    models: dict[str, type[UpstreamModel]] = {
+        "table": Table,
+        "commodity": Commodity,
+        "region": Region,
+        "attribute": Attribute,
+    }
+    for name in PACKAGED_LISTS:
+        raw = packaged_file(name)
+        assert set(raw) == FILE_KEYS, name
+        packaged = PackagedList.load(PACKAGE, name)
+        assert (packaged.param, packaged.endpoint) == (name, "wasde1026.xml"), "named by param"
+        assert packaged.fetched == PACKAGED_FETCHED
+        assert packaged.note is not None
+        assert "ESMIS release 796099" in packaged.note
+        assert "Report_Month 'October 2026'" in packaged.note
+        model = models[name]
+        for row, record in zip(packaged.parse(model, source=SOURCE), raw["records"], strict=True):
+            assert list(record) == list(model.model_fields), "every field, null included"
+            assert row.dump_upstream() == record
+        assert {record["report_month"] for record in raw["records"]} == {"October 2026"}
+    assert "wasde1026.xls" in (PackagedList.load(PACKAGE, "commodity").note or "")

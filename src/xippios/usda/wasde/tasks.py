@@ -31,33 +31,62 @@ What every task follows:
   ``ORIGwasde-08-12-2013.xml``, before the revision's, ``wasde-08-12-2013.xml``, and
   esmis's ``download_release_file`` takes the first file of a format, so
   ``get_release("2013-08")`` reads the original.
+- The packaged answers: ``list_tables``, ``list_commodities`` and ``list_regions`` answer
+  from ``reference/table.json``, ``commodity.json`` and ``region.json``, the lists
+  ``scripts/refresh_reference.py`` read from the latest release's files, through core's
+  ``PackagedList``, without a request. Their ``meta`` is ``PackagedList.meta``'s
+  (ADR-0022, rule 1): ``retrieved_at`` the list's ``fetched``, ``endpoint`` the file it
+  came from as catalogued (``"wasde1026.xml"``), ``vintage`` the release's
+  ``Report_Month`` as printed (``"October 2026"``), which every record carries,
+  ``published_at`` and ``total`` empty; ``meta.request`` holds ``search`` when given.
+  ``search`` keeps a record where the text occurs in one of its fields, ignoring case
+  (core's ``matches``).
 """
 
 import calendar
 import re
 import tempfile
+from collections.abc import Callable, Iterable
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from xippios.core import InvalidRequestError, NotFoundError, Result, ResultMeta, sync
+from xippios.core import (
+    InvalidRequestError,
+    NotFoundError,
+    PackagedList,
+    Result,
+    ResultMeta,
+    matches,
+    sync,
+)
 from xippios.usda.esmis import tasks as esmis
 from xippios.usda.esmis.models import Release as EsmisRelease
 from xippios.usda.esmis.models import ReleaseFile
 
 from xippios.usda.wasde._client import SOURCE
-from xippios.usda.wasde.models import Release, WasdeXmlCell
+from xippios.usda.wasde.models import Commodity, Region, Release, Table, WasdeXmlCell
+from xippios.usda.wasde.params import PACKAGE
 from xippios.usda.wasde.parse.wasde_xml import parse_wasde_xml
 
-__all__ = ["get_latest_release", "get_release", "list_releases"]
+__all__ = [
+    "get_latest_release",
+    "get_release",
+    "list_commodities",
+    "list_regions",
+    "list_releases",
+    "list_tables",
+]
 
 # A task named here is Python-only: no tool, no route; the adapters skip it (ADR-0019 decision 4).
 BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 
 # MCP_CAPS, only where a tool needs a result cap of its own, keyed by the task function's
-# name (conventions §8, ADR-0016). None here: both tools keep the default, 200 rows or
-# 64 KB; list_releases called without since answers every WASDE release (703 on
-# 2026-10-28), and its docstring tells an agent to bound it.
+# name (conventions §8, ADR-0016). None here: every tool keeps the default, 200 rows or
+# 64 KB. list_releases called without since answers every WASDE release (703 on
+# 2026-10-28), and its docstring tells an agent to bound it; the three packaged lists fit
+# whole, list_tables 30 rows, list_commodities 43 and list_regions 70, the largest
+# result list_tables's 29,639 bytes of compact JSON, its footnotes included (October 2026).
 
 PUBLICATION = "wasde"
 """WASDE's publication identifier in ESMIS, which esmis's release tasks take."""
@@ -273,6 +302,132 @@ async def get_release_async(month: str | None = None) -> Result[list[WasdeXmlCel
     return Result(data=records, meta=meta)
 
 
+def _packaged[M: (Table, Commodity, Region)](
+    name: str, model: type[M], search: str | None, fields: Callable[[M], Iterable[object]]
+) -> Result[list[M]]:
+    """The packaged list ``name``'s records that ``search`` matches, with the list's meta.
+
+    ``meta.vintage`` is the ``report_month`` the records carry, read from the first, as
+    the refresh script writes one release's month on every record.
+    """
+    packaged = PackagedList.load(PACKAGE, name)
+    rows = packaged.parse(model, source=SOURCE)
+    vintage = rows[0].report_month if rows else None
+    kept = [row for row in rows if matches(search, *fields(row))]
+    return Result(
+        data=kept, meta=packaged.meta(SOURCE, request={"search": search}, vintage=vintage)
+    )
+
+
+async def list_tables_async(search: str | None = None) -> Result[list[Table]]:
+    """WASDE's table pages with their titles, subtitles, footnotes and matrices, from the package.
+
+    Answered without a request from the list the package read from the October 2026
+    release's XML (``wasde1026.xml``, ``reference/table.json``): 30 pages, printed pages
+    8 to 37, each with its ``report`` (``"sr12"``, the page as a ``WasdeXmlCell``'s
+    ``report`` names it), its printed ``page`` number, its titles, subtitles and
+    footnotes (``sub_report_footer`` to ``sub_report_footer3``) as printed, stated once
+    here for the page, and its ``matrices``, the report items in document order, the
+    values a ``WasdeXmlCell``'s ``matrix`` takes there (``["matrix3", "matrix4"]`` on
+    page 26).
+    Pages 8 to 10 hold the world and U.S. aggregates, 11 to 17 the U.S. supply and use,
+    18 to 30 the world supply and use by region, 31 to 34 U.S. animal products, eggs,
+    milk and dairy prices, 35 to 37 the reliability of the month's projections. A page
+    WAOB changed since is as it was until the package's next refresh. ``meta.vintage``
+    is the release's ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when
+    the file was downloaded and ``meta.endpoint`` the file.
+
+    Args:
+        search: Keep the pages where this text occurs, ignoring case, in the report, the
+            page number, a title, a subtitle or a matrix name, each on its own, never in
+            a footnote, e.g. ``"wheat"`` (pages 11, 18 and 19), ``"sr24"``,
+            ``"reliability"`` (pages 35 to 37). ``None`` (the default) keeps every page.
+    """
+    return _packaged(
+        "table",
+        Table,
+        search,
+        lambda row: (
+            row.report,
+            row.page,
+            row.sub_report_title,
+            row.sub_report_title2,
+            row.sub_report_title3,
+            row.sub_report_subtitle,
+            row.sub_report_subtitle2,
+            row.sub_report_subtitle3,
+            *row.matrices,
+        ),
+    )
+
+
+async def list_commodities_async(search: str | None = None) -> Result[list[Commodity]]:
+    """WASDE's supply-and-use matrices with their commodities, from the packaged list.
+
+    Answered without a request from the list the package read from the October 2026
+    release's XML and XLS (``reference/commodity.json``): 43 matrices of 23 commodities,
+    each with its ``commodity`` as the files print it, its ``region`` (``"United
+    States"`` on the U.S. pages 11 to 17, 32 and 33, ``"Mexico"`` for page 16's second matrix,
+    ``"World"`` on the world pages 18 to 30, whose matrices hold the world and its
+    regions), its ``report`` and ``matrix``, which together name the matrix's
+    ``WasdeXmlCell`` records, and its ``table``, the title. The XML names none of these
+    matrices' commodities as a whole: only page 32's records carry a ``commodity``, one
+    per row (e.g. ``"Beef"``, ``"Pork"``, ``"Broiler"``, ``"Turkey"``, ``"Red Meat &
+    Poultry"``), while this list names its matrix ``"Meats"``, so ``search="beef"``
+    answers nothing here: read page 32's records for its rows. On pages 12 to 15 the
+    commodities are the XLS's block titles, upper case as
+    printed (``"FEED GRAINS"``, ``"CORN"``, ``"SOYBEAN MEAL"``), matched to the matrices
+    by position; elsewhere the title's words (``"Wheat"``, ``"Coarse Grain"``,
+    ``"Meats"``, ``"Egg"``, ``"Milk"``). A world commodity spans two pages, the past
+    years and the projection by month (wheat, coarse grain, corn, rice, cotton), or one
+    page of three matrices (soybean, soybean meal, soybean oil). Pages 8 to 10 (the
+    aggregates), 31 (quarterly production and prices), 34 (dairy prices) and 35 to 37
+    (reliability) are not in the list. ``meta.vintage`` is the release's
+    ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when the XML was
+    downloaded and ``meta.endpoint`` the XML.
+
+    Args:
+        search: Keep the matrices where this text occurs, ignoring case, in the
+            commodity, the region, the report, the matrix or the title, each on its own,
+            e.g. ``"soybean"`` (pages 15 and 28 to 30), ``"rice"``, ``"sr13"``,
+            ``"mexico"``. ``None`` (the default) keeps every matrix.
+    """
+    return _packaged(
+        "commodity",
+        Commodity,
+        search,
+        lambda row: (row.commodity, row.region, row.report, row.matrix, row.table),
+    )
+
+
+async def list_regions_async(search: str | None = None) -> Result[list[Region]]:
+    """The regions WASDE's tables print, as printed, with their pages, from the packaged list.
+
+    Answered without a request from the list the package read from the October 2026
+    release's XML (``reference/region.json``): 70 distinct ``region`` texts of the world
+    pages 18 to 30, page 9's cotton table and the reliability pages 35 and 36, in the
+    order of their first appearance, each with its ``reports``, the pages that print it.
+    A text is kept as printed, with its indent, spacing and footnote marker, as a
+    ``WasdeXmlCell``'s ``region`` holds it, so a region can have several texts:
+    ``"World"``, ``"World  2/"`` and ``"World  3/"``; ``"        China"``, ``"       China"``
+    and ``"    China"``. A task that slices a table by region, to come, matches the text
+    stripped of its indent and its footnote marker, so an agent passes ``"Argentina"`` or
+    ``"World"``. The U.S. pages 11 to 17 and 31 to 34 print none. ``meta.vintage``
+    is the release's ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when
+    the XML was downloaded and ``meta.endpoint`` the XML.
+
+    Args:
+        search: Keep the regions where this text occurs, ignoring case, in the text or
+            one of its pages, each on its own, e.g. ``"china"`` (four texts, World Less
+            China among them), ``"european union"``, ``"sr24"`` (the regions of page 24).
+            ``None`` (the default) keeps every region.
+    """
+    return _packaged("region", Region, search, lambda row: (row.region, *row.reports))
+
+
 get_latest_release = sync(get_latest_release_async)
 get_release = sync(get_release_async)
+list_commodities = sync(list_commodities_async)
+list_regions = sync(list_regions_async)
 list_releases = sync(list_releases_async)
+list_tables = sync(list_tables_async)

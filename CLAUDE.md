@@ -16,7 +16,7 @@ the family rules every source shares are in `.claude/family.md`, which the next 
 | Credentials | none; the API is open |
 | Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; ADR-0010), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
 | Write tools | no, this package is read-only |
-| Files | a release carries XML, XLS, TXT and PDF since 2016-10 (`docs/upstream/layout.md`); parsed in `parse/`, one module per file kind: the XML with the standard library's `xml.etree.ElementTree` (`parse/wasde_xml.py`); the XLS (xlrd) and the PDF's narrative (pypdf) follow; the parser tests read the samples under `tests/fixtures/files/`, their provenance in its `README.md` (ADR-0020) |
+| Files | a release carries XML, XLS, TXT and PDF since 2016-10 (`docs/upstream/layout.md`); parsed in `parse/`, one module per file kind: the XML with the standard library's `xml.etree.ElementTree` (`parse/wasde_xml.py`); the XLS with xlrd, a dependency, of which the refresh script reads the block titles of pages 12 to 15 for now (`_vocabulary.py`), its parser and the PDF's narrative (pypdf) to follow; the parser tests read the samples under `tests/fixtures/files/`, their provenance in its `README.md` (ADR-0020) |
 | Depends on | `xippios-usda-esmis~=0.1.0`: the task layer and its models only, never `api/` or `_client`; this package's servers serve its own tasks, and an agent that wants a dependency's tools runs that package's server (ADR-0021); used to list WASDE's releases in ESMIS's catalog and to download their files |
 
 The snapshot listed in `docs/upstream/FETCHED.md` is the reference for names, parameters and semantics.
@@ -31,24 +31,28 @@ src/xippios/usda/wasde/
   _client.py       the one configured AsyncClient (base URL, rate limit) and classify,
                    upstream's documented error shapes
   errors.py        the package's own error classes, where conventions §5 calls for one
-  models.py        pydantic models (UpstreamModel): Release, esmis's release re-shaped, and
-                   WasdeXmlCell, one value of a release's XML file
+  models.py        pydantic models (UpstreamModel): Release, esmis's release re-shaped,
+                   WasdeXmlCell, one value of a release's XML file, and Table, Commodity,
+                   Region and Attribute, the records of the four packaged lists
   api/             empty: the package wraps no endpoint of its own; ESMIS's catalog and the
                    download are xippios-usda-esmis's tasks (ADR-0021)
   parse/           file parsers, one module per file kind: parse_<file_kind>(path) -> list[Model];
                    wasde_xml.py, parse_wasde_xml
+  _vocabulary.py   the rules that build the four packaged lists from a release's XML records
+                   and its XLS's block titles (xlrd); the refresh script and the live tests
+                   call them, no task does
   tasks.py         task functions; __all__ is what the adapters register, but BULK_TASKS,
                    the Python-only ones; MCP_CAPS any per-tool result caps
   mcp.py           xippios-usda-wasde-mcp entry point
   http.py          FastAPI router
-  params.py        the packaged reference lists, read from reference/; none yet
-  enums.py         StrEnums (IntEnums for integer ids) generated from the packaged lists;
-                   never edited by hand; none yet
-  reference/       packaged code lists (CSV/JSON) plus README with provenance; the README
-                   only, no list yet
+  params.py        PACKAGED_LISTS, the four packaged lists' names
+  enums.py         empty: no value list is packaged, so no enum is generated
+  reference/       table.json, commodity.json, region.json and attribute.json, PackagedList
+                   files, plus README with provenance
 scripts/
-  refresh_reference.py   the template's skeleton: no list is packaged yet, and the lists to
-                         come are read from a release's file, not through api/
+  refresh_reference.py   downloads the latest release's XML and XLS through esmis (five
+                         requests), builds the four lists with _vocabulary and writes them
+                         with PackagedList.write; --keep and --from rebuild from kept files
   cut_sample.py          downloads one release's XML through esmis once, writes the samples
                          under tests/fixtures/files/wasde_xml/ and the download fixture
   refresh_upstream.py    captures docs/upstream/ and writes FETCHED.md (/refresh-upstream): the
@@ -64,9 +68,12 @@ tests/
                    the adapters serving exactly the tasks, task shapes and docstrings, the
                    README status table, the template tag, the core bound
   test_parse.py    the parser's tests on the samples
-  test_tasks.py    per-task replay tests, both tools through the MCP server
-  test_live.py     @pytest.mark.live smoke tests, one per task, and the live parser test on
-                   the latest XML, which one session fixture fetches once
+  test_tasks.py    per-task replay tests, every tool through the MCP server, the list tasks
+                   on the packaged files
+  test_reference.py  the packaged lists against the samples, the list rules and refusals
+  test_live.py     @pytest.mark.live smoke tests, one per task, the live parser test on the
+                   latest XML, and the packaged lists against the latest XML and XLS, which
+                   one session fixture fetches once
 docs/upstream/     documentation snapshot and FETCHED.md
 .github/workflows/ ci.yml (the required ci check, with the CHANGELOG and fixture-size steps),
                    publish.yml (the release train: tag, build, PyPI), live.yml (nightly live
@@ -135,7 +142,7 @@ The API needs no key, so the workflow uses no secret.
   records: 5913 table values and 630 reliability statistics (`statistic` names the
   attribute without the table index). The U.S. pages print a commodity heading over each
   matrix that the file does not hold (`FEED GRAINS`, `CORN` on page 12): `matrix` tells
-  them apart.
+  them apart, and `list_commodities` names them from the XLS.
 - **Units.** `unit` carries only what the file states for the row or the page (Johannes,
   2026-10-28, G5 inside PR 3). On the reliability pages `average`, `smallest` and
   `largest` take the nearest `commodity_label` of their table at or before them, as the
@@ -157,7 +164,50 @@ The API needs no key, so the workflow uses no secret.
   `tests/fixtures/files/**` `-text`, so no checkout converts the samples' CRLF (gap,
   row 189). The catalog fixtures are esmis's
   answers recorded here through core's recorder with esmis's client (ADR-0021).
+- **The packaged lists** (decided by Johannes on 2026-10-28, G5). `reference/table.json`
+  (30 pages with their titles, subtitles and footnotes, stated once for the page:
+  Johannes, 2026-10-28, G5 inside PR 5), `commodity.json` (43 matrices), `region.json`
+  (70 texts) and
+  `attribute.json` (451 row labels) are `PackagedList` files, written by
+  `scripts/refresh_reference.py` from the latest release's XML and XLS with
+  `PackagedList.write`, never by hand; each is named after its `param` (`table`,
+  `commodity`, `region`, `attribute`; conventions §3), `endpoint` the XML's name as
+  ESMIS catalogs it (`wasde1026.xml`), `fetched` the UTC time the XML was complete,
+  `note` the provenance (the release, its `Report_Month`, for the commodity list the
+  XLS and the positional rule), and every record carries `report_month`, which the list
+  tasks give as `meta.vintage`. `list_tables`, `list_commodities` and `list_regions`
+  answer from them without a request, `meta` from `PackagedList.meta`, `search` through
+  core's `matches`, the default MCP cap (the largest answer 29,639 bytes); the attribute
+  list has no task in 0.1.0 and is kept for the tasks that name a table's rows. The
+  commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
+  32 and 33 (pages 32 and 33 by the session, 2026-10-28, rule 7); the XML names none
+  of their commodities as a whole: only page 32's records carry a `commodity`, one per
+  row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`), while the list names
+  its matrix `Meats`, so `list_commodities(search="beef")` answers nothing. On pages 12
+  to 15 the commodity is the XLS's block title, the
+  Nth of sheet `Page N` (column 0 of a header row whose other cells hold market years)
+  for the Nth item, and the script refuses to write when a page's counts differ;
+  elsewhere it is the title's words between its region and `Supply and Use`; `region`
+  is `United States` for a `U.S.` title, `Mexico` and `World` as printed. Region texts
+  stay as printed, with indents and footnote markers; a task that slices a table by
+  region (to come) matches the text stripped of both (gap row 195). The rules are
+  `_vocabulary.py`'s docstring. Nothing is generated into `enums.py` (no value list) and
+  `params.PACKAGED_LISTS` names the four files, as the template's
+  `/refresh-reference-data` expects; the script replaces the template's `LISTS`,
+  `ID_LISTS` and `TABLES` and its `--render-only`, as sdk-usda-esmis's does. The refresh
+  budget: five keyless requests (the latest release, then the release and the file for
+  the XML and for the XLS), about 3.7 MiB, at esmis's pace. The lists are refreshed
+  before each release, in the release train's refresh PR (conventions §12; Workflow
+  rules), so each release ships the lists of the latest WASDE, its month
+  their vintage (ADR-0022 decision 1). `--keep DIR` keeps the downloaded files with what
+  the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (decided by Johannes on 2026-10-28): one session fixture runs `get_release()` and
-  keeps the XML for the live parser test; six keyless requests and one download, about
-  3.4 MB.
+  keeps the XML for the live parser test, then downloads the release's XLS once for the
+  block titles; the live tests of the three list tasks build the lists from those files
+  and compare them with the packaged ones, every field but `report_month`, with the
+  month word of the reliability titles masked (`Reliability of <Month> Projections`,
+  pages 35 to 37: every release names its own month; gap row 195) and each table footer,
+  `sub_report_footer` to `sub_report_footer3`, compared only for whether it is set on
+  both sides, never its text, which changes every release (the session, 2026-10-28,
+  rule 7; gap row 195), a difference naming the rows. Eight keyless requests, two of them downloads, about 3.7 MiB.

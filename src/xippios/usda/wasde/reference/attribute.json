@@ -1,0 +1,2714 @@
+{
+  "param": "attribute",
+  "endpoint": "wasde1026.xml",
+  "fetched": "2026-10-28T16:26:51Z",
+  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z: one record per distinct report, matrix and attribute of the XML's records as printed, in file order; a value without an attribute gives none.",
+  "records": [
+    {
+      "report": "sr08",
+      "matrix": "matrix1",
+      "attribute": "Output",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix1",
+      "attribute": "Trade 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nUse 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix2",
+      "attribute": "Output",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix2",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix2",
+      "attribute": "Trade 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix2",
+      "attribute": "Total\r\nUse 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr08",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix1",
+      "attribute": "Output",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix1",
+      "attribute": "Trade 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nUse",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix2",
+      "attribute": "Output",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix2",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix2",
+      "attribute": "Trade 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix2",
+      "attribute": "Total\r\nUse 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr09",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix1",
+      "attribute": "Output",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix1",
+      "attribute": "Trade",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nUse  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix2",
+      "attribute": "Output",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix2",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix2",
+      "attribute": "Trade",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix2",
+      "attribute": "Total\r\nUse  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix3",
+      "attribute": "Output",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix3",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix3",
+      "attribute": "Trade",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix3",
+      "attribute": "Total\r\nUse  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr10",
+      "matrix": "matrix3",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Area Planted",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Area Harvested ",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Yield per Harvested Acre",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "  Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Food",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Seed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Feed and Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "  Domestic, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "  Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix1",
+      "attribute": "Avg. Farm Price ($/bu)  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "  Supply, Total 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Food",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Seed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Feed and Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "  Domestic Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "  Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr11",
+      "matrix": "matrix2",
+      "attribute": "Ending Stocks, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Area Planted",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Area Harvested ",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Yield per Harvested Acre",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Feed and Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Food, Seed & Industrial",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "    Domestic, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "    Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Area Planted",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Area Harvested",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Yield per Harvested Acre",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Feed and Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Food, Seed & Industrial 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "   Ethanol & by-products 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "    Domestic, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "    Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr12",
+      "matrix": "matrix2",
+      "attribute": "Avg. Farm Price ($/bu)  4/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Area Planted (mil. acres)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Area Harvested (mil. acres)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Yield (bushels/acre)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Feed and Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Food, Seed & Industrial",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "    Total Domestic",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "    Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix1",
+      "attribute": "Avg. Farm Price ($/bu)  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Area Planted (mil. acres)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Area Harvested (mil. acres)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Yield (bushels/acre)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Feed and Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Food, Seed & Industrial",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "    Total Domestic",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "    Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix2",
+      "attribute": "Avg. Farm Price ($/bu)  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Area Planted (mil. acres)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Area Harvested (mil. acres)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Yield (bushels/acre)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Feed and Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Food, Seed & Industrial",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "    Total Domestic",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "    Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr13",
+      "matrix": "matrix3",
+      "attribute": "Avg. Farm Price ($/bu)  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "Area Planted",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "Area Harvested",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "Yield per Harvested Acre",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "  Beginning Stocks 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "  Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "  Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "      Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "  Domestic & Residual  3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "  Exports, Total  4/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "      Rough",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "      Milled (rough equiv.)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "          Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "  Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "Avg. Milling Yield (%)  5/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix1",
+      "attribute": "Avg. Farm Price ($/cwt)  6/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Harvested Acres (mil.)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Yield (pounds/acre)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "      Supply, Total  7/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Domestic & Residual  3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Exports  8/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "      Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix2",
+      "attribute": "  Avg. Farm Price ($/cwt)  6/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Harvested Acres (mil.)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Yield (pounds/acre)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "      Supply, Total  7/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Domestic & Residual  3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Exports  8/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "      Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "  Avg. Farm Price ($/cwt)  1/ 6/ 9/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "     California 10/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr14",
+      "matrix": "matrix3",
+      "attribute": "     Other States 1/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Area Planted",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Area Harvested",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Yield per Harvested Acre",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Crushings",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Seed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Residual",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "    Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix1",
+      "attribute": "Avg. Farm Price ($/bu)  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "Production 4/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "Domestic Disappearance",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "     Biofuel 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "     Food, Feed & other Industrial",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "     Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "Ending stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix2",
+      "attribute": "Avg. Price (c/lb)  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "Production 4/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "    Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "Domestic Disappearance",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "    Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr15",
+      "matrix": "matrix3",
+      "attribute": "Avg. Price ($/s.t.)  2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Production 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "    Beet Sugar",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "    Cane Sugar",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "        Florida",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "        Louisiana",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "        Texas",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "    TRQ 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "    Other Program 4/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "    Non-program",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "        Mexico",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "        High-tier tariff/other",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "            Total Supply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Deliveries",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "    Food",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "    Other 5/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Miscellaneous",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "            Total Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix1",
+      "attribute": "Stocks to Use Ratio",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix2",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix2",
+      "attribute": "Domestic 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr16",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "  Planted",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "  Harvested",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Yield per Harvested Acre",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "  Supply, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Domestic Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Exports, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "  Use, Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Unaccounted 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr17",
+      "matrix": "matrix1",
+      "attribute": "Avg. Farm Price 3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix2",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix2",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix2",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr18",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr19",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix2",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix2",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix2",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr20",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr21",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix2",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix2",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix2",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr22",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nFeed",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "matrix": "matrix1",
+      "attribute": "Domestic\r\nTotal 2/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr23",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix1",
+      "attribute": "Total /2\r\nDomestic",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix2",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix2",
+      "attribute": "Total /2\r\nDomestic",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr24",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr25",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr25",
+      "matrix": "matrix1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr25",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr25",
+      "matrix": "matrix1",
+      "attribute": "Total /2\r\nDomestic",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr25",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr25",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix3",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix3",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix3",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix3",
+      "attribute": "Domestic\r\nUse",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix3",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix3",
+      "attribute": "Loss\r\n  /2  ",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix3",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix4",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix4",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix4",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix4",
+      "attribute": "Domestic\r\nUse",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix4",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix4",
+      "attribute": "Loss\r\n  /2  ",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr26",
+      "matrix": "matrix4",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "matrix": "matrix2",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "matrix": "matrix2",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "matrix": "matrix2",
+      "attribute": "Domestic\r\nUse",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "matrix": "matrix2",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "matrix": "matrix2",
+      "attribute": "Loss\r\n  /2  ",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr27",
+      "matrix": "matrix2",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix4",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix4",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix4",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix4",
+      "attribute": "Domestic\r\nCrush",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix4",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix4",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix4",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix5",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix5",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix5",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix5",
+      "attribute": "Domestic\r\nCrush",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix5",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix5",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix5",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix3",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix3",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix3",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix3",
+      "attribute": "Domestic\r\nCrush",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix3",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix3",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr28",
+      "matrix": "matrix3",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix4",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix4",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix4",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix4",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix4",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix4",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix5",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix5",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix5",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix5",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix5",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix5",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix6",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix6",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix6",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix6",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix6",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr29",
+      "matrix": "matrix6",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix4",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix4",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix4",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix4",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix4",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix4",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix5",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix5",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix5",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix5",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix5",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix5",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix6",
+      "attribute": "Beginning\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix6",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix6",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix6",
+      "attribute": "Domestic\r\nTotal",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix6",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr30",
+      "matrix": "matrix6",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Beginning\r\nstocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Production\r\n1/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nSupply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Ending\r\nStocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Total\r\nUse",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr32",
+      "matrix": "matrix1",
+      "attribute": "Per Capita\r\n2/  3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "    Supply\r\n         Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "         Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "         Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "             Total Supply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "    Use\r\n         Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "         Hatching Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "         Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "         Disappearance\r\n             Total",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix1",
+      "attribute": "             Per Capita (number)",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "    Farm Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "Fat Basis Supply\r\n    Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "    Marketings",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "    Imports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "        Total Supply",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "Fat Basis Use\r\n    Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "    Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "    Domestic Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "Skim-solid Basis Supply\r\n    Beginning Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr33",
+      "matrix": "matrix2",
+      "attribute": "Skim-solid Basis Use\r\n    Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "matrix": "matrix1",
+      "attribute": "Cheese",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "matrix": "matrix1",
+      "attribute": "Butter",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "matrix": "matrix1",
+      "attribute": "Nonfat Dry Milk",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "matrix": "matrix1",
+      "attribute": "Dry Whey",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "matrix": "matrix1",
+      "attribute": "Class III",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "matrix": "matrix1",
+      "attribute": "Class IV",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr34",
+      "matrix": "matrix1",
+      "attribute": "All Milk  3/",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr35",
+      "matrix": "table1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr35",
+      "matrix": "table1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr35",
+      "matrix": "table1",
+      "attribute": "Domestic Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr35",
+      "matrix": "table1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr36",
+      "matrix": "table1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr36",
+      "matrix": "table1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr36",
+      "matrix": "table1",
+      "attribute": "Domestic Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr36",
+      "matrix": "table1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr37",
+      "matrix": "table1",
+      "attribute": "Production",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr37",
+      "matrix": "table1",
+      "attribute": "Exports",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr37",
+      "matrix": "table1",
+      "attribute": "Domestic Use",
+      "report_month": "October 2026"
+    },
+    {
+      "report": "sr37",
+      "matrix": "table1",
+      "attribute": "Ending Stocks",
+      "report_month": "October 2026"
+    }
+  ]
+}

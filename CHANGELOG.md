@@ -40,3 +40,23 @@ All notable changes to this project are documented here. The format follows
   fetches the latest XML once. `docs/upstream/layout.md` now says that the XML repeats
   each unit row in every row group, which unit a path carries, and which attributes on
   elements are layout text.
+- `list_tables(search)`, `list_commodities(search)` and `list_regions(search)`, MCP tools
+  `usda_wasde_list_tables`, `usda_wasde_list_commodities` and `usda_wasde_list_regions`:
+  answered without a request from four lists packaged under `reference/`, read from the
+  October 2026 release (`wasde1026.xml`, `wasde1026.xls`): its 30 table pages with
+  their titles, subtitles, footnotes and matrices, the 43 supply-and-use matrices of
+  pages 11 to 30, 32 and 33 with their commodity and region, its 70 region texts with
+  their pages, and its 451 row labels by matrix (`reference/attribute.json`, for the
+  tasks to come, no task yet).
+  The XML names the commodity of no matrix as a whole: on pages 12 to 15 it is the XLS's
+  block title of the same position, and the refresh refuses to write when a page's
+  titles and matrices differ in number; elsewhere the title's words. Only page 32's
+  records carry a `commodity`, one per row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red
+  Meat & Poultry`), while the list names its matrix `Meats`, so
+  `list_commodities(search="beef")` answers nothing. `meta.vintage` is the
+  release's `Report_Month`. `scripts/refresh_reference.py` downloads the latest XML and
+  XLS through esmis (five requests) and writes the lists, refreshed before each release;
+  the nightly live test compares them with the latest release, the month word of the
+  reliability titles masked and each table footer compared only for whether it is set,
+  never its text, which changes every release.
+- `xlrd` is a dependency, reading the XLS's block titles.

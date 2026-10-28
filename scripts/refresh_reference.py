@@ -1,162 +1,272 @@
-"""Refresh the packaged reference data from upstream (``/refresh-reference-data``).
+"""Refresh the packaged reference lists from the latest WASDE release (``/refresh-reference-data``).
 
-Every list in ``LISTS``, ``ID_LISTS`` or ``TABLES`` is fetched through the layer-1
-wrappers in ``api/``, never through a task that might answer from the package; once all
-are fetched, each is written to ``reference/<name>.json`` by ``PackagedList.write``: the
-list's name, the upstream operation it came from, the UTC time of the fetch to the second
-and upstream's records under upstream's field names (``dump_upstream``), a value list as
-records of one field named by the list (conventions §3). ``TABLES`` are packaged without
-an enum. Then ``enums.py`` is regenerated from the packaged files by one
-``xippios.core.reference.render_enums`` call, a ``StrEnum`` per value list in ``LISTS``
-and an ``IntEnum`` per list of integer ids and names in ``ID_LISTS`` (``id_name_pairs``),
-so that a member compares equal to the id in upstream's data, each class naming the day
-its list was fetched; and formatted with ``ruff format`` and ``ruff check --fix``, as it
-is committed (ADR-0008). Where a member name derives to nothing, or two collide, name it
-by hand in ``render``'s call: ``render_enums(member_names=...)``, per list and value (an
-id for an ``IntEnum``).
+WASDE packages four lists, each read from the latest release's files, never typed in,
+and written with core's ``PackagedList.write`` (conventions §3, ADR-0022; decided by
+Johannes on 2026-10-28, G5):
 
-Only lists that are the same for every caller are packaged; a multi-tenant source
-packages no tenant data (ADR-0014). Run from the repository root, with whatever the list
-endpoints need in the environment (a key only where they take one)::
+- ``reference/table.json``: one record per page of the XML (``Table``);
+- ``reference/commodity.json``: one record per supply-and-use matrix, pages 11 to 30, 32
+  and 33, with its commodity (``Commodity``), on pages 12 to 15 the XLS's block title by
+  position;
+- ``reference/region.json``: every distinct ``region`` text of the XML (``Region``);
+- ``reference/attribute.json``: every distinct ``report``, ``matrix`` and ``attribute``
+  of the XML (``Attribute``), for the tasks that name a table's rows.
+
+One run downloads the latest release's XML and XLS through xippios-usda-esmis's tasks,
+as ``scripts/cut_sample.py`` does: ``get_latest_release`` (one request), then
+``download_release_file`` for each file (two requests each, the release and the file):
+three catalog requests and two downloads, about 3.7 MiB, keyless, at esmis's pace. It
+parses the XML with the package's ``parse_wasde_xml``, reads the XLS's block titles with
+xlrd, and builds the lists with ``xippios.usda.wasde._vocabulary``, whose docstring
+gives the rules; a file they do not fit (a page of 12 to 15 whose block titles are not
+as many as its report items, a title the commodity rule cannot read) is refused, and
+nothing is written. Each file's ``param`` is the parameter the list serves, its file
+named after it (conventions §3); ``endpoint`` is the XML's name as ESMIS catalogs it
+(``wasde1026.xml``), the file every record's ``report``, ``matrix`` and labels come
+from; ``fetched`` the UTC time the XML was complete; ``note`` the provenance: the
+release, its ``Report_Month``, and for the commodity list the XLS and the positional
+rule. Then the provenance rows of ``reference/README.md`` are rewritten and the counts
+printed.
+
+No ``enums.py`` is generated: the four lists are tables of several fields, no value
+list, so the template's ``render_enums`` step and its ``--render-only`` are dropped, as
+sdk-usda-esmis drops them; ``params.PACKAGED_LISTS`` names the four files. Run from the
+repository root::
 
     uv run python scripts/refresh_reference.py
 
-``--render-only`` regenerates ``enums.py`` from the packaged ``reference/*.json`` alone,
-without a request and without a key: after a core release changes the renderer
-(conventions §15, item 6), it changes ``enums.py`` and nothing else.
+``--keep DIR`` keeps the downloaded files in ``DIR`` with ``release.json``, what the run
+learnt of them (the release, each file's name, URL and UTC time); ``--from DIR`` builds
+the lists from such a directory without a request, ``fetched`` the kept time: a rule
+fixed after a refused run is applied to the same files.
 """
 
 import argparse
-import subprocess
-import sys
-from collections.abc import Callable, Coroutine, Sequence
-from datetime import UTC, datetime
+import json
+import re
+import tempfile
+from dataclasses import asdict, dataclass
+from datetime import datetime
 from pathlib import Path
-from typing import Any
 
-from xippios.core import PackagedList, UpstreamModel, sync
-from xippios.core.reference import id_name_pairs, render_enums
+from xippios.core import PackagedList, UpstreamModel, ValidationError, sync
+from xippios.usda.esmis import tasks as esmis
 
+from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde.params import PACKAGED_LISTS
+from xippios.usda.wasde.parse import parse_wasde_xml
+from xippios.usda.wasde.tasks import PUBLICATION
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE_DIR = ROOT / "src/xippios/usda/wasde"
-REFERENCE = PACKAGE_DIR / "reference"
-ENUMS = PACKAGE_DIR / "enums.py"
-GENERATOR = "scripts/refresh_reference.py"
-
-Values = Callable[[], Coroutine[Any, Any, Sequence[str]]]
-"""An async fetcher of a list's values through ``api/``."""
-
-Records = Callable[[], Coroutine[Any, Any, Sequence[UpstreamModel]]]
-"""An async fetcher of a list's records through ``api/``, e.g. the wrapper itself."""
-
-LISTS: dict[str, tuple[str, Values]] = {
-    # the list, as upstream names the parameter, to (the upstream operation, an async
-    # fetcher of its values through api/), e.g.
-    # "state_alpha": ("get_param_values", lambda: api.get_param_values("state_alpha")),
-}
-"""Value lists, packaged as records of one field named by the list, one ``StrEnum`` each."""
-
-ID_LISTS: dict[str, tuple[str, Records, str, str]] = {
-    # the list to (the upstream operation, an async fetcher of its records through api/,
-    # the id field, the name field), the fields as upstream names them, e.g.
-    # "unitsOfMeasure": ("GetUnitsOfMeasure", api.GetUnitsOfMeasure, "unitId", "unitDescription"),
-}
-"""Lists of integer ids and names, packaged as upstream's records, one ``IntEnum`` each.
-
-Each enum is keyed by its id field and named after it, ``unitId`` making ``UnitId``,
-whose docstring reads "Values of ``unitId``" (conventions §3).
-"""
-
-TABLES: dict[str, tuple[str, Records]] = {
-    # the list to (the upstream operation, an async fetcher of its records through api/), e.g.
-    # "commodities": ("GetCommodities", api.GetCommodities),
-}
-"""Record lists packaged as tables, with no enum, e.g. the codes ``params`` checks."""
+REFERENCE = ROOT / "src/xippios/usda/wasde/reference"
+README = REFERENCE / "README.md"
+MANIFEST = "release.json"
+FORMATS = ("xml", "xls")
+PROVENANCE = re.compile(r"(\| File \| Origin \| Fetched \|\n\| --- \| --- \| --- \|\n)(?:\|.*\n)*")
+"""The provenance table of ``reference/README.md``: its header kept, its rows replaced."""
 
 
-def packaged(name: str, endpoint: str, records: Sequence[dict[str, Any]]) -> PackagedList:
-    """The list ``name`` as just fetched from ``endpoint``, for ``reference/<name>.json``."""
-    return PackagedList(
-        param=name, endpoint=endpoint, fetched=datetime.now(UTC), records=list(records)
+@dataclass(frozen=True)
+class File:
+    """One downloaded file of the release.
+
+    Attributes:
+        name: The file's name as ESMIS catalogs it, e.g. ``"wasde1026.xml"``.
+        url: Its URL.
+        path: Where it was written, relative to the kept directory, e.g. ``"wasde.xml"``.
+        retrieved_at: When it was complete, UTC, ISO 8601 with ``Z``.
+    """
+
+    name: str
+    url: str
+    path: str
+    retrieved_at: str
+
+
+@dataclass(frozen=True)
+class Release:
+    """What the run learnt of the release: ``release.json`` in a kept directory.
+
+    Attributes:
+        release_id: ESMIS's release id, e.g. ``"796099"``.
+        release_date: The release's printed date, e.g. ``"2026-10-09"``.
+        files: The downloaded files by format, ``"xml"`` and ``"xls"``.
+    """
+
+    release_id: str
+    release_date: str
+    files: dict[str, File]
+
+
+async def download(directory: Path) -> Release:
+    """The latest release's XML and XLS, written to ``directory``: five requests."""
+    latest = await esmis.get_latest_release_async(PUBLICATION)
+    release = latest.data
+    files: dict[str, File] = {}
+    for format in FORMATS:
+        path = f"wasde.{format}"
+        answer = await esmis.download_release_file_async(int(release.id), format, directory / path)
+        files[format] = File(
+            name=answer.meta.endpoint,
+            url=str(answer.meta.request["url"]),
+            path=path,
+            retrieved_at=stamp(answer.meta.retrieved_at),
+        )
+    return Release(
+        release_id=release.id,
+        release_date=f"{release.release_datetime:%Y-%m-%d}",
+        files=files,
     )
 
 
-def read(name: str) -> PackagedList:
-    """The packaged ``reference/<name>.json``, as ``refresh`` wrote it."""
-    path = REFERENCE / f"{name}.json"
+def stamp(moment: datetime) -> str:
+    """A UTC time to the second, ISO 8601 with ``Z``."""
+    return moment.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def kept(directory: Path) -> Release:
+    """The release a ``--keep`` run wrote to ``directory``."""
+    path = directory / MANIFEST
     if not path.is_file():
-        raise SystemExit(f"{path.name} is not packaged yet: run the script without --render-only")
-    return PackagedList.model_validate_json(path.read_text(encoding="utf-8"))
+        raise SystemExit(f"{directory} holds no {MANIFEST}: keep a run's files with --keep")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    files = {format: File(**file) for format, file in payload.pop("files").items()}
+    return Release(files=files, **payload)
 
 
-def render() -> None:
-    """Regenerate ``enums.py`` from the packaged files and format it as it is committed."""
-    lists: dict[str, Sequence[str] | Sequence[tuple[int, str]]] = {}
-    fetched: dict[str, str] = {}
-    class_names: dict[str, str] = {}
-    keys = [*LISTS, *(id_field for _, _, id_field, _ in ID_LISTS.values())]
-    if len(set(keys)) < len(keys):
-        raise SystemExit("an id field of ID_LISTS names a list of LISTS: one enum each")
-    for name in LISTS:
-        values = read(name)
-        lists[name] = [record[name] for record in values.records]
-        fetched[name] = f"{values.fetched:%Y-%m-%d}"
-    for name, (_, _, id_field, name_field) in ID_LISTS.items():
-        ids = read(name)
-        lists[id_field] = id_name_pairs(ids.records, id_field=id_field, name_field=name_field)
-        fetched[id_field] = f"{ids.fetched:%Y-%m-%d}"
-        class_names[id_field] = id_field[:1].upper() + id_field[1:]
-    module = render_enums(lists, fetched=fetched, class_names=class_names, generator=GENERATOR)
-    ENUMS.write_text(module, encoding="utf-8")
-    sys.stdout.flush()
-    for command in (["format"], ["check", "--fix"]):
-        run = subprocess.run([sys.executable, "-m", "ruff", *command, str(ENUMS)], cwd=ROOT)
-        if run.returncode:
-            raise SystemExit(f"ruff {' '.join(command)} left {ENUMS.name} failing")
-    print(f"{ENUMS.name}: {len(lists)} enums")  # noqa: T201
+def records(models: list[UpstreamModel]) -> list[dict[str, object]]:
+    """The models under upstream's field names, for a packaged file."""
+    return [model.dump_upstream() for model in models]
 
 
-def refresh() -> None:
-    """Fetch every list, then write its file, then regenerate ``enums.py`` from the files."""
-    if sorted([*LISTS, *ID_LISTS, *TABLES]) != sorted(PACKAGED_LISTS):
-        raise SystemExit("LISTS, ID_LISTS and TABLES name other lists than params.PACKAGED_LISTS")
-    lists = [
-        *(
-            packaged(name, endpoint, [{name: value} for value in sync(fetch)()])
-            for name, (endpoint, fetch) in LISTS.items()
-        ),
-        *(
-            packaged(name, endpoint, [record.dump_upstream() for record in sync(fetch)()])
-            for name, (endpoint, fetch, _, _) in ID_LISTS.items()
-        ),
-        *(
-            packaged(name, endpoint, [record.dump_upstream() for record in sync(fetch)()])
-            for name, (endpoint, fetch) in TABLES.items()
-        ),
+def build(directory: Path, release: Release) -> list[PackagedList]:
+    """The four lists from the release's files in ``directory``, as their packaged files.
+
+    Raises:
+        ValidationError: The files do not fit the rules of ``_vocabulary``; nothing is
+            written then.
+    """
+    xml, xls = release.files["xml"], release.files["xls"]
+    cells = parse_wasde_xml(directory / xml.path)
+    titles = vocabulary.block_titles(directory / xls.path)
+    lists: dict[str, list[UpstreamModel]] = {
+        "table": list(vocabulary.tables(directory / xml.path)),
+        "commodity": list(vocabulary.commodities(cells, titles)),
+        "region": list(vocabulary.regions(cells)),
+        "attribute": list(vocabulary.attributes(cells)),
+    }
+    month = cells[0].report_month  # one month, or regions refused the records
+    source = (
+        f"Read from {xml.name} of ESMIS release {release.release_id} (released "
+        f"{release.release_date}, Report_Month {month!r}), downloaded through "
+        f"xippios-usda-esmis's download_release_file, complete at {xml.retrieved_at}"
+    )
+    counts = ", ".join(f"{report} {len(found)}" for report, found in titles.items())
+    notes = {
+        "table": f"{source}: one record per page element of the XML, the attributes of the "
+        "page's <Report> as printed (Name, Report_Month, sub_report_title to "
+        "sub_report_title3, sub_report_subtitle to sub_report_subtitle3, sub_report_footer "
+        "to sub_report_footer3; on a page whose <Report> holds no footer, the "
+        "sub_report_footer of its one report item that carries it, pages 35 to 37), the "
+        "number that ends page_title, and the element names of the page's report items in "
+        "document order.",
+        "commodity": f"{source}, and from {xls.name} of the same release, complete at "
+        f"{xls.retrieved_at}: one record per report item of the supply-and-use pages 11 to "
+        "30, 32 and 33, its table the "
+        "title parse_wasde_xml gives the item, its region the region the title starts "
+        "with (U.S. as 'United States', Mexico, World). The commodity on pages 12 to 15 is "
+        "the XLS's block title by position: sheet 'Page N' prints a title in column 0 of "
+        "each block's header row (a row whose other cells hold market years, such as '2024/25'), "
+        "in the order of the XML's report items of page N, and the Nth title is the Nth "
+        "item's; the script writes only when every page has as many titles as report "
+        f"items ({counts}). On pages 11, 16 to 30, 32 and 33 the commodity is the title's words "
+        "between its region and 'Supply and Use' (a 'by Class:' before it left out), as "
+        "printed.",
+        "region": f"{source}: every distinct region text of the XML's records as printed, "
+        "in the order of its first appearance, with the pages (Name) that print it.",
+        "attribute": f"{source}: one record per distinct report, matrix and attribute of "
+        "the XML's records as printed, in file order; a value without an attribute gives "
+        "none.",
+    }
+    if sorted(lists) != sorted(PACKAGED_LISTS):
+        raise SystemExit(
+            f"the script builds {sorted(lists)}, params.PACKAGED_LISTS names "
+            f"{sorted(PACKAGED_LISTS)}"
+        )
+    fetched = datetime.fromisoformat(xml.retrieved_at)
+    return [
+        PackagedList(
+            param=name, endpoint=xml.name, fetched=fetched, note=notes[name], records=records(found)
+        )
+        for name, found in lists.items()
     ]
-    REFERENCE.mkdir(exist_ok=True)
-    for fetched in lists:
-        path = REFERENCE / f"{fetched.param}.json"
-        fetched.write(path)
-        print(f"{path.name}: {len(fetched.records)} records from {fetched.endpoint}")  # noqa: T201
-    render()
+
+
+def provenance(packaged: list[PackagedList], release: Release) -> None:
+    """Rewrite the provenance rows of ``reference/README.md``: file, origin, fetched."""
+    xml, xls = release.files["xml"], release.files["xls"]
+    origin = f"ESMIS release {release.release_id} of {release.release_date}"
+    origins = {
+        "table": f"`{xml.name}`, {origin}, its pages' `<Report>` attributes and the "
+        "reliability items' footers",
+        "commodity": f"`{xml.name}` and `{xls.name}`, {origin}, the XML's report items of "
+        "pages 11 to 30, 32 and 33 and the XLS's block titles of pages 12 to 15",
+        "region": f"`{xml.name}`, {origin}, its `region` texts",
+        "attribute": f"`{xml.name}`, {origin}, its `attribute` texts by page and item",
+    }
+    rows = [
+        f"| `{table.param}.json` | {origins[table.param]} ({len(table.records)} records) | "
+        f"{stamp(table.fetched)} |"
+        for table in packaged
+    ]
+    text = README.read_text(encoding="utf-8")
+    text = PROVENANCE.sub(lambda match: match.group(1) + "\n".join(rows) + "\n", text, count=1)
+    README.write_text(text, encoding="utf-8")
+
+
+def refresh(directory: Path, *, fetch: bool) -> None:
+    """Download (or read the kept files), build the lists, write them and the provenance."""
+    if not PROVENANCE.search(README.read_text(encoding="utf-8")):
+        raise SystemExit(f"{README.name} has no provenance table to update; nothing fetched")
+    if fetch:
+        release = sync(download)(directory)
+        (directory / MANIFEST).write_text(
+            json.dumps(asdict(release), indent=2) + "\n", encoding="utf-8"
+        )
+        print(f"downloaded release {release.release_id}: 5 requests")  # noqa: T201
+    else:
+        release = kept(directory)
+    try:
+        packaged = build(directory, release)
+    except ValidationError as refused:
+        raise SystemExit(f"{refused}; nothing written") from None
+    for table in packaged:
+        table.write(REFERENCE / f"{table.param}.json")
+        print(f"{table.param}.json: {len(table.records)} records, fetched {stamp(table.fetched)}")  # noqa: T201
+    provenance(packaged, release)
+    print(f"{README.name} updated")  # noqa: T201
 
 
 def main() -> None:
-    """Refresh from upstream, or with ``--render-only`` regenerate ``enums.py`` alone."""
+    """Refresh the four lists from the latest release, or from a kept run's files."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0] if __doc__ else None)
-    parser.add_argument(
-        "--render-only",
-        action="store_true",
-        help="regenerate enums.py from the packaged reference/*.json, without a request or a key",
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--keep", type=Path, help="keep the downloaded files in this directory")
+    group.add_argument(
+        "--from",
+        dest="source",
+        type=Path,
+        help="build from the files a --keep run kept here, without a request",
     )
     args = parser.parse_args()
-    if args.render_only:
-        render()
+    if args.source is not None:
+        refresh(args.source, fetch=False)
+    elif args.keep is not None:
+        args.keep.mkdir(parents=True, exist_ok=True)
+        refresh(args.keep, fetch=True)
     else:
-        refresh()
+        with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
+            refresh(Path(directory), fetch=True)
 
 
 if __name__ == "__main__":

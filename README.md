@@ -24,7 +24,7 @@ No API key is needed.
 ```python
 from datetime import date
 
-from xippios.usda.wasde import get_latest_release, get_release, list_releases
+from xippios.usda.wasde import get_latest_release, get_release, list_commodities, list_releases
 
 latest = get_latest_release()  # the newest WASDE release in ESMIS
 latest.data.id, latest.data.month  # "796099", "2026-10"
@@ -32,6 +32,9 @@ latest.meta.published_at  # 2026-10-09 12:00:00: ESMIS's printed time, no zone (
 
 releases = list_releases(since=date(2026, 1, 1))  # bound it: without since, 29 requests
 [release.month for release in releases.data if release.revision]  # ["2026-06", "2026-05"]
+
+page_12 = list_commodities(search="sr12")  # packaged with the package: no request
+[row.commodity for row in page_12.data]  # ["FEED GRAINS", "CORN"]: matrix1 and matrix2
 
 october = get_release("2026-10")  # Python only: downloads the XML, parses it, removes it
 october.meta.endpoint, october.meta.vintage  # "wasde1026.xml", "October 2026"
@@ -44,8 +47,16 @@ page prints, as printed (`WasdeXmlCell`): 6543 for October 2026, pages 8 to 37. 
 is what the file states: the subtitle of the world and summary pages (8 to 10, 18 to 30),
 the label of a reliability table for its average, smallest and largest; on the U.S.
 pages it is `None`, since the XML does not say which of its repeated unit rows the page
-shows (the XLS and the TXT print them in place). Task functions are listed in the status
-table below.
+shows (the XLS and the TXT print them in place). `list_tables`, `list_commodities` and
+`list_regions` answer from lists packaged with the package, read from the October 2026
+release's files by `scripts/refresh_reference.py` (`reference/README.md`) and refreshed
+before each release: its 30 table pages with their titles, subtitles and footnotes, the
+43 supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, and its
+70 region texts, as printed. The XML names none of these matrices' commodities as a
+whole: on pages 12 to 15 they are the XLS's block titles; only page 32's records carry a
+`commodity`, one per row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`),
+while the list names its matrix `Meats`, so `list_commodities(search="beef")` answers
+nothing. Task functions are listed in the status table below.
 
 ## MCP
 
@@ -77,6 +88,9 @@ exactly tasks.__all__. -->
 | ESMIS `esmis_api_release_findByIdentifier` for `wasde`, through xippios-usda-esmis's `list_releases`, pages walked newest first | `list_releases(since=None, until=None)` | `usda_wasde_list_releases` | alpha |
 | ESMIS `esmis_api_release_findByIdentifier` for `wasde`, page 0, through xippios-usda-esmis's `get_latest_release` | `get_latest_release()` | `usda_wasde_get_latest_release` | alpha |
 | the release's XML file, downloaded through xippios-usda-esmis's `download_release_file`, parsed by `parse_wasde_xml` | `get_release(month=None)`, a bulk task | none, Python only | alpha |
+| the XML's pages, their titles, subtitles, footnotes and matrices, packaged from the latest release (`reference/table.json`), no request | `list_tables(search=None)` | `usda_wasde_list_tables` | alpha |
+| the XML's supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, on pages 12 to 15 the XLS's block titles, packaged (`reference/commodity.json`), no request | `list_commodities(search=None)` | `usda_wasde_list_commodities` | alpha |
+| the XML's region texts with their pages, packaged (`reference/region.json`), no request | `list_regions(search=None)` | `usda_wasde_list_regions` | alpha |
 
 ## Upstream terms and attribution
 
