@@ -32,6 +32,7 @@ STATISTICS = {
     "below_final",
     "above_final",
 }
+LABELLED = {"average", "smallest", "largest"}
 VALUE_ATTRIBUTE = re.compile(
     r"(?:m\d+_)?cell_value\d+|wb_value|(?:root_mean_square_error|confidence_interval|average"
     r"|smallest|largest|below_final|above_final)\d*"
@@ -72,7 +73,6 @@ def test_a_sample_gives_records_of_its_pages_in_order(case: str) -> None:
         assert record.table
         if record.statistic is None:
             assert record.matrix.startswith("matrix")
-            assert record.unit is None, "pages 8 to 34 carry no unit (parse_wasde_xml)"
         else:
             assert record.matrix.startswith("table")
             assert record.statistic in STATISTICS
@@ -111,7 +111,7 @@ def test_the_record_mirrors_the_file() -> None:
         attribute="Output",
         attribute_group=None,
         statistic=None,
-        unit=None,
+        unit="Million Metric Tons",
         cell_value="2858.26",
         value=Decimal("2858.26"),
     )
@@ -266,8 +266,54 @@ def test_page_37_names_its_statistics_without_the_table_index() -> None:
     assert {record.matrix for record in reliability} == {"table1", "table2", "table3", "table4"}
 
 
-def test_the_reliability_unit_carries_to_the_rows_after_its_label() -> None:
-    units = {(record.matrix, record.commodity): record.unit for record in page("sr12_sr37", "sr37")}
+WORLD_AND_SUMMARY = {f"sr{number:02d}" for number in (*range(8, 11), *range(18, 31))}
+"""The pages whose XML holds no unit attribute and whose subtitle states their unit."""
+
+
+@pytest.mark.parametrize("case", CASES)
+def test_a_table_value_takes_its_subtitle_where_the_page_has_no_unit_rows(case: str) -> None:
+    """Pages 8 to 10 and 18 to 30: the subtitle as printed; the U.S. pages: ``None``."""
+    for record in records(case):
+        if record.statistic is not None:
+            continue
+        if record.report in WORLD_AND_SUMMARY:
+            assert record.unit == record.sub_report_subtitle, record.report
+            assert record.unit
+        else:
+            assert record.unit is None, record.report
+
+
+def test_the_subtitles_as_units() -> None:
+    units = {
+        (record.report, record.matrix): record.unit
+        for case in ("sr08_sr35_sr36", "sr09_sr16", "sr11_sr24")
+        for record in records(case)
+        if record.statistic is None
+    }
+    assert units == {
+        ("sr08", "matrix1"): "Million Metric Tons",
+        ("sr08", "matrix2"): "Million Metric Tons",
+        ("sr09", "matrix1"): "Million Metric Tons",
+        ("sr09", "matrix2"): "Million 480-lb. Bales",
+        ("sr16", "matrix1"): None,
+        ("sr16", "matrix2"): None,
+        ("sr11", "matrix1"): None,
+        ("sr11", "matrix2"): None,
+        ("sr24", "matrix1"): "(Million Metric Tons)",
+        ("sr24", "matrix2"): "(Million Metric Tons)",
+    }
+
+
+def test_the_reliability_unit_carries_to_the_differences_after_its_label() -> None:
+    """``commodity_label`` names the unit of ``average``, ``smallest`` and ``largest`` only."""
+    reliability = page("sr12_sr37", "sr37")
+    others = {record.unit for record in reliability if record.statistic not in LABELLED}
+    assert others == {None}, "a percentage and counts of years"
+    units = {
+        (record.matrix, record.commodity): record.unit
+        for record in reliability
+        if record.statistic in LABELLED
+    }
     assert units == {
         ("table1", "CORN"): "Million Bushels",
         ("table1", "SORGHUM"): "Million Bushels",
@@ -283,7 +329,9 @@ def test_the_reliability_unit_carries_to_the_rows_after_its_label() -> None:
         ("table4", "Milk"): None,
     }
     soybeans_and_cotton = {
-        record.commodity: record.unit for record in page("sr08_sr35_sr36", "sr36")
+        record.commodity: record.unit
+        for record in page("sr08_sr35_sr36", "sr36")
+        if record.statistic in LABELLED
     }
     assert soybeans_and_cotton == {
         "SOYBEANS": "Million Metric Tons",

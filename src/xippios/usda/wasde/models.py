@@ -99,13 +99,16 @@ class WasdeXmlCell(UpstreamModel):
         attribute_group: ``attribute_groupN``, the column of page 11's wheat-by-class
             table, e.g. ``"Hard Red\r\nWinter"``, ``"Total"``.
         statistic: On the reliability pages the name of the value's attribute, the
-            table index removed, e.g. ``"root_mean_square_error"``, ``"average"``,
+            table index removed by the naming rule (``average1`` is ``"average"``;
+            Johannes, 2026-10-28, G5 inside PR 3), e.g. ``"root_mean_square_error"``,
             ``"below_final"``; ``None`` on pages 8 to 34.
-        unit: On the reliability pages the unit the table prints above the rows, the
-            nearest ``commodity_label`` of the table at or before the value, e.g.
-            ``"Million Bushels"``; ``None`` on pages 8 to 34, whose unit rows the file
-            repeats in every row group without saying which the page prints
-            (``parse_wasde_xml``).
+        unit: What the file states for the row or the page (Johannes, 2026-10-28, G5
+            inside PR 3): on the reliability pages, for ``average``, ``smallest`` and
+            ``largest`` only, the nearest ``commodity_label`` of the table at or before
+            the value, e.g. ``"Million Bushels"``; on pages 8 to 10 and 18 to 30 the
+            table's ``sub_report_subtitle`` as printed, e.g. ``"(Million Metric
+            Tons)"``; ``None`` on pages 11 to 17 and 31 to 34, for which the XML carries
+            no per-row unit (``parse_wasde_xml``), and on the other statistics.
         cell_value: The value as printed, e.g. ``"2,141"``, ``"-4"``, ``"10.45 *"``,
             ``"3/"``.
         value: ``cell_value`` as a number, its thousands separators removed

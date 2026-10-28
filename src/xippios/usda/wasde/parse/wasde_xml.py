@@ -58,18 +58,30 @@ footer2) and 33 (title and title2, one footer3), each with two items, whose seco
 item's labels and footnotes are those of the second title's table; page 37's one
 footer, on ``table4``, goes to its four tables.
 
-**Units.** On the reliability pages the unit is carried, the way a reader reads the
-page: each value takes the nearest ``commodity_label`` of its table at or before it
-(``"Million Bushels"`` on CORN carries to SORGHUM, BARLEY and OATS on page 37); a table
-without one leaves it ``None``. On pages 8 to 34 the file does not say which unit a
-value has, so ``unit`` is ``None`` there: where a page prints unit rows (pages 11, 12,
-14 to 17, 33, 34), the file repeats every one of them in every row group of the matrix
-with its text (page 12's ``Million Acres``, ``Metric Tons`` and ``Million Metric Tons``
-in each of its 13 groups) and keeps no trace of which the page shows before which rows;
-a unit on a value's path is the text of its column's cell, one part of a unit printed
-across several columns (``"Million"`` over Broiler and ``" Pounds"`` over Turkey on page
-31). The units of the world pages stand in ``sub_report_subtitle``
-(``"(Million Metric Tons)"``).
+**Units.** ``unit`` carries only what the file states for the row or the page (Johannes,
+2026-10-28, G5 inside PR 3):
+
+- on the reliability pages, ``average``, ``smallest`` and ``largest`` take the nearest
+  ``commodity_label`` of their table at or before them, the way a reader reads the page
+  (``"Million Bushels"`` on CORN carries to SORGHUM, BARLEY and OATS on page 37); the
+  other four statistics, a percentage and counts of years, and a table without a label
+  leave it ``None``;
+- on a page whose XML holds no unit attribute, a table value takes its table's
+  ``sub_report_subtitle`` as printed, nothing parsed out of it: pages 8 to 10 and 18 to
+  30 (``"Million Metric Tons"``, ``"(Million Metric Tons)"``, ``"(Million 480-Pound
+  Bales)"``);
+- a page whose XML holds unit attributes, the U.S. pages, leaves it ``None``, as does a
+  page without a subtitle: pages 11 to 17 and 31 to 34. The XML carries no per-row unit
+  for them. Where
+  a page prints unit rows, it repeats every one of them in every row group of the matrix
+  with its text (page 12's ``Million Acres``, ``Metric Tons`` and ``Million Metric Tons``
+  in each of its 13 groups) and keeps no trace of which the page shows before which
+  rows; a unit on a value's path is the text of its column's cell, one part of a unit
+  printed across several columns (``"Million"`` over Broiler and ``" Pounds"`` over
+  Turkey on page 31). The XLS and the TXT print the unit rows in place
+  (``docs/upstream/layout.md``). Page 14 prints unit rows in its first matrix, so none
+  of its three takes its subtitle, ``" (Rough Equivalent of Rough and Milled Rice)"``,
+  which stays on its records as ``sub_report_subtitle``, as every subtitle does.
 
 **Values.** ``cell_value`` is the attribute's text as printed; ``value`` its number, the
 thousands separators removed (core's ``parse_decimal``), ``None`` where the text is no
@@ -113,6 +125,8 @@ _STATISTIC = re.compile(
 )
 _UNIT = re.compile(r"m\d+_(?:unit_descr|unit_description|Unit_Description)\d+")
 _COMMODITY_LABEL = "commodity_label"
+_LABELLED_STATISTICS = frozenset({"average", "smallest", "largest"})
+"""The statistics in the unit a reliability table's ``commodity_label`` names."""
 _LAYOUT = re.compile(
     r"[Tt]extbox\d+|FormatFiller\d+|ReportFiller\d+|m\d+_filler\d+|m\d+_formatfiller\d+"
     r"|commodity_attribute\d+|m\d+_attribute_title\d+"
@@ -139,11 +153,12 @@ class _Page:
     sub_report_subtitle: str | None
     sub_report_footer: str | None
     matrix: str
+    unit: str | None
 
 
 @dataclass
 class _Walk:
-    """The walk of one report item: its records so far and the unit carried in it."""
+    """The walk of one report item: its records so far and the reliability unit carried."""
 
     page: _Page
     records: list[WasdeXmlCell] = field(default_factory=list)
@@ -180,6 +195,13 @@ def _value(text: str) -> Decimal | None:
     """The printed text as a number, ``None`` where it is no finite number."""
     number = parse_decimal(text)
     return number if number is not None and number.is_finite() else None
+
+
+def _unit(page: _Page, walk: _Walk, statistic: str | None) -> str | None:
+    """A value's unit: the item's stated one, or a labelled statistic's carried label."""
+    if statistic is None:
+        return page.unit
+    return walk.unit if statistic in _LABELLED_STATISTICS else None
 
 
 def _walk(element: ET.Element, labels: dict[str, str], walk: _Walk, *, item: bool = False) -> None:
@@ -235,7 +257,7 @@ def _walk(element: ET.Element, labels: dict[str, str], walk: _Walk, *, item: boo
                 attribute=labels.get("attribute"),
                 attribute_group=labels.get("attribute_group"),
                 statistic=statistic_name,
-                unit=walk.unit if statistic_name is not None else None,
+                unit=_unit(page, walk, statistic_name),
                 cell_value=text,
                 value=_value(text),
             )
@@ -276,6 +298,7 @@ def _page(holder: ET.Element) -> list[WasdeXmlCell]:
     tables = _by_item(titles, len(items), "title", name)
     subtitles = _by_item(_numbered(attributes, _SUBTITLE), len(items), "subtitle", name)
     footnotes = _by_item(footers, len(items), "footer", name)
+    unit_rows = any(_UNIT.fullmatch(key) for node in report.iter() for key in node.attrib)
     records: list[WasdeXmlCell] = []
     for index, item in enumerate(items):
         table = tables[index]
@@ -289,6 +312,7 @@ def _page(holder: ET.Element) -> list[WasdeXmlCell]:
                 sub_report_subtitle=subtitles[index],
                 sub_report_footer=footnotes[index],
                 matrix=item.tag,
+                unit=None if unit_rows else subtitles[index],
             )
         )
         _walk(item, {}, walk, item=True)
