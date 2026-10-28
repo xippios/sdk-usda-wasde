@@ -47,8 +47,9 @@ What every task follows:
   sheet ``WASDE Text`` (``parse.wasde_xls``), else its PDF's narrative pages
   (``parse.wasde_pdf``), text only, also where the XLS holds no narrative (Johannes,
   2026-10-28, G5 inside PR 5). ``meta.endpoint`` is the file read,
-  ``meta.vintage`` the report month the XLS prints (``"October 2026"``), ``None`` for a
-  PDF, ``meta.published_at`` the release time as for ``get_release``.
+  ``meta.vintage`` the report month the XLS prints (``"October 2026"``), for a PDF the
+  ESMIS release id as esmis prints it (``"95659"``; the session, 2026-10-28, rule 7;
+  ADR-0020 decision 5), ``meta.published_at`` the release time as for ``get_release``.
 - The packaged answers: ``list_tables``, ``list_commodities`` and ``list_regions`` answer
   from ``reference/table.json``, ``commodity.json`` and ``region.json``, the lists
   ``scripts/refresh_reference.py`` read from the latest release's files, through core's
@@ -674,10 +675,10 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
     if national:
         return national, False
     world = [row for row in mine if row.region == WORLD]
+    regions = PackagedList.load(PACKAGE, "region")
     printed: dict[str, list[str]] = {}
     if world:
         reports = [row.report for row in world]
-        regions = PackagedList.load(PACKAGE, "region")
         for text in regions.parse(Region, source=SOURCE):
             bare = _bare(text.region)
             on = [report for report in text.reports if report in reports]
@@ -686,16 +687,20 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
                 kept += [report for report in on if report not in kept]
         if region in printed:
             return world, True
-    choices = {bare: f"rows of {', '.join(on)}" for bare, on in printed.items()}
+    # Each choice described as the corrected call answers it: a U.S. or Mexico matrix
+    # comes first, as above, and the by-class table answers no region.
+    choices: dict[str, str] = {}
     for row in mine:
-        if row.region != WORLD:
-            choices[row.region] = f"{row.report} {row.matrix}"
+        if row.region != WORLD and BY_CLASS not in row.table:
+            choices.setdefault(row.region, f"{row.report} {row.matrix}")
+    for bare, on in printed.items():
+        choices.setdefault(bare, f"rows of {', '.join(on)}")
     found = _closest(region, choices)
     raise UnknownCode(
         "region",
         region,
         list_name="region",
-        fetched=listed.fetched,
+        fetched=regions.fetched,
         closest=found,
         hint=None if found else f"{commodity!r} is printed for {', '.join(choices)}.",
         reason=f"A region of {commodity!r} is 'United States' or 'Mexico' where it has a U.S. "
@@ -808,7 +813,9 @@ async def _narrative(release: Release, request: dict[str, object]) -> Result[lis
         dest = Path(directory) / "release.pdf"
         downloaded = await esmis.download_release_file_async(int(release.id), "pdf", dest)
         pages = parse_wasde_pdf(dest)
-    meta = _file_meta(downloaded, release, request, None)
+    # A PDF prints a date, no month label: its vintage is the ESMIS release id, as esmis
+    # prints it (the session, 2026-10-28, rule 7; ADR-0020 decision 5; gap, row 202).
+    meta = _file_meta(downloaded, release, request, release.id)
     return Result(data=[page.text for page in pages], meta=meta)
 
 
@@ -817,29 +824,28 @@ async def read_report_text_async(month: str | None = None) -> Result[list[str]]:
 
     Read from the release's XLS file, sheet ``WASDE Text``: one string per row that holds
     text, as printed, the first the report's number (``"WASDE - 676\r"``), then the
-    paragraphs from ``WHEAT:`` to cotton, 25 strings and 16,004 characters for October
-    2026. A release without an XLS file, or whose XLS holds no such sheet while it has a
-    PDF, is read from its PDF instead (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020
-    decision 4): one string per narrative page, the pages before
-    the one headed Interagency Commodity Estimates Committees (pages 1 to 5 in July 2010
-    and October 2026), their text as pypdf extracts it; no page after that one is read,
-    and no figure ever comes from a PDF. ``meta.endpoint`` is the file read
-    (``"wasde1026.xls"``, ``"wasde-07-09-2010.pdf"``); ``meta.vintage`` for an XLS the
-    report month its first table sheet prints in its first cell (``"October 2026"``), for
-    a PDF ``None``, whose narrative prints a date only; ``meta.published_at`` the release
-    time as ESMIS prints it, naive; ``meta.request`` the month given, the release id and
-    the file's URL. The release is the latest, or the one of ``month`` with the latest
-    release time that carries an XLS or a PDF file; every release since 2011 but
-    2014-01-23 carries an XLS. Every call downloads the file and keeps nothing. Requests:
-    the latest release 1, or the month's pages of ``list_releases``, 25 releases a page
-    from the newest back to the month; then the release 1 and the file 1 (346 KB for
-    October 2026's XLS), and 2 more where a PDF is read after an XLS without the sheet. A
-    month without a release, or whose releases carry neither file (those of 1995 to 1997
-    carry TXT files), raises ``NotFoundError`` naming their formats; a month not written
-    ``"YYYY-MM"`` ``InvalidRequestError``; an XLS whose narrative sheet holds anything but
-    text in its first column, or a PDF whose narrative's end cannot be told (no page
-    headed Interagency Commodity Estimates Committees, as in a scan without text),
-    ``ValidationError``.
+    paragraphs from ``WHEAT:`` to cotton, 25 strings and 16,004 characters for October 2026.
+    A release without an XLS file, or whose XLS holds no such sheet while it has a PDF, is
+    read from its PDF instead (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020 decision 4):
+    one string per narrative page, the pages before the one headed Interagency Commodity
+    Estimates Committees (pages 1 to 5 in July 2010 and October 2026), their text as pypdf
+    extracts it; no page after that one is read, and no figure ever comes from a PDF.
+    ``meta.endpoint`` is the file read (``"wasde1026.xls"``, ``"wasde-07-09-2010.pdf"``);
+    ``meta.vintage`` for an XLS the report month its first table sheet prints in its first
+    cell (``"October 2026"``), for a PDF, whose narrative prints a date and no month label,
+    the ESMIS release id as esmis prints it (``"95659"``); ``meta.published_at`` the release
+    time as ESMIS prints it, naive; ``meta.request`` the month given, the release id and the
+    file's URL. The release is the latest, or the one of ``month`` with the latest release
+    time that carries an XLS or a PDF file; every release since 2011 but 2014-01-23 carries
+    an XLS. Every call downloads the file and keeps nothing. Requests: the latest release 1,
+    or the month's pages of ``list_releases``, 25 releases a page from the newest back to
+    the month; then the release 1 and the file 1 (346 KB for October 2026's XLS), and 2 more
+    where a PDF is read after an XLS without the sheet. A month without a release, or whose
+    releases carry neither file (those of 1995 to 1997 carry TXT files), raises
+    ``NotFoundError`` naming their formats; a month not written ``"YYYY-MM"``
+    ``InvalidRequestError``; an XLS whose narrative sheet holds anything but text in its
+    first column, or a PDF whose narrative's end cannot be told (no page headed Interagency
+    Commodity Estimates Committees, as in a scan without text), ``ValidationError``.
 
     Args:
         month: The release month, ``"YYYY-MM"``, e.g. ``"2026-10"``, ``"2010-07"``;

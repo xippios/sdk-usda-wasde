@@ -201,8 +201,9 @@ The API needs no key, so the workflow uses no secret.
   up to the first page that prints `Interagency Commodity Estimates Committees` on a
   line of its own, after its running header (`WASDE-484-6`, `WASDE-676-6`): pages 1 to
   5 in July 2010 and October 2026; no later page is read, no figure comes from a PDF
-  (ADR-0020 decision 4), and `meta.vintage` is `None`, since the narrative prints a
-  date, not a month label. The release is the month's latest that carries an XLS or a
+  (ADR-0020 decision 4), and `meta.vintage` is the ESMIS release id as esmis prints it
+  (`"95659"`), since the narrative prints a date, not a month label (the session,
+  2026-10-28, rule 7; ADR-0020 decision 5; gap, row 202). The release is the month's latest that carries an XLS or a
   PDF; a month whose releases carry neither is refused naming their formats. ESMIS
   lists revision workbooks as the XLS of some releases of 2001 to 2008, and which older
   report workbooks hold the sheet is unknown: hence the fallback.

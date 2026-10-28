@@ -539,6 +539,14 @@ def test_a_region_is_matched_without_its_indent_and_footnote_marker(
             "'CORN' is printed for United States.",
         ),
         (
+            "Wheat",
+            "united states",
+            "'united states' is not a region in the packaged region list (fetched 2026-10-28). "
+            "Did you mean United States (sr11 matrix1)? A region of 'Wheat' is 'United "
+            "States' or 'Mexico' where it has a U.S. or Mexico matrix, else one its world "
+            "pages print",
+        ),
+        (
             "Sugar",
             "Mexco",
             "'Mexco' is not a region in the packaged region list (fetched 2026-10-28). "
@@ -624,7 +632,7 @@ async def test_a_release_without_an_xls_is_read_from_its_pdf(
     assert result.data == [page.text for page in parse_wasde_pdf(PDF_SAMPLE)]
     assert len(result.data) == 5, "pages 1 to 5, the narrative of July 2010"
     assert result.meta.endpoint == "wasde-07-09-2010.pdf"
-    assert result.meta.vintage is None, "the PDF prints a date, no report month label"
+    assert result.meta.vintage == "95659", "the PDF prints a date: the ESMIS release id"
     assert (result.meta.published_at, result.meta.published_at_naive) == (JULY_2010_PRINTED, True)
     assert result.meta.request == {"month": "2010-07", "release_id": 95659, "url": PDF_2010}
     assert (sent_urls(release), sent_urls(download)) == ([RELEASE_2010], [PDF_2010])

@@ -78,8 +78,9 @@ All notable changes to this project are documented here. The format follows
   narrative as text, from its XLS's sheet `WASDE Text` (25 paragraphs for October 2026,
   `meta.vintage` the month the first table sheet prints), or, for a release without an
   XLS or whose XLS holds no such sheet, from its PDF's narrative pages, up to the page
-  headed Interagency Commodity Estimates Committees, `meta.vintage` empty; no figure is
-  read from a PDF.
+  headed Interagency Commodity Estimates Committees, `meta.vintage` the ESMIS release id
+  (`"95659"`), since a PDF prints a date, not a month label; no figure is read from a
+  PDF.
 - `parse.parse_wasde_xls(path)` and `parse.parse_wasde_pdf(path)`, the narrative's
   parsers (`WasdeXlsText`, `WasdePdfPage`); `pypdf` is a dependency, `xlwt` a dev
   dependency that writes the XLS sample.
