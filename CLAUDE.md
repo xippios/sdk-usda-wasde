@@ -105,10 +105,11 @@ The API needs no key, so the workflow uses no secret.
   `"YYYY-MM"`, the printed date's; a reposted month is one release whose files carry
   `v2` (`wasde0626v2.xml`; `Release.revision`), so a revised month answers its
   revision and the original is not catalogued. `get_release(month)` takes the month's
-  release with the latest release time: in 2010-12
-  and 2014-01 that release carries no XML (a TXT, an ASC) while an earlier one does,
-  and the month is refused like any release without an XML, naming its formats and the
-  first release with one (2010-07-09, release 95659).
+  latest release that carries an XML file (Johannes, 2026-10-28, G5 inside PR 3): in
+  2010-12 and 2014-01 a later release carries a TXT or an ASC only and the month answers
+  the earlier one's XML; a month whose releases carry none (every month before 2010-07)
+  is refused, naming their formats and the first release with one (2010-07-09, release
+  95659).
 - **The XML** (`parse/wasde_xml.py`, its docstring the rules). One generic walker sorts
   every attribute into a dimension, a value, a unit, layout text or a page attribute; any
   other raises `ValidationError` naming the page, element and attribute. A field is the
@@ -120,12 +121,16 @@ The API needs no key, so the workflow uses no secret.
   attribute without the table index). The U.S. pages print a commodity heading over each
   matrix that the file does not hold (`FEED GRAINS`, `CORN` on page 12): `matrix` tells
   them apart.
-- **Units.** On the reliability pages each value takes the nearest `commodity_label` of
-  its table at or before it, as the page reads. On pages 8 to 34 `unit` is `None`: the
-  file repeats every unit row in every row group of a matrix, each with its text, and
-  keeps no trace of which the page prints; a unit on a value's path is its column's
-  share of a unit printed across columns. It stays `None` there until a rule that reads
-  the page is decided; the world pages' unit stands in `sub_report_subtitle`.
+- **Units.** `unit` carries only what the file states for the row or the page (Johannes,
+  2026-10-28, G5 inside PR 3). On the reliability pages `average`, `smallest` and
+  `largest` take the nearest `commodity_label` of their table at or before them, as the
+  page reads; the other four statistics stay `None`. On a page whose XML holds no unit
+  attribute (pages 8 to 10, 18 to 30) a table value takes its table's
+  `sub_report_subtitle` as printed. On the U.S. pages (11 to 17, 31 to 34) it is `None`:
+  the XML carries no per-row unit for them, since it repeats every unit row in every row
+  group of a matrix, each with its text, and keeps no trace of which the page prints,
+  and a unit on a value's path is its column's share of a unit printed across columns;
+  the XLS and the TXT print the unit rows in place.
 - **Samples and fixtures.** Six samples under `tests/fixtures/files/wasde_xml/`, each a
   verbatim cut of whole pages of the October 2026 file under 256 KiB, written by
   `scripts/cut_sample.py` from one download, provenance in its `README.md`. The
@@ -133,7 +138,9 @@ The API needs no key, so the workflow uses no secret.
   exchange with the sample `sr08_sr35_sr36.xml` as its body, marked `truncated` with the
   whole file's `original_bytes` and `sha256`, rewritten in the script's own step
   (ADR-0024); detect-secrets reads that sha256 as a secret, and `.secrets.baseline`
-  holds it audited, `is_secret: false` (gap, row 124). The catalog fixtures are esmis's
+  holds it audited, `is_secret: false` (gap, row 124). `.gitattributes` marks
+  `tests/fixtures/files/**` `-text`, so no checkout converts the samples' CRLF (gap,
+  row 189). The catalog fixtures are esmis's
   answers recorded here through core's recorder with esmis's client (ADR-0021).
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (decided by Johannes on 2026-10-28): one session fixture runs `get_release()` and

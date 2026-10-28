@@ -40,10 +40,12 @@ corn[0].attribute, corn[0].market_year, corn[0].cell_value  # "Area Planted", "2
 ```
 
 Each record of `get_release` is one value of the release's tables with the labels its
-page prints, as printed (`WasdeXmlCell`): 6543 for October 2026, pages 8 to 37. On pages
-8 to 34 `unit` is `None`, since the file does not say which unit row the page shows;
-the world pages state theirs in `sub_report_subtitle`. Task functions are listed in the
-status table below.
+page prints, as printed (`WasdeXmlCell`): 6543 for October 2026, pages 8 to 37. `unit`
+is what the file states: the subtitle of the world and summary pages (8 to 10, 18 to 30),
+the label of a reliability table for its average, smallest and largest; on the U.S.
+pages it is `None`, since the XML does not say which of its repeated unit rows the page
+shows (the XLS and the TXT print them in place). Task functions are listed in the status
+table below.
 
 ## MCP
 
