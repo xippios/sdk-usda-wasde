@@ -259,7 +259,9 @@ The API needs no key, so the workflow uses no secret.
   the XML and for the XLS), about 3.7 MiB, at esmis's pace. The lists are refreshed
   before each release, in the release train's refresh PR (conventions §12; Workflow
   rules), so each release ships the lists of the latest WASDE, its month
-  their vintage (ADR-0022 decision 1). `--keep DIR` keeps the downloaded files with what
+  their vintage (ADR-0022 decision 1); a refresh that reproduces them record for record
+  needs no PR: 0.1.0 ships those of ESMIS release 796099 (October 2026), which the
+  refresh of 2026-10-28 reproduced. `--keep DIR` keeps the downloaded files with what
   the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (decided by Johannes on 2026-10-28): one session fixture runs `get_release()` and

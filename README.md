@@ -60,8 +60,9 @@ the label of a reliability table for its average, smallest and largest; on the U
 pages it is `None`, since the XML does not say which of its repeated unit rows the page
 shows (the XLS and the TXT print them in place). `list_tables`, `list_commodities` and
 `list_regions` answer from lists packaged with the package, read from the October 2026
-release's files by `scripts/refresh_reference.py` (`reference/README.md`) and refreshed
-before each release: its 30 table pages with their titles, subtitles and footnotes, the
+release's files (ESMIS release 796099) by `scripts/refresh_reference.py`
+(`reference/README.md`) and refreshed before each release: its 30 table pages with
+their titles, subtitles and footnotes, the
 43 supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, and its
 70 region texts, as printed. The XML names none of these matrices' commodities as a
 whole: on pages 12 to 15 they are the XLS's block titles; only page 32's records carry a
