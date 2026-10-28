@@ -36,7 +36,6 @@ release, the file, about 3.4 MB), its XLS 2 and its PDF 2 (the release, the file
 value, as every live run takes ``--tb=short``.
 """
 
-import calendar
 import re
 import shutil
 from collections.abc import Callable, Sequence
@@ -58,6 +57,7 @@ from xippios.usda.wasde._client import BASE_URL, config
 from xippios.usda.wasde.models import Table, WasdeXmlCell
 from xippios.usda.wasde.parse import parse_wasde_pdf, parse_wasde_xls, parse_wasde_xml
 from xippios.usda.wasde.parse.wasde_pdf import HEADING
+from xippios.usda.wasde.parse.wasde_xls import MONTH_NAMES
 
 pytestmark = [pytest.mark.live, pytest.mark.anyio]
 
@@ -74,7 +74,7 @@ STATISTICS = {
     "above_final",
 }
 MONTH = re.compile(r"\d{4}-(0[1-9]|1[0-2])")
-REPORT_MONTH = re.compile(rf"(?:{'|'.join(calendar.month_name[1:])}) \d{{4}}")
+REPORT_MONTH = re.compile(rf"(?:{'|'.join(MONTH_NAMES)}) \d{{4}}")
 
 
 @dataclass(frozen=True)
@@ -236,7 +236,7 @@ def differences(
 
 
 RELIABILITY_TITLE = re.compile(
-    rf"(Reliability of (?:United States )?)(?:{'|'.join(calendar.month_name[1:])})( Projections)"
+    rf"(Reliability of (?:United States )?)(?:{'|'.join(MONTH_NAMES)})( Projections)"
 )
 """A reliability page's title, its month word the release's own: ``Reliability of October
 Projections 1/`` (page 35), ``Reliability of United States October Projections  1/`` (37)."""

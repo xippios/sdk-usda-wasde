@@ -15,7 +15,7 @@ from pypdf import PageObject, PdfReader, PdfWriter
 from xippios.core import ValidationError
 
 from xippios.usda.wasde.models import WasdePdfPage
-from xippios.usda.wasde.parse import parse_wasde_pdf
+from xippios.usda.wasde.parse import parse_wasde_pdf, wasde_pdf
 from xippios.usda.wasde.parse.wasde_pdf import HEADING
 
 SAMPLE = Path(__file__).parent / "fixtures" / "files" / "wasde_pdf" / "wasde-07-09-2010.pdf"
@@ -107,3 +107,25 @@ def test_a_file_that_is_no_pdf_is_refused(tmp_path: Path, content: bytes) -> Non
     path.write_bytes(content)
     with pytest.raises(ValidationError, match=r"^wasde\.pdf: not a PDF pypdf reads"):
         parse_wasde_pdf(path)
+
+
+@pytest.mark.parametrize("error", [ValueError("bad xref"), KeyError("/Root"), AssertionError()])
+def test_any_error_pypdf_raises_on_a_file_is_refused_naming_it(
+    monkeypatch: pytest.MonkeyPatch, error: Exception
+) -> None:
+    """A corrupt file raises more than pypdf's own errors; each reads as the taxonomy's."""
+
+    def corrupt(*args: object, **kwargs: object) -> None:
+        raise error
+
+    monkeypatch.setattr(wasde_pdf, "PdfReader", corrupt)
+    with pytest.raises(ValidationError) as caught:
+        parse_wasde_pdf(SAMPLE)
+    assert str(caught.value).startswith(
+        f"wasde.pdf: not a PDF pypdf reads: {type(error).__name__}: "
+    )
+
+
+def test_a_file_that_cannot_be_opened_passes_as_raised(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        parse_wasde_pdf(tmp_path / "missing.pdf")

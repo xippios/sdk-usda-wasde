@@ -30,8 +30,7 @@ from pathlib import Path
 from typing import NoReturn
 
 from pypdf import PdfReader
-from pypdf.errors import PyPdfError
-from xippios.core import ValidationError
+from xippios.core import ValidationError, XippiosError
 
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.models import WasdePdfPage
@@ -55,6 +54,24 @@ def _headed(text: str) -> bool:
     return any(line.strip().casefold() == heading for line in text.splitlines())
 
 
+def _narrative(path: Path) -> list[WasdePdfPage]:
+    """The narrative pages of the PDF at ``path``; ``parse_wasde_pdf`` is its door."""
+    reader = PdfReader(path)
+    pages: list[WasdePdfPage] = []
+    for number, page in enumerate(reader.pages, start=1):
+        text = page.extract_text()
+        if _headed(text):
+            if not pages:
+                _refuse(f"page 1 prints the heading {HEADING!r}: no narrative", str(path))
+            return pages
+        pages.append(WasdePdfPage(page=number, text=text))
+    _refuse(
+        f"none of its {len(pages)} pages prints the heading {HEADING!r} on a line of its own, "
+        "so where the narrative ends cannot be told",
+        str(path),
+    )
+
+
 def parse_wasde_pdf(path: str | PathLike[str]) -> list[WasdePdfPage]:
     """The narrative pages of a WASDE release's PDF file, one record per page, in order.
 
@@ -65,23 +82,13 @@ def parse_wasde_pdf(path: str | PathLike[str]) -> list[WasdePdfPage]:
         path: The PDF file as ESMIS serves it, e.g. ``"wasde-07-09-2010.pdf"``.
 
     Raises:
-        ValidationError: pypdf cannot read the file, no page prints the heading, or page
-            1 does.
+        ValidationError: pypdf cannot read the file (any error it raises on it, its class
+            and text named), no page prints the heading, or page 1 does. An ``OSError``,
+            a file that cannot be opened, passes as raised.
     """
     try:
-        reader = PdfReader(Path(path))
-        pages: list[WasdePdfPage] = []
-        for number, page in enumerate(reader.pages, start=1):
-            text = page.extract_text()
-            if _headed(text):
-                if not pages:
-                    _refuse(f"page 1 prints the heading {HEADING!r}: no narrative", str(path))
-                return pages
-            pages.append(WasdePdfPage(page=number, text=text))
-    except PyPdfError as error:
-        _refuse(f"not a PDF pypdf reads: {error}", str(path))
-    _refuse(
-        f"none of its {len(pages)} pages prints the heading {HEADING!r} on a line of its own, "
-        "so where the narrative ends cannot be told",
-        str(path),
-    )
+        return _narrative(Path(path))
+    except (XippiosError, OSError):
+        raise
+    except Exception as error:  # pypdf raises more than its own errors on a corrupt file
+        _refuse(f"not a PDF pypdf reads: {type(error).__name__}: {error}", str(path))

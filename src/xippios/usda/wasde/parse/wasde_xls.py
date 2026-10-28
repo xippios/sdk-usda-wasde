@@ -26,7 +26,6 @@ tables in 2001 to 2008 (``layout.md``), and the parser does not know which older
 workbooks carry the sheet.
 """
 
-import calendar
 import io
 import re
 from os import PathLike
@@ -34,21 +33,34 @@ from pathlib import Path
 from typing import NoReturn
 
 import xlrd
-from xippios.core import NotFoundError, ValidationError
-from xlrd.biffh import XLRDError
-from xlrd.compdoc import CompDocError
+from xippios.core import NotFoundError, ValidationError, XippiosError
 
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.models import WasdeXlsText
 
-__all__ = ["TEXT_SHEET", "parse_wasde_xls"]
+__all__ = ["MONTH_NAMES", "TEXT_SHEET", "parse_wasde_xls"]
 
 FILE_KIND = "wasde.xls"
 """The file kind, as messages name it."""
 TEXT_SHEET = "WASDE Text"
 """The sheet that holds the narrative, as the workbook names it."""
 _PAGE_SHEET = re.compile(r"Page \d+")
-_MONTH = re.compile(rf"(?:{'|'.join(calendar.month_name[1:])}) \d{{4}}")
+MONTH_NAMES = (
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+)
+"""The month names WASDE prints, in English, written out so that no locale changes them."""
+_MONTH = re.compile(rf"(?:{'|'.join(MONTH_NAMES)}) \d{{4}}")
 _EMPTY = (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK)
 
 
@@ -70,27 +82,9 @@ def _report_month(book: xlrd.book.Book) -> str | None:
     return text if cell.ctype == xlrd.XL_CELL_TEXT and _MONTH.fullmatch(text) else None
 
 
-def parse_wasde_xls(path: str | PathLike[str]) -> list[WasdeXlsText]:
-    """The narrative of a WASDE release's XLS file, one record per paragraph, in sheet order.
-
-    The rows of sheet ``WASDE Text`` that hold text, verbatim, each with the report month
-    the first table sheet prints; the rules are this module's docstring.
-
-    Args:
-        path: The XLS file as ESMIS serves it, e.g. ``"wasde1026.xls"``.
-
-    Raises:
-        NotFoundError: The workbook has no sheet ``WASDE Text``, or the sheet holds no
-            text: the file holds no narrative; the message names its sheets.
-        ValidationError: The file is no workbook xlrd reads, or a cell of the sheet holds
-            something other than text, or text after the first column; the message names
-            the row and the column.
-    """
-    try:
-        book = xlrd.open_workbook(str(Path(path)), logfile=io.StringIO(), on_demand=True)
-    except (XLRDError, CompDocError) as error:
-        _refuse(f"not a workbook xlrd reads: {error}", str(path))
-    with book:
+def _rows(path: Path) -> list[WasdeXlsText]:
+    """The narrative's records of the workbook at ``path``; ``parse_wasde_xls`` is its door."""
+    with xlrd.open_workbook(str(path), logfile=io.StringIO(), on_demand=True) as book:
         sheets = book.sheet_names()
         if TEXT_SHEET not in sheets:
             raise NotFoundError(
@@ -125,3 +119,28 @@ def parse_wasde_xls(path: str | PathLike[str]) -> list[WasdeXlsText]:
                 source=SOURCE,
             )
     return records
+
+
+def parse_wasde_xls(path: str | PathLike[str]) -> list[WasdeXlsText]:
+    """The narrative of a WASDE release's XLS file, one record per paragraph, in sheet order.
+
+    The rows of sheet ``WASDE Text`` that hold text, verbatim, each with the report month
+    the first table sheet prints; the rules are this module's docstring.
+
+    Args:
+        path: The XLS file as ESMIS serves it, e.g. ``"wasde1026.xls"``.
+
+    Raises:
+        NotFoundError: The workbook has no sheet ``WASDE Text``, or the sheet holds no
+            text: the file holds no narrative; the message names its sheets.
+        ValidationError: The file is no workbook xlrd reads (any error xlrd raises on it,
+            its class and text named), or a cell of the sheet holds something other than
+            text, or text after the first column; the message names the row and the
+            column. An ``OSError``, a file that cannot be opened, passes as raised.
+    """
+    try:
+        return _rows(Path(path))
+    except (XippiosError, OSError):
+        raise
+    except Exception as error:  # xlrd raises more than its own errors on a corrupt file
+        _refuse(f"not a workbook xlrd reads: {type(error).__name__}: {error}", str(path))

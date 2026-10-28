@@ -10,6 +10,7 @@ file.
 """
 
 import io
+import struct
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -140,3 +141,27 @@ def test_a_file_that_is_no_workbook_is_refused(tmp_path: Path, content: bytes) -
     path.write_bytes(content)
     with pytest.raises(ValidationError, match=r"^wasde\.xls: not a workbook xlrd reads"):
         parse_wasde_xls(path)
+
+
+@pytest.mark.parametrize(
+    "error", [struct.error("unpack requires a buffer"), KeyError(7), AssertionError("BOF")]
+)
+def test_any_error_xlrd_raises_on_a_file_is_refused_naming_it(
+    monkeypatch: pytest.MonkeyPatch, error: Exception
+) -> None:
+    """A corrupt file raises more than xlrd's own errors; each reads as the taxonomy's."""
+
+    def corrupt(*args: object, **kwargs: object) -> None:
+        raise error
+
+    monkeypatch.setattr(xlrd, "open_workbook", corrupt)
+    with pytest.raises(ValidationError) as caught:
+        parse_wasde_xls(SAMPLE)
+    assert str(caught.value).startswith(
+        f"wasde.xls: not a workbook xlrd reads: {type(error).__name__}: "
+    )
+
+
+def test_a_file_that_cannot_be_opened_passes_as_raised(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        parse_wasde_xls(tmp_path / "missing.xls")
