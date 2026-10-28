@@ -41,10 +41,11 @@ src/xippios/usda/wasde/
                    the Python-only ones; MCP_CAPS any per-tool result caps
   mcp.py           xippios-usda-wasde-mcp entry point
   http.py          FastAPI router
-  params.py        the packaged reference lists, read from reference/
+  params.py        the packaged reference lists, read from reference/; none yet
   enums.py         StrEnums (IntEnums for integer ids) generated from the packaged lists;
-                   never edited by hand
-  reference/       packaged code lists (CSV/JSON) plus README with provenance
+                   never edited by hand; none yet
+  reference/       packaged code lists (CSV/JSON) plus README with provenance; the README
+                   only, no list yet
 scripts/
   refresh_reference.py   the template's skeleton: no list is packaged yet, and the lists to
                          come are read from a release's file, not through api/
@@ -62,7 +63,6 @@ tests/
   test_family.py   core's family check, one line: namespace levels, py.typed, __version__,
                    the adapters serving exactly the tasks, task shapes and docstrings, the
                    README status table, the template tag, the core bound
-  test_api.py      optional: the endpoint wrappers' own tests
   test_parse.py    the parser's tests on the samples
   test_tasks.py    per-task replay tests, both tools through the MCP server
   test_live.py     @pytest.mark.live smoke tests, one per task, and the live parser test on
@@ -102,9 +102,14 @@ The API needs no key, so the workflow uses no secret.
   files, revision and month parsed from esmis's fields) and keep esmis's `meta.endpoint`
   (`esmis_api_release_findByIdentifier`), `meta.total` and printed release time
   (`published_at` with `+0000` dropped, `published_at_naive`; ADR-0022). A month is
-  `"YYYY-MM"`, the printed date's; a reposted month is one release whose files carry
-  `v2` (`wasde0626v2.xml`; `Release.revision`), so a revised month answers its
-  revision and the original is not catalogued. `get_release(month)` takes the month's
+  `"YYYY-MM"`, the printed date's. Since 2024-12 a reposted month is one release whose
+  files carry `v2` (`wasde0626v2.xml`; `Release.revision`) and the original is not
+  catalogued, so such a month answers its revision. Release 95621 (2013-08) lists the
+  original's XML, `ORIGwasde-08-12-2013.xml`, before the revision's,
+  `wasde-08-12-2013.xml`, and esmis's `download_release_file` takes the first file of a
+  format, so `get_release("2013-08")` reads the original (esmis row 193 asks for a name
+  selector); 2013-07 (95622) lists `R1` and `ORIG` PDF and XLS files beside one XML
+  without a prefix. `get_release(month)` takes the month's
   latest release that carries an XML file (Johannes, 2026-10-28, G5 inside PR 3): in
   2010-12 and 2014-01 a later release carries a TXT or an ASC only and the month answers
   the earlier one's XML; a month whose releases carry none (every month before 2010-07)
@@ -114,7 +119,17 @@ The API needs no key, so the workflow uses no secret.
   every attribute into a dimension, a value, a unit, layout text or a page attribute; any
   other raises `ValidationError` naming the page, element and attribute. A field is the
   attribute's name with the matrix index removed (`m1_commodity1` is `commodity`;
-  page 11's class columns `attribute_group2` give `attribute_group`), labels as printed.
+  page 11's class columns `attribute_group2` give `attribute_group`), labels as printed,
+  with three exceptions (gap, row 195): the page's and the table's names are kept on the
+  record under names of their own, as conventions §3 keeps sheet and table names
+  (`report` holds `Name`, `table` the `sub_report_title`, `sub_report_title2` or
+  `sub_report_title3`, `matrix` the report item's element name); a dimension the pages
+  spell several ways is folded into one field (`attr_desc` into `attribute`,
+  `wb_forecast_month_desc` into `forecast_month`); and every value goes into
+  `cell_value`, `wb_value` and the reliability statistics included, the statistic's name
+  into `statistic`. The parser knows the October 2026 layout; the live test checks it
+  against the current release nightly, and an older file with an attribute or a
+  structure it does not know raises `ValidationError`.
   A page's titles, subtitles and footers go to its report items in document order: one
   to all, N to N (pages 9, 11, 16, 31, 33, 37 checked). October 2026 gives 6543
   records: 5913 table values and 630 reliability statistics (`statistic` names the

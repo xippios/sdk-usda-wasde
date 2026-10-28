@@ -26,10 +26,10 @@ All notable changes to this project are documented here. The format follows
   through `xippios-usda-esmis`'s tasks, each a `Release` with its id, its release time as
   printed, its files, its month (`"YYYY-MM"`) and its `revision` (`"v2"` for a month
   WAOB reposted); MCP tools `usda_wasde_list_releases` and `usda_wasde_get_latest_release`.
-- `get_release(month)`, a bulk task, Python only: the latest release's, or the month's,
-  XML downloaded through esmis into a temporary directory and parsed into one
-  `WasdeXmlCell` per value, 6543 for October 2026; `meta.vintage` is the file's
-  `Report_Month`, `meta.endpoint` the file's name.
+- `get_release(month)`, a bulk task, Python only: the XML of the latest release, or of
+  the month's latest release that carries one, downloaded through esmis into a temporary
+  directory and parsed into one `WasdeXmlCell` per value, 6543 for October 2026;
+  `meta.vintage` is the file's `Report_Month`, `meta.endpoint` the file's name.
 - `parse.parse_wasde_xml(path)`: the XML of pages 8 to 37 read with the standard
   library's ElementTree, labels as printed; `unit` is the subtitle of the pages that
   state their unit there and the reliability tables' label for their average, smallest
@@ -37,7 +37,6 @@ All notable changes to this project are documented here. The format follows
   group; an attribute the parser does not know raises `ValidationError`.
 - Six XML samples cut from the October 2026 file by `scripts/cut_sample.py`, the esmis
   catalog fixtures and the download's replay fixture, its body a sample; the live test
-  fetches the latest XML once. `get_release(month)` answers the month's latest release
-  that carries an XML file. `docs/upstream/layout.md` now says that the XML repeats
+  fetches the latest XML once. `docs/upstream/layout.md` now says that the XML repeats
   each unit row in every row group, which unit a path carries, and which attributes on
   elements are layout text.
