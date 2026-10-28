@@ -1,0 +1,18 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v0.3.0
+_src_path: https://github.com/xippios/sdk-template.git
+api_base_url: https://esmis.nal.usda.gov
+api_key_env: ''
+core_git_ref: ''
+core_version: 0.3.0
+gateway: none
+has_files: true
+import_path: usda.wasde
+rate_limit_burst: 1
+rate_limit_per_minute: 30
+rate_limit_provenance: self-imposed
+source_dependencies: '[{name: usda-esmis, minor: "0.1", key_env: ""}]'
+source_name: USDA WAOB World Agricultural Supply and Demand Estimates
+source_slug: usda-wasde
+upstream_docs_url: https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates
+upstream_url: https://www.usda.gov/oce/commodity/wasde
