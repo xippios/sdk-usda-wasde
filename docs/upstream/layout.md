@@ -22,8 +22,8 @@ The October 2026 release, ESMIS release 796099, released 2026-10-09, downloaded 
 | wasde1026.pdf | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.pdf | 939374 | 6cc97c08be7e683b6114ae8e16d49fce2f21dce3ed3f9933b0acbd2d37e6840b |
 
 The sizes agree with those ESMIS's page of the release printed on 2026-10-28 (917.36 KB,
-119.51 KB, 346 KB and 3.4 MB, in units of 1024). The release history below is read from the 703
-WASDE releases that xippios-usda-esmis's `list_releases("wasde")` returned on
+119.51 KB, 346 KB and 3.4 MB, in units of 1024). The release history below is read from
+the 703 WASDE releases that xippios-usda-esmis's `list_releases("wasde")` returned on
 2026-10-28, every page of the list. No other release file was read for this file.
 
 ## The four files
@@ -145,7 +145,9 @@ carries `region` and the seven values `root_mean_square_error`, `confidence_inte
 `WHEAT`). The `commodity_group` carries `Percent` in `commodity_attribute2` (page 35),
 `Textbox41` (page 36) or `textbox4` (page 37), and on pages 36 and 37 a `commodity_label`
 with the commodity's unit (`Million Metric Tons`, `Million Bushels`); page 35's footnote
-explains the measures. On page 37 the values sit on `attribute_group` (suffix `1`:
+explains the measures. On page 37 the commodity label is `commodity1` on the
+`commodity_group` of table 1 and `commodity2` to `commodity4` on `commodity_group2` to
+`commodity_group4` in tables 2 to 4; the values sit on `attribute_group` (suffix `1`:
 `root_mean_square_error1`, …) and on `commodity_group2` to `commodity_group4` (suffixes
 `2` to `4`). Page 36's footnote says that no WASDE was published in October 2013 or
 October 2025.
@@ -343,11 +345,18 @@ least one file of each kind:
 | 2026 | 10 | 10 | 10 | 10 |  | 10 |  |  |  |
 
 The first XML is that of 2010-07-09, and every release since 2011 carries an XML and an
-XLS but one, 2014-01-23, which carries an ASC file only. The XLS files of 2001 to 2008 are revision files (below), not the report's tables.
-TXT is missing from 2011 to 2015 and from the first nine releases of 2016 (it is back
-from 2016-10-12). The one XLSX is that of 2010-08-12, the one ZIP (`95501.zip`, with a
-`readme.txt`) that of 1995-01-31, the three DOC files belong to 2006-05-12 and 2006-07-12
-(revision notes) and 2008-07-02, and the one ASC is `wasde-01-23-2014.asc`. October 2013 and October 2025 have no release.
+XLS but one, 2014-01-23, which carries an ASC file only. The XLS files of 2001 to 2008
+are revision files (below), not the report's tables. TXT is missing from 2011 to 2015
+and from the first nine releases of 2016 (it is back from 2016-10-12). The one XLSX is
+that of 2010-08-12, the one ZIP (`95501.zip`, with a `readme.txt`) that of 1995-01-31,
+the three DOC files belong to 2006-05-12 and 2006-07-12 (revision notes) and
+2008-07-02, and the one ASC is `wasde-01-23-2014.asc`.
+
+Counting every calendar month from the first release (September 1973) to the last
+(October 2026), eight months have no release in the catalog: 1974-02, 1975-02, 1975-05,
+1976-02, 1977-02, 2013-10, 2019-01 and 2025-10. Page 36's footnote names two of them,
+October 2013 and October 2025, as months without a WASDE, due to a partial government
+shutdown.
 
 ### File names
 
@@ -355,19 +364,22 @@ from 2016-10-12). The one XLSX is that of 2010-08-12, the one ZIP (`95501.zip`, 
 | --- | --- |
 | `wasde-<mm>-<dd>-<yyyy>.<ext>` | 1973-09-17 to 2018-09-12 |
 | `WASDE-582-October-11-2018.<ext>` | 2018-10-11 |
-| `latest.<ext>` | 2018-11-08 to 2021-07-12, and the PDF and TXT of 2024-11-08 |
-| `wasde<mm><yy>.<ext>` | 2019-05-10 to 2026-10-09; on 2024-11-08 the XML and the XLS only |
+| `latest.<ext>` | 2018-11-08 to 2021-07-12 except 2019-05-10, and the PDF and TXT of 2024-11-08 |
+| `wasde<mm><yy>.<ext>` | 2019-05-10, then 2021-08-12 to 2026-10-09 except the revised months below; on 2024-11-08 the XML and the XLS only |
 | `wasde<mm><yy>v2.<ext>` | the revised months 2024-12-10, 2025-04-10, 2025-05-12, 2026-05-12, 2026-06-11 |
 
 WAOB's notice of 2018 (`New_WASDE_Filename_Format.pdf`) announces the `WASDEmmyy` names
-from the August 10, 2018 report on its own website; ESMIS's catalog names them so only
-from 2019-05-10. Other names occur once or a few times: revision files of 2001 to 2008
+on its own website from the August 10, 2018 report on, beside the `latest.*` names,
+which were to continue through the April 2019 release only. ESMIS's catalog uses the
+`wasde<mm><yy>` names once, on 2019-05-10, and from 2021-08-12 on, and the `latest.*`
+names until 2021-07-12, and once more for the PDF and the TXT of 2024-11-08. Other names
+occur once or a few times: revision files of 2001 to 2008
 (`wasde-05-10-2001_wheat-revision.pdf`, `wasde-05-10-2002_EUgrains_revision.xls`,
 `wasde-05-09-2008_Historical_Dairy_revisions.xls`, …), announcements and special reports
-of 2001 and 2008, cotton TXT files of January to April 1996 (`wasde-01-16-1996_cotton.txt`),
-the original and the revision of July 2013 (`ORIGwasde-07-11-2013.pdf`,
-`R1wasde-07-11-2013.pdf`) and the original of August 2013 (`ORIGwasde-08-12-2013.xml`),
-and `Pages_from_wasde-06-22-1984-2.pdf`.
+of 2001 and 2008, cotton TXT files of January to April 1996
+(`wasde-01-16-1996_cotton.txt`), the original and the revision of July 2013
+(`ORIGwasde-07-11-2013.pdf`, `R1wasde-07-11-2013.pdf`) and the original of August 2013
+(`ORIGwasde-08-12-2013.xml`), and `Pages_from_wasde-06-22-1984-2.pdf`.
 
 ### Revisions and several releases in a month
 
