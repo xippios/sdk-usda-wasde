@@ -11,7 +11,7 @@ the family rules every source shares are in `.claude/family.md`, which the next 
 | | |
 | --- | --- |
 | Upstream | USDA WAOB World Agricultural Supply and Demand Estimates, https://www.usda.gov/oce/commodity/wasde |
-| API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.1.0 |
+| API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.1.1 |
 | Documentation | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates and WAOB's pages under https://www.usda.gov/oce/commodity/wasde, snapshotted in `docs/upstream/` by `scripts/refresh_upstream.py` (`/refresh-upstream`); a page www.usda.gov refuses to automated requests is kept from USDA's CDN origin, usda.azureedge.us; no page names an OpenAPI or Swagger document, so `SPEC_URL` is `None`; the file layouts, as observed, in `docs/upstream/layout.md` |
 | Credentials | none; the API is open |
 | Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; ADR-0010), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
@@ -238,7 +238,7 @@ The API needs no key, so the workflow uses no secret.
   tasks give as `meta.vintage`. `list_tables`, `list_commodities` and `list_regions`
   answer from them without a request, `meta` from `PackagedList.meta`, `search` through
   core's `matches`, the default MCP cap (the largest answer 29,639 bytes); the attribute
-  list has no task in 0.1.0 and is kept for the tasks that name a table's rows. The
+  list has no task in 0.1.1 and is kept for the tasks that name a table's rows. The
   commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
   32 and 33 (pages 32 and 33 by the session, 2026-10-28, rule 7); the XML names none
   of their commodities as a whole: only page 32's records carry a `commodity`, one per
@@ -260,7 +260,7 @@ The API needs no key, so the workflow uses no secret.
   before each release, in the release train's refresh PR (conventions §12; Workflow
   rules), so each release ships the lists of the latest WASDE, its month
   their vintage (ADR-0022 decision 1); a refresh that reproduces them record for record
-  needs no PR: 0.1.0 ships those of ESMIS release 796099 (October 2026), which the
+  needs no PR: 0.1.1 ships those of ESMIS release 796099 (October 2026), which the
   refresh of 2026-10-28 reproduced. `--keep DIR` keeps the downloaded files with what
   the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
