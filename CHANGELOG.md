@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-29
+
+The first version on PyPI. 0.1.0 was tagged on 2026-10-28, on its release PR's merge,
+but never published: the pending trusted publisher on PyPI named another project, and
+a publish run whose tag exists cannot be re-run from the start, so the release is
+re-done as a patch, as `publish.yml` prescribes. 0.1.1 ships 0.1.0 unchanged; what it
+contains is listed under 0.1.0 in `CHANGELOG.md`.
+
 ## [0.1.0] - 2026-10-28
 
 ### Added

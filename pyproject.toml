@@ -1,6 +1,6 @@
 [project]
 name = "xippios-usda-wasde"
-version = "0.1.0"
+version = "0.1.1"
 description = "Typed client, MCP tools and HTTP routes for USDA WAOB World Agricultural Supply and Demand Estimates"
 readme = "README.md"
 license = "Apache-2.0"
