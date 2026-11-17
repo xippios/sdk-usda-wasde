@@ -35,7 +35,7 @@ from xippios.usda.wasde import (
 
 latest = get_latest_release()  # the newest WASDE release in ESMIS
 latest.data.id, latest.data.month  # "796099", "2026-10"
-latest.meta.published_at  # 2026-10-09 12:00:00: ESMIS's printed time, no zone (ADR-0022)
+latest.meta.published_at  # 2026-10-09 12:00:00: ESMIS's printed time, no zone (sdk-core ADR-0022)
 
 releases = list_releases(since=date(2026, 1, 1))  # bound it: without since, 29 requests
 [release.month for release in releases.data if release.revision]  # ["2026-06", "2026-05"]
