@@ -31,6 +31,9 @@ LINK = re.compile(r"\]\(([^)]*)\)")
 SOURCE = re.compile(r"^Converted by `scripts/refresh_upstream\.py` from (\S+?)[,;] ")
 NOTED_URL = re.compile(r"https?://[^\s;,]+")
 NOTED_PATH = re.compile(r"(?<=\s)/[\w./-]+")
+CALENDAR = "https://esmis.nal.usda.gov/release-calendar"
+"""The one row that no page of the snapshot links: ESMIS's release calendar, which the
+snapshot names for WASDE's release dates."""
 
 
 def load_script() -> ModuleType:
@@ -172,17 +175,36 @@ def recorded() -> set[str]:
 
 def test_every_page_the_snapshot_links_is_fetched_or_not_fetched() -> None:
     """Each page that a page of the snapshot links is recorded in the table of files or has a
-    row of ``Not fetched``, never both. A row whose URL ends in ``/`` is a folder: a file
-    under it is the row's (conventions §3)."""
-    urls = [page.url for page in script.NOT_FETCHED]
-    left_out = {page_of(url) for url in urls}
-    folders = tuple(url for url in urls if url.endswith("/"))
+    row of ``Not fetched``, never both. A folder that ``FOLDERS`` names is the row of the files
+    under it; every other row is its own page's alone (conventions §3)."""
+    left_out = {page_of(page.url) for page in script.NOT_FETCHED}
+    folders: tuple[str, ...] = script.FOLDERS
+    assert folders
+    assert set(folders) <= {page.url for page in script.NOT_FETCHED}
     fetched = recorded()
     found = linked()
     assert len(found) >= 150
     assert sorted(left_out & fetched) == []
     unlisted = found - fetched - left_out
     assert sorted(url for url in unlisted if not url.startswith(folders)) == []
+
+
+def still_linked(url: str, found: set[str]) -> bool:
+    """Whether a row's page is linked: a folder's by a linked file under it."""
+    if url in script.FOLDERS:
+        return any(page.startswith(url) for page in found)
+    return page_of(url) in found
+
+
+def test_every_row_of_not_fetched_is_a_page_the_snapshot_links() -> None:
+    """A row whose page no page of the snapshot links any more is stale, as after a release
+    that drops the oldest of the release list: every row's page is linked, but the release
+    calendar's (conventions §3)."""
+    found = linked()
+    urls = [page.url for page in script.NOT_FETCHED]
+    assert CALENDAR in urls
+    stale = [url for url in urls if url != CALENDAR and not still_linked(url, found)]
+    assert stale == []
 
 
 def captured(text: str) -> list[str]:
