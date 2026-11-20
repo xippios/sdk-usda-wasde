@@ -19,10 +19,11 @@ test, and on small XML texts the test writes to ``tmp_path``, never on a fixture
 """
 
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
-from xippios.core import PackagedList, ValidationError
+from xippios.core import PackagedList, UpstreamModel, ValidationError
 
 from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde._client import SOURCE
@@ -162,12 +163,15 @@ def test_differences_names_a_missing_a_new_a_changed_and_a_moved_row() -> None:
     ]
 
 
-def test_differences_compares_every_field_of_a_table_but_its_month() -> None:
-    table = packaged("table", Table)[0]
-    for name in Table.model_fields:
-        if name in {"report", "report_month"}:
+def assert_every_field_compared(
+    row: UpstreamModel, keys: set[str], name: Callable[[UpstreamModel], str]
+) -> None:
+    """Each field of ``row`` but the ones that name it and ``report_month``, changed alone,
+    makes ``differences`` name the row as changed."""
+    for field in type(row).model_fields:
+        if field in keys | {"report_month"}:
             continue  # the row's name, and the release
-        value = getattr(table, name)
+        value = getattr(row, field)
         other: object
         if isinstance(value, int):
             other = value + 1
@@ -175,10 +179,38 @@ def test_differences_compares_every_field_of_a_table_but_its_month() -> None:
             other = [*value, "matrix9"]
         else:
             other = f"{value} 9/"
-        changed = table.model_copy(update={name: other})
-        assert vocabulary.differences([table], [changed], vocabulary.by_report) == [
-            f"changed: {table.report}"
-        ], name
+        changed = row.model_copy(update={field: other})
+        assert vocabulary.differences([row], [changed], name) == [f"changed: {name(row)}"], field
+
+
+def test_differences_compares_every_field_of_a_table_but_its_month() -> None:
+    assert_every_field_compared(packaged("table", Table)[0], {"report"}, vocabulary.by_report)
+
+
+def test_differences_compares_every_field_of_a_commodity_but_its_month() -> None:
+    commodity = packaged("commodity", Commodity)[0]
+    assert_every_field_compared(commodity, {"report", "matrix"}, vocabulary.by_matrix)
+
+
+def test_the_namers_tell_two_matrices_of_one_page_apart() -> None:
+    """``by_matrix`` and ``by_attribute`` name each row of their list once.
+
+    Page 12's two matrices, ``FEED GRAINS`` and ``CORN``, are two commodities, and a row
+    label is named by its page, its matrix and its text.
+    """
+    commodities = packaged("commodity", Commodity)
+    feed_grains, corn = (row for row in commodities if row.report == "sr12")
+    assert vocabulary.by_matrix(feed_grains) != vocabulary.by_matrix(corn)
+    assert len({vocabulary.by_matrix(row) for row in commodities}) == len(commodities)
+    attributes = packaged("attribute", Attribute)
+    first = attributes[0]
+    rows = [
+        first,
+        first.model_copy(update={"matrix": "matrix9"}),
+        first.model_copy(update={"attribute": f"{first.attribute} 9/"}),
+    ]
+    assert len({vocabulary.by_attribute(row) for row in rows}) == len(rows)
+    assert len({vocabulary.by_attribute(row) for row in attributes}) == len(attributes)
 
 
 def test_the_built_footers_are_the_parsers_by_page() -> None:
