@@ -233,6 +233,12 @@ _DOCUMENTS = f"{USDA}/sites/default/files/documents"
 _ERS = "https://www.ers.usda.gov"
 _CORNELL = "https://usda.library.cornell.edu/concern/publications"
 
+RELEASE_FOLDER = f"{_ESMIS}/sites/default/release-files/"
+"""ESMIS's folder of release files, a folder per release, which holds release files alone."""
+FOLDERS = (RELEASE_FOLDER,)
+"""The rows of ``NOT_FETCHED`` that are folders, each the row of the files under it, which
+move with every release; every other row, a URL ending in ``/`` among them, is one page's."""
+
 EARLIER_RELEASES = (
     "2026-10-09",
     "2026-09-11",
@@ -276,7 +282,7 @@ NOT_FETCHED: tuple[NotFetched, ...] = (
         "package uses, keeps it as an excerpt",
     ),
     NotFetched(
-        f"{_ESMIS}/sites/default/release-files/",
+        RELEASE_FOLDER,
         "the folder of the release files that the publication page's release list and the "
         "newest release's page link, a folder per release with its XML, XLS, TXT and PDF: "
         f"data, no documentation; `{OBSERVED}` notes their layouts as observed, and "
@@ -558,8 +564,8 @@ NOT_FETCHED: tuple[NotFetched, ...] = (
     ),
 )
 """Every page the documentation links that the snapshot deliberately does not request, in
-the order of the pages that link them; a URL ending in ``/`` is a folder, its row the
-files under it."""
+the order of the pages that link them; a row that ``FOLDERS`` names is the row of the files
+under it."""
 
 SPEC_URL: str | None = None
 """The machine-readable API document (OpenAPI, Swagger) the documentation names: none.
