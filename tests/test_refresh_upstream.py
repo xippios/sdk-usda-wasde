@@ -15,7 +15,7 @@ import importlib.util
 import re
 from pathlib import Path
 from types import ModuleType
-from urllib.parse import urldefrag, urljoin, urlsplit
+from urllib.parse import unquote, urldefrag, urljoin, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "refresh_upstream.py"
@@ -128,11 +128,24 @@ def test_every_row_of_not_fetched_gives_its_reason() -> None:
 
 def page_of(url: str) -> str:
     """The page a URL names: its fragment, which is never sent, and a trailing slash dropped,
-    and USDA's CDN origin named as www.usda.gov, whose site it serves at the same paths."""
-    url = urldefrag(url).url.rstrip("/")
+    an escape such as ``%20`` read as its character, and USDA's CDN origin named as
+    www.usda.gov, whose site it serves at the same paths."""
+    url = unquote(urldefrag(url).url).rstrip("/")
     origin: str = script.ORIGIN
     usda: str = script.USDA
     return usda + url.removeprefix(origin) if url.startswith(f"{origin}/") else url
+
+
+def test_no_url_of_not_fetched_holds_a_space() -> None:
+    """A table cell's URL is no Markdown link, and GitHub links it only up to a space, so a
+    space in a page's address is written ``%20``, which ``page_of`` reads back."""
+    lines = render(observed=True).splitlines()
+    rows = [line for line in lines[lines.index(LEFT_OUT) + 4 :] if line.startswith("| ")]
+    urls = [row.removeprefix("| ").split(" | ")[0] for row in rows]
+    assert len(urls) == len(script.NOT_FETCHED)
+    assert [url for url in urls if " " in url] == []
+    documents = f"{script.USDA}/sites/default/files/documents"
+    assert page_of(f"{documents}/Egg%20SU%20Table.xlsx") == f"{documents}/Egg SU Table.xlsx"
 
 
 def linked() -> set[str]:
