@@ -39,6 +39,16 @@ these read only what the refresh script and the live tests need
 - ``attributes``: one ``Attribute`` per distinct ``report``, ``matrix`` and
   ``attribute`` of the records, in file order; a value without an ``attribute`` gives
   none.
+- ``differences``: the rows in which a list read from one release differs from the same
+  list read from another, in what no release changes: every field but ``report_month``,
+  which names the release, with the month word of the reliability titles masked
+  (``month_masked``: ``Reliability of <Month> Projections``, pages 35 to 37) and each
+  footer of a table reduced to whether it is set (``footers_set``), since its text
+  changes every release (the projection month on page 35, the months of the estimates on
+  pages 13 and 16; https://github.com/xippios/sdk-usda-wasde/pull/4). The live tests
+  compare the packaged lists with the latest release's by it, and the offline tests with
+  the October 2026 samples; ``by_report``, ``by_matrix``, ``by_region`` and
+  ``by_attribute`` name a row of each list.
 
 A file these rules do not fit raises ``ValidationError`` naming the page, and the
 refresh script writes nothing: a supply-and-use page without values, a title that does not
@@ -52,23 +62,32 @@ several items.
 import io
 import re
 import xml.etree.ElementTree as ET
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from os import PathLike
 from pathlib import Path
 from typing import NoReturn
 
 import xlrd
-from xippios.core import ValidationError
+from xippios.core import UpstreamModel, ValidationError
 
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.models import Attribute, Commodity, Region, Table, WasdeXmlCell
+from xippios.usda.wasde.parse.wasde_xls import MONTH_NAMES
 
 __all__ = [
     "BLOCK_PAGES",
     "COMMODITY_PAGES",
+    "FOOTERS",
     "attributes",
     "block_titles",
+    "by_attribute",
+    "by_matrix",
+    "by_region",
+    "by_report",
     "commodities",
+    "differences",
+    "footers_set",
+    "month_masked",
     "regions",
     "report_name",
     "tables",
@@ -326,3 +345,79 @@ def attributes(records: Sequence[WasdeXmlCell]) -> list[Attribute]:
         Attribute(report=report, matrix=matrix, attribute=attribute, report_month=month)
         for report, matrix, attribute in rows
     ]
+
+
+def differences(
+    packaged: Sequence[UpstreamModel],
+    current: Sequence[UpstreamModel],
+    name: Callable[[UpstreamModel], str],
+) -> list[str]:
+    """The rows of the packaged list that the current release's differs in, by name only.
+
+    Every field is compared but ``report_month``, which names the release the list was
+    read from; a row missing, added, changed or moved is named, never its values.
+    """
+
+    def fields(row: UpstreamModel) -> dict[str, object]:
+        return row.model_dump(exclude={"report_month"})
+
+    before = {name(row): fields(row) for row in packaged}
+    after = {name(row): fields(row) for row in current}
+    found = [f"missing now: {key}" for key in before if key not in after]
+    found += [f"new: {key}" for key in after if key not in before]
+    found += [f"changed: {key}" for key in before if key in after and before[key] != after[key]]
+    shared = [key for key in before if key in after]
+    if shared != [key for key in after if key in before]:
+        found.append("the order of the rows changed")
+    return found
+
+
+RELIABILITY_TITLE = re.compile(
+    rf"(Reliability of (?:United States )?)(?:{'|'.join(MONTH_NAMES)})( Projections)"
+)
+"""A reliability page's title, its month word the release's own: ``Reliability of October
+Projections 1/`` (page 35), ``Reliability of United States October Projections  1/`` (37)."""
+
+
+def month_masked(table: Table) -> Table:
+    """The table with the month word of a reliability title replaced by ``<month>``."""
+    titles = ("sub_report_title", "sub_report_title2", "sub_report_title3")
+    return table.model_copy(
+        update={
+            name: RELIABILITY_TITLE.sub(r"\1<month>\2", text)
+            for name in titles
+            if (text := getattr(table, name)) is not None
+        }
+    )
+
+
+FOOTERS = ("sub_report_footer", "sub_report_footer2", "sub_report_footer3")
+"""A table's footers, whose text changes every release."""
+
+
+def footers_set(table: Table) -> Table:
+    """The table with each footer reduced to whether it is set: its text changes monthly."""
+    return table.model_copy(
+        update={name: "<set>" for name in FOOTERS if getattr(table, name) is not None}
+    )
+
+
+def by_report(row: UpstreamModel) -> str:
+    """A table's name in ``differences``: its page, ``sr12``."""
+    return str(getattr(row, "report", ""))
+
+
+def by_matrix(row: UpstreamModel) -> str:
+    """A commodity's name in ``differences``: its page and matrix, ``sr12 matrix2``."""
+    return f"{getattr(row, 'report', '')} {getattr(row, 'matrix', '')}"
+
+
+def by_region(row: UpstreamModel) -> str:
+    """A region's name in ``differences``: its text as printed, quoted with its indent."""
+    return repr(getattr(row, "region", ""))
+
+
+def by_attribute(row: UpstreamModel) -> str:
+    """An attribute's name in ``differences``: its page, matrix and text as printed."""
+    attribute = getattr(row, "attribute", "")
+    return f"{getattr(row, 'report', '')} {getattr(row, 'matrix', '')} {attribute!r}"
