@@ -96,7 +96,7 @@ OCTOBER_PRINTED = datetime(2026, 10, 9, 12, 0)
 """The October 2026 release's ``release_datetime`` as printed, its ``+0000`` dropped."""
 JULY_2010_PRINTED = datetime(2010, 7, 9, 12, 0)
 """The July 2010 release's ``release_datetime`` as printed, its ``+0000`` dropped."""
-PACKAGED_FETCHED = datetime(2026, 10, 28, 16, 26, 51, tzinfo=UTC)
+PACKAGED_FETCHED = datetime(2026, 11, 20, 18, 3, 38, tzinfo=UTC)
 """The packaged lists' ``fetched``, when the refresh script's XML download was complete."""
 FILE_KEYS = {"param", "endpoint", "fetched", "note", "records"}
 """The keys a packaged file may hold (sdk-core ADR-0041, decision 5)."""
@@ -371,7 +371,7 @@ def test_get_table_answers_one_page(
     [
         ("SR12", "sr12 (page 12: U.S. Feed Grain and Corn Supply and Use  1/)"),
         ("12", "sr12 (page 12: U.S. Feed Grain and Corn Supply and Use  1/)?"),
-        ("sr7", "sr37 (page 37: Reliability of United States October Projections  1/)"),
+        ("sr7", "sr37 (page 37: Reliability of United States November Projections  1/)"),
     ],
 )
 def test_get_table_refuses_a_page_list_tables_lacks(
@@ -381,7 +381,7 @@ def test_get_table_refuses_a_page_list_tables_lacks(
         tasks.get_table(table)
     message = str(caught.value)
     assert message.startswith(
-        f"{table!r} is not a table in the packaged table list (fetched 2026-10-28). "
+        f"{table!r} is not a table in the packaged table list (fetched 2026-11-20). "
         f"Did you mean {first}"
     )
     assert "'sr' and its two-digit printed number: page 12 is 'sr12'" in message
@@ -540,25 +540,25 @@ def test_a_region_is_matched_without_its_indent_and_footnote_marker(
         (
             "corn",
             "United States",
-            "'corn' is not a commodity in the packaged commodity list (fetched 2026-10-28). "
+            "'corn' is not a commodity in the packaged commodity list (fetched 2026-11-20). "
             "Did you mean CORN (United States sr12), Corn (World sr22, World sr23), ",
         ),
         (
             "Wheat",
             "argentina",
-            "'argentina' is not a region in the packaged region list (fetched 2026-10-28). "
+            "'argentina' is not a region in the packaged region list (fetched 2026-11-20). "
             "Did you mean Argentina (rows of sr18, sr19)?",
         ),
         (
             "CORN",
             "World",
-            "'World' is not a region in the packaged region list (fetched 2026-10-28). "
+            "'World' is not a region in the packaged region list (fetched 2026-11-20). "
             "'CORN' is printed for United States.",
         ),
         (
             "Wheat",
             "united states",
-            "'united states' is not a region in the packaged region list (fetched 2026-10-28). "
+            "'united states' is not a region in the packaged region list (fetched 2026-11-20). "
             "Did you mean United States (sr11 matrix1)? A region of 'Wheat' is 'United "
             "States' or 'Mexico' where it has a U.S. or Mexico matrix, else one its world "
             "pages print",
@@ -566,7 +566,7 @@ def test_a_region_is_matched_without_its_indent_and_footnote_marker(
         (
             "Sugar",
             "Mexco",
-            "'Mexco' is not a region in the packaged region list (fetched 2026-10-28). "
+            "'Mexco' is not a region in the packaged region list (fetched 2026-11-20). "
             "Did you mean Mexico (sr16 matrix2)?",
         ),
     ],
@@ -605,7 +605,7 @@ def test_a_balance_sheet_the_file_lacks_is_not_found(replay_fixture: ReplayFixtu
         "wasde1026.xml of release 796099 holds no record of 'Corn' for 'Argentina' in sr22 "
         "matrix1 'World Corn Supply and Use  1/'; sr22 matrix2 'World Corn Supply and Use  "
         "1/'; sr23 matrix1 \"World Corn Supply and Use  1/  (Cont'd.)\", as the packaged list "
-        "read them from October 2026; get_table (over MCP, the tool usda_wasde_get_table) "
+        "read them from November 2026; get_table (over MCP, the tool usda_wasde_get_table) "
         "answers a page as that month prints it"
     )
 
@@ -818,9 +818,9 @@ MCP_CASES: list[McpCase] = [
         [],
         lambda payload: (
             [table["report"] for table in payload["data"]] == ["sr11", "sr18", "sr19"]
-            and payload["meta"]["vintage"] == "October 2026"
-            and payload["meta"]["endpoint"] == "wasde1026.xml"
-            and payload["meta"]["retrieved_at"] == "2026-10-28T16:26:51Z"
+            and payload["meta"]["vintage"] == "November 2026"
+            and payload["meta"]["endpoint"] == "wasde1126.xml"
+            and payload["meta"]["retrieved_at"] == "2026-11-20T18:03:38Z"
             and payload["meta"]["request"] == {"search": "wheat"}
         ),
     ),
@@ -832,7 +832,7 @@ MCP_CASES: list[McpCase] = [
         lambda payload: (
             [row["commodity"] for row in payload["data"]] == ["FEED GRAINS", "CORN"]
             and [row["matrix"] for row in payload["data"]] == ["matrix1", "matrix2"]
-            and payload["meta"]["vintage"] == "October 2026"
+            and payload["meta"]["vintage"] == "November 2026"
         ),
     ),
     (
@@ -846,7 +846,7 @@ MCP_CASES: list[McpCase] = [
             == {
                 "region": "World",
                 "reports": ["sr09", "sr26", "sr27", "sr35", "sr36"],
-                "report_month": "October 2026",
+                "report_month": "November 2026",
             }
             and "note" not in payload
         ),
@@ -1164,9 +1164,9 @@ def test_a_list_task_answers_its_packaged_list_without_a_request(
     assert len(result.data) == len(packaged.records) == rows, "the counts the docstring names"
     assert result.data == packaged.parse(model, source=SOURCE), "the file's order"
     assert result.meta.source == SOURCE
-    assert result.meta.endpoint == "wasde1026.xml", "the file the list came from"
+    assert result.meta.endpoint == "wasde1126.xml", "the file the list came from"
     assert result.meta.retrieved_at == packaged.fetched == PACKAGED_FETCHED
-    assert result.meta.vintage == "October 2026", "the release's Report_Month"
+    assert result.meta.vintage == "November 2026", "the release's Report_Month"
     assert result.meta.request == {}, "search left None is omitted"
     assert (result.meta.published_at, result.meta.total) == (None, None)
     assert not result.meta.published_at_naive
@@ -1208,7 +1208,7 @@ def test_search_keeps_the_rows_where_the_text_occurs_in_a_field(
     result = task(search=search)
     assert [key(row) for row in result.data] == keys
     assert result.meta.request == {"search": search}
-    assert result.meta.vintage == "October 2026"
+    assert result.meta.vintage == "November 2026"
     assert respx_mock.calls.call_count == 0
 
 
@@ -1232,14 +1232,14 @@ def test_the_packaged_files_hold_the_four_keys_and_a_note() -> None:
         raw = packaged_file(name)
         assert set(raw) == FILE_KEYS, name
         packaged = PackagedList.load(PACKAGE, name)
-        assert (packaged.param, packaged.endpoint) == (name, "wasde1026.xml"), "named by param"
+        assert (packaged.param, packaged.endpoint) == (name, "wasde1126.xml"), "named by param"
         assert packaged.fetched == PACKAGED_FETCHED
         assert packaged.note is not None
-        assert "ESMIS release 796099" in packaged.note
-        assert "Report_Month 'October 2026'" in packaged.note
+        assert "ESMIS release 796142" in packaged.note
+        assert "Report_Month 'November 2026'" in packaged.note
         model = models[name]
         for row, record in zip(packaged.parse(model, source=SOURCE), raw["records"], strict=True):
             assert list(record) == list(model.model_fields), "every field, null included"
             assert row.dump_upstream() == record
-        assert {record["report_month"] for record in raw["records"]} == {"October 2026"}
-    assert "wasde1026.xls" in (PackagedList.load(PACKAGE, "commodity").note or "")
+        assert {record["report_month"] for record in raw["records"]} == {"November 2026"}
+    assert "wasde1126.xls" in (PackagedList.load(PACKAGE, "commodity").note or "")
