@@ -426,6 +426,7 @@ def test_an_unknown_attribute_is_refused_naming_it(tmp_path: Path) -> None:
         parse_wasde_xml(xml_file(tmp_path, body))
     message = str(caught.value)
     assert message.startswith("wasde.xml: sr99 matrix1: unknown attribute 'surprise1' on <Cell>")
+    assert message.endswith("the layout the parser knows (docs/upstream/OBSERVED.md)")
     assert caught.value.raw == {"report": "sr99", "element": "Cell", "attribute": "surprise1"}
 
 
