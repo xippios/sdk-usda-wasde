@@ -344,7 +344,7 @@ semantics or the shape of the public API.
   `scripts/refresh_reference.py` from the latest release's XML and XLS with
   `PackagedList.write`, never by hand; each is named after its `param` (`table`,
   `commodity`, `region`, `attribute`; conventions §3), `endpoint` the XML's name as
-  ESMIS catalogs it (`wasde1026.xml`), `fetched` the UTC time the XML was complete,
+  ESMIS catalogs it (`wasde1126.xml`), `fetched` the UTC time the XML was complete,
   `note` the provenance (the release, its `Report_Month`, for the commodity list the
   XLS and the positional rule), and every record carries `report_month`, which the list
   tasks give as `meta.vintage`. `list_tables`, `list_commodities` and `list_regions`
@@ -369,7 +369,8 @@ semantics or the shape of the public API.
   `/refresh-reference-data` expects; the script replaces the template's `LISTS`,
   `ID_LISTS` and `TABLES` and its `--render-only`, as sdk-usda-esmis's does. The refresh
   budget: five keyless requests (the latest release, then the release and the file for
-  the XML and for the XLS), about 3.7 MiB, at esmis's pace. The lists are refreshed
+  the XML and for the XLS), 2.3 MiB for November 2026 and 3.7 MiB for October 2026, at
+  esmis's pace. The lists are refreshed
   before each release, in the release train's refresh PR (conventions §12), so each
   release ships the lists of the latest WASDE, its month
   their vintage (sdk-core ADR-0041 decision 1); a refresh that reproduces them record for

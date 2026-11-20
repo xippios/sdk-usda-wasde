@@ -55,10 +55,10 @@ compared only for whether it is set on both sides, never its text, which changes
 release (the projection month on page 35, the months of the estimates on pages 13 and
 16); any other difference fails, naming the rows.
 
-`endpoint` is the XML's name as ESMIS catalogs it (`wasde1026.xml`), the file every
+`endpoint` is the XML's name as ESMIS catalogs it (`wasde1126.xml`), the file every
 record's page, matrix and labels come from; the commodity file's `note` names the XLS as
 well. `fetched` is the UTC time the XML was complete. Every record carries the release's
-`report_month` (`October 2026`), which the list tasks give as `meta.vintage`.
+`report_month` (`November 2026`), which the list tasks give as `meta.vintage`.
 
 They load through `xippios.core.PackagedList`, which also builds the answer's `meta`:
 

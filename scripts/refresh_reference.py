@@ -15,7 +15,8 @@ https://github.com/xippios/sdk-usda-wasde/pull/4):
 One run downloads the latest release's XML and XLS through xippios-usda-esmis's tasks,
 as ``scripts/cut_sample.py`` does: ``get_latest_release`` (one request), then
 ``download_release_file`` for each file (two requests each, the release and the file):
-three catalog requests and two downloads, about 3.7 MiB, keyless, at esmis's pace. It
+three catalog requests and two downloads, 2.3 MiB for November 2026 and 3.7 MiB for
+October 2026, keyless, at esmis's pace. It
 parses the XML with the package's ``parse_wasde_xml``, reads the XLS's block titles with
 xlrd, and builds the lists with ``xippios.usda.wasde._vocabulary``, whose docstring
 gives the rules; a file they do not fit (a page of 12 to 15 whose block titles are not
