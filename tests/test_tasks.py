@@ -3,7 +3,7 @@
 ``/add-endpoint`` and ``/record-fixture`` add them.
 
 The tasks send through xippios-usda-esmis's tasks, so the fixtures are esmis's answers,
-recorded here on 2026-10-28 under esmis's wrapper names (ADR-0021 decision 4): WASDE's
+recorded here on 2026-10-28 under esmis's wrapper names (sdk-core ADR-0021 decision 4): WASDE's
 release page 0 (``release_find_by_identifier/wasde_page0.json``), release 796099
 (``release_find_by_id/796099.json``) and the downloads of its XML and its XLS: two
 fixtures of the XML (``download_release_file/wasde1026_xml.json`` and
@@ -21,6 +21,9 @@ the MCP server; the bulk task is neither a tool nor a route.
 """
 
 import json
+import os
+import subprocess
+import sys
 import tempfile
 from collections.abc import Callable
 from datetime import UTC, date, datetime
@@ -30,7 +33,11 @@ from typing import Any
 
 import pytest
 import respx
+from fastapi import FastAPI
 from fastapi.routing import APIRoute
+from fastapi.testclient import TestClient
+from mcp.client import Client
+from mcp.types import TextContent
 from pydantic import TypeAdapter
 from xippios.core import (
     InvalidRequestError,
@@ -53,7 +60,8 @@ from xippios.core.testing import (
 from xippios.usda.esmis.models import Release as EsmisRelease
 from xippios.usda.esmis.models import ReleaseFile, ReleaseResults
 
-from xippios.usda.wasde import tasks
+from xippios.usda.wasde import _client, tasks
+from xippios.usda.wasde import mcp as wasde_mcp
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.http import router
 from xippios.usda.wasde.mcp import server
@@ -91,7 +99,14 @@ JULY_2010_PRINTED = datetime(2010, 7, 9, 12, 0)
 PACKAGED_FETCHED = datetime(2026, 10, 28, 16, 26, 51, tzinfo=UTC)
 """The packaged lists' ``fetched``, when the refresh script's XML download was complete."""
 FILE_KEYS = {"param", "endpoint", "fetched", "note", "records"}
-"""The keys a packaged file may hold (ADR-0022, amendment point 8)."""
+"""The keys a packaged file may hold (sdk-core ADR-0041, decision 5)."""
+OUT_OF_DATE = "If upstream added it since, the packaged list is out of date."
+"""How core's ``UnknownCode`` ends from core 0.4.0, a sentence an agent can act on."""
+
+
+def task_and_tool(task: str) -> str:
+    """A task named in a refusal with its MCP tool, as conventions §8 asks."""
+    return f"{task} (over MCP, the tool {tool_name(SOURCE, getattr(tasks, task))})"
 
 
 def page_0() -> list[EsmisRelease]:
@@ -142,7 +157,7 @@ def test_a_release_is_a_projection_of_esmis_release() -> None:
         assert_projection(
             release,
             upstream,
-            files=tasks._files(upstream),
+            files=upstream.release_files(),
             revision=release.revision,
             month=upstream.release_datetime.strftime("%Y-%m"),
         )
@@ -370,6 +385,8 @@ def test_get_table_refuses_a_page_list_tables_lacks(
         f"Did you mean {first}"
     )
     assert "'sr' and its two-digit printed number: page 12 is 'sr12'" in message
+    assert f"{task_and_tool('list_tables')} lists the pages." in message
+    assert message.endswith(OUT_OF_DATE)
     assert isinstance(caught.value, InvalidRequestError)
     assert respx_mock.calls.call_count == 0, "refused before anything is sent"
 
@@ -563,6 +580,22 @@ def test_get_balance_sheet_refuses_a_near_miss_naming_the_closest(
     assert respx_mock.calls.call_count == 0, "refused before anything is sent"
 
 
+@pytest.mark.parametrize(
+    ("commodity", "region", "task"),
+    [("corn", "United States", "list_commodities"), ("Wheat", "argentina", "list_regions")],
+)
+def test_a_balance_sheet_refusal_names_the_list_task_with_its_tool(
+    respx_mock: respx.MockRouter, commodity: str, region: str, task: str
+) -> None:
+    """The list task that names the known values is named with its tool (conventions §8)."""
+    with pytest.raises(UnknownCode) as caught:
+        tasks.get_balance_sheet(commodity, region)
+    message = str(caught.value)
+    assert task_and_tool(task) in message
+    assert message.endswith(OUT_OF_DATE)
+    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
+
+
 def test_a_balance_sheet_the_file_lacks_is_not_found(replay_fixture: ReplayFixture) -> None:
     """The replayed body holds pages 11 and 24, not the world corn pages 22 and 23."""
     replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
@@ -572,7 +605,8 @@ def test_a_balance_sheet_the_file_lacks_is_not_found(replay_fixture: ReplayFixtu
         "wasde1026.xml of release 796099 holds no record of 'Corn' for 'Argentina' in sr22 "
         "matrix1 'World Corn Supply and Use  1/'; sr22 matrix2 'World Corn Supply and Use  "
         "1/'; sr23 matrix1 \"World Corn Supply and Use  1/  (Cont'd.)\", as the packaged list "
-        "read them from October 2026; get_table answers a page as that month prints it"
+        "read them from October 2026; get_table (over MCP, the tool usda_wasde_get_table) "
+        "answers a page as that month prints it"
     )
 
 
@@ -902,6 +936,183 @@ async def test_a_refusal_reaches_the_agent_as_text(respx_mock: respx.MockRouter)
     text = await mcp_call_text(server, "usda_wasde_get_balance_sheet", {"commodity": "corn"})
     assert text.startswith("error: UnknownCode: 'corn' is not a commodity")
     assert respx_mock.calls.call_count == 0
+
+
+async def tool_result(name: str, arguments: dict[str, Any]) -> tuple[bool, str]:
+    """A tool's answer through an in-process client: its ``isError`` flag and its text."""
+    async with Client(server) as client:
+        result = await client.call_tool(name, arguments)
+    content = result.content[0]
+    assert isinstance(content, TextContent), result.content
+    return result.is_error, content.text
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("arguments", "text"),
+    [
+        ({"commodity": "corn"}, "error: UnknownCode: 'corn' is not a commodity"),
+        ({}, "error: InvalidRequestError: commodity: Field required"),
+    ],
+    ids=["a-refusal-of-the-task", "a-refusal-of-the-schema"],
+)
+async def test_an_error_answer_sets_is_error(
+    respx_mock: respx.MockRouter, arguments: dict[str, Any], text: str
+) -> None:
+    """A client tells a refusal from data by the flag, not only by the text (core 0.4.0)."""
+    flagged, answer = await tool_result("usda_wasde_get_balance_sheet", arguments)
+    assert flagged
+    assert answer.startswith(text)
+    assert respx_mock.calls.call_count == 0
+
+
+@pytest.mark.anyio
+async def test_an_answer_with_data_is_no_error() -> None:
+    flagged, answer = await tool_result("usda_wasde_list_tables", {"search": "sr12"})
+    assert not flagged
+    assert json.loads(answer)["data"][0]["report"] == "sr12"
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("name", "arguments", "text"),
+    [
+        (
+            "usda_wasde_get_table",
+            {"table": "sr12", "year": 2026},
+            "error: InvalidRequestError: year: Not an argument of this tool; it takes table, month",
+        ),
+        (
+            "usda_wasde_list_tables",
+            {"serch": "wheat"},
+            "error: InvalidRequestError: serch: Not an argument of this tool; it takes search",
+        ),
+    ],
+    ids=["get_table", "list_tables"],
+)
+async def test_a_tool_refuses_an_argument_it_does_not_declare(
+    respx_mock: respx.MockRouter, name: str, arguments: dict[str, Any], text: str
+) -> None:
+    """Refused before the tool runs, where 0.1 dropped the argument and ran without it."""
+    flagged, answer = await tool_result(name, arguments)
+    assert flagged
+    assert answer == text
+    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
+
+
+@pytest.mark.parametrize(
+    ("path", "detail"),
+    [
+        ("/usda-wasde/get_table", "table: Field required"),
+        ("/usda-wasde/get_balance_sheet?region=Mexico", "commodity: Field required"),
+        (
+            "/usda-wasde/list_releases?since=2026-13-01",
+            "since: Input should be a valid date or datetime, month value is outside expected "
+            "range of 1-12",
+        ),
+    ],
+    ids=["get_table", "get_balance_sheet", "list_releases"],
+)
+def test_a_route_refuses_an_argument_its_schema_refuses_as_problem_details(
+    respx_mock: respx.MockRouter, path: str, detail: str
+) -> None:
+    """HTTP 422 as problem details before the task runs, the input never echoed."""
+    app = FastAPI()
+    app.include_router(router)
+    with TestClient(app) as http:
+        answer = http.get(path)
+    assert answer.status_code == 422
+    assert answer.headers["content-type"] == "application/problem+json"
+    problem = answer.json()
+    assert (problem["title"], problem["detail"], problem["source"]) == (
+        "InvalidRequestError",
+        detail,
+        SOURCE,
+    )
+    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
+
+
+def test_the_package_reads_no_variable() -> None:
+    """``ENV_VARS``, the list a host reads beside ``SOURCE``, is empty: the API is keyless."""
+    assert _client.ENV_VARS == ()
+    assert "ENV_VARS" in _client.__all__
+    assert wasde_mcp.ENV_VARS is _client.ENV_VARS
+
+
+def test_build_is_the_tool_set_the_server_serves() -> None:
+    """A host serves ``build()`` as the entry point does: every task but the bulk one."""
+    tools = wasde_mcp.build()
+    served = [name for name in tasks.__all__ if name not in tasks.BULK_TASKS]
+    assert [task.__name__ for task in tools.tasks] == served
+    assert tools.source == SOURCE
+    assert dict(tools.caps or {}) == dict(tasks.MCP_CAPS)
+
+
+ENTRY_POINT = Path(sys.executable).parent / "xippios-usda-wasde-mcp"
+"""The installed entry point, ``[project.scripts]`` of ``pyproject.toml``."""
+PLAIN = {"PYTHON_COLORS": "0", "COLUMNS": "100"}
+"""The terminal the entry point's text is compared in: no colors, which Python 3.14's
+argparse adds under ``FORCE_COLOR``, and a width that keeps the usage line whole."""
+
+
+def entry_point(*arguments: str) -> subprocess.CompletedProcess[str]:
+    """The entry point run with ``arguments``, which stop it before it serves."""
+    return subprocess.run(
+        [str(ENTRY_POINT), *arguments],
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+        env={**os.environ, **PLAIN},
+    )
+
+
+def test_the_entry_point_names_itself_in_its_usage_and_errors() -> None:
+    """Core 0.4.0 names the entry point that runs, where 0.1 named the server's slug."""
+    run = entry_point("--bogus")
+    assert run.returncode == 2
+    assert run.stderr.startswith("usage: xippios-usda-wasde-mcp [-h]")
+    assert run.stderr.splitlines()[-1] == (
+        "xippios-usda-wasde-mcp: error: unrecognized arguments: --bogus"
+    )
+
+
+def test_allow_remote_changes_nothing_on_this_read_server() -> None:
+    run = entry_point("--help")
+    assert run.returncode == 0
+    assert "--allow-remote changes nothing: this read server is not held to loopback" in (
+        " ".join(run.stdout.split())
+    )
+
+
+SAMPLED = [
+    ("wasde1026_xml", SAMPLE),
+    ("wasde1026_xml_sr11_sr24", SR11_SR24),
+    ("wasde1026_xls", XLS_SAMPLE),
+]
+"""The download fixtures whose body is a sample of the file, with that sample."""
+
+
+@pytest.mark.parametrize(("case", "sample"), SAMPLED, ids=[case for case, _ in SAMPLED])
+def test_a_download_fixture_carries_its_sample_marked_sample(case: str, sample: Path) -> None:
+    """The body is the sample the parser tests read, marked ``sample``, never ``truncated``.
+
+    ``truncated`` is the recorder's cut; a sample the source cut is marked ``sample`` with
+    the whole file's size and sha256 (sdk-core ADR-0020, amendment 2026-11-18, point a).
+    """
+    response = load_fixture(FIXTURES / "download_release_file" / f"{case}.json").response
+    assert (response.sample, response.truncated) == (True, False)
+    assert response.content == sample.read_bytes()
+    assert response.original_bytes is not None
+    assert response.original_bytes > len(response.content)
+
+
+def test_the_pdf_download_fixture_is_the_whole_file() -> None:
+    response = load_fixture(
+        FIXTURES / "download_release_file" / "wasde-07-09-2010_pdf.json"
+    ).response
+    assert (response.sample, response.truncated) == (False, False)
+    assert response.content == PDF_SAMPLE.read_bytes()
 
 
 def test_every_task_is_tested_through_the_mcp_server_or_is_bulk() -> None:

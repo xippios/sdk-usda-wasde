@@ -14,10 +14,10 @@ follows, sdk-core's conventions among them, are listed under
 | API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.1.1 |
 | Documentation | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates and WAOB's pages under https://www.usda.gov/oce/commodity/wasde, snapshotted in `docs/upstream/` by `scripts/refresh_upstream.py` (`/refresh-upstream`); a page www.usda.gov refuses to automated requests is kept from USDA's CDN origin, usda.azureedge.us; no page names an OpenAPI or Swagger document, so `SPEC_URL` is `None`; the file layouts, as observed, in `docs/upstream/layout.md` |
 | Credentials | none; the API is open |
-| Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; sdk-core ADR-0010), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
+| Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; sdk-core ADR-0033), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
 | Write tools | no, this package is read-only |
 | Files | a release carries XML, XLS, TXT and PDF since 2016-10 (`docs/upstream/layout.md`); parsed in `parse/`, one module per file kind: the XML with the standard library's `xml.etree.ElementTree` (`parse/wasde_xml.py`); the XLS's narrative, sheet `WASDE Text`, with xlrd, a dependency (`parse/wasde_xls.py`), whose block titles of pages 12 to 15 the refresh script reads as well (`_vocabulary.py`); the PDF's narrative pages with pypdf, a dependency, text only (`parse/wasde_pdf.py`; sdk-core ADR-0020 decision 4); the TXT is not read; the parser tests read the samples under `tests/fixtures/files/`, their provenance in its `README.md` (sdk-core ADR-0020) |
-| Depends on | `xippios-usda-esmis~=0.1.0`: the task layer and its models only, never `api/` or `_client`; this package's servers serve its own tasks, and an agent that wants a dependency's tools runs that package's server (sdk-core ADR-0021); used to list WASDE's releases in ESMIS's catalog and to download their files |
+| Depends on | `xippios-usda-esmis~=0.3.0`: the task layer and its models only, never `api/` or `_client`; this package's servers serve its own tasks, and an agent that wants a dependency's tools runs that package's server (sdk-core ADR-0021); used to list WASDE's releases in ESMIS's catalog and to download their files |
 
 The snapshot listed in `docs/upstream/FETCHED.md` is the reference for names, parameters and
 semantics; a wrapper is never written from memory of the API.
@@ -29,7 +29,7 @@ src/xippios/usda/wasde/
   __init__.py      public surface: __version__ and re-exported task functions
   py.typed         PEP 561 marker; consumers' mypy --strict needs it
   _version.py      __version__ from distribution metadata
-  _client.py       the one configured AsyncClient (base URL, rate limit) and classify,
+  _client.py       the one configured AsyncClient (base URL, rate limit), ENV_VARS and classify,
                    upstream's documented error shapes
   errors.py        the package's own error classes, where conventions §5 calls for one
   models.py        pydantic models mirroring upstream payloads (UpstreamModel); by the
@@ -51,7 +51,7 @@ src/xippios/usda/wasde/
                    call them, no task does
   tasks.py         task functions; __all__ is what the adapters register, but BULK_TASKS,
                    the Python-only ones; MCP_CAPS any per-tool result caps
-  mcp.py           xippios-usda-wasde-mcp entry point
+  mcp.py           xippios-usda-wasde-mcp entry point: build() the tool set, server
   http.py          FastAPI router
   params.py        PACKAGED_LISTS, the four packaged lists' names
   enums.py         empty: no value list is packaged, so no enum is generated
@@ -86,6 +86,7 @@ tests/
   test_tasks.py    per-task replay tests, every tool through the MCP server, the list tasks
                    on the packaged files
   test_reference.py  the packaged lists against the samples, the list rules and refusals
+  test_cut_sample.py  cut_sample.py's download fixture, its sample marked, written offline
   test_live.py     @pytest.mark.live smoke tests, one per task, the live parser tests on the
                    latest XML, XLS and PDF, and the packaged lists against the latest XML and
                    XLS, which one session fixture fetches once with the PDF
@@ -130,7 +131,7 @@ uv run xippios-usda-wasde-mcp   # stdio; add --http for streamable HTTP
 ```
 
 `uv run pytest` is offline: core's plugin refuses the network and skips the rate limiter's
-waits in every test not marked `live` (conventions §10, sdk-core ADR-0013). A test that
+waits in every test not marked `live` (conventions §10, sdk-core ADR-0035). A test that
 asserts a limiter wait or a quota pause is marked `rate_limited`, one that must reach the
 network `network`.
 
@@ -152,6 +153,15 @@ and counts, never on a raw payload.
 - Upstream's documented error shapes go into `classify` in `_client.py`, once, and an error
   class of the package's own into `errors.py`; a wrapper never inspects a status code
   (conventions §5, §6).
+- One limiter paces each host the package sends to (conventions §2, §6). A second base URL
+  on the host of the API base URL goes through the one `client` of `_client.py` by its
+  absolute URL, and `classify`'s path checks name both bases. An origin or mirror that the
+  publisher runs itself, where its canonical host refuses automated requests, takes that
+  host's pace through the same client, and `docs/upstream/` names both hosts; a mirror that
+  anyone else runs is never sent to. A host that a dependency sends to is reached through
+  the dependency's tasks alone. Any other host gets a client of its own in `_client.py`,
+  its base URL and its `RateLimit` beside the first's, and a row of its own in the table
+  under What this package wraps, with its pace and where the pace comes from.
 - A change brings its tests, written before the code, and passes the offline checks above;
   its changelog entry is a fragment under `changelog/`, one file holding its bullet, as
   `changelog/README.md` lays it out (conventions §12). Commit subjects follow Conventional
@@ -166,16 +176,17 @@ and counts, never on a raw payload.
 
 - Never hand-write a fixture, and never commit one without grepping it for key patterns
   (conventions §10).
-- Never read or print `.envrc`, `.env`, or any variable ending in `_API_KEY`,
-  `_REFRESH_TOKEN` or `_SECRET`.
+- Never read or print `.envrc`, `.env`, or any variable ending in `_API_KEY`, `_TOKEN`
+  or `_SECRET`.
 - Never write a key, a token or another credential into a file or a commit.
 - Never put logic in `mcp.py` or `http.py`, and never add a route or a tool by hand: the
   adapters register `tasks.__all__` (sdk-core ADR-0001).
-- Never rename or re-map an upstream concept to another source's (sdk-core ADR-0003).
+- Never rename or re-map an upstream concept to another source's (sdk-core ADR-0028).
 - Never return a documented personal identifier in a task's projection, echo one in
   `meta.request`, or commit one in a fixture (sdk-core ADR-0017).
-- Never edit `docs/upstream/` by hand: `/refresh-upstream` fetches it, and the pull request
-  shows its diff (conventions §3).
+- Never edit `docs/upstream/` by hand but `docs/upstream/layout.md`, the notes on what
+  upstream does but never documents, the file layouts as observed: `/refresh-upstream`
+  fetches the rest, and the pull request shows its diff (conventions §3).
 - Never add `src/xippios/__init__.py`, nor an `__init__.py` at a level between it and the
   package (sdk-core ADR-0006).
 - Never push a tag by hand: a release's tag comes from `publish.yml` alone (conventions §12).
@@ -187,7 +198,7 @@ template release reaches it in a pull request of its own, with
 `uvx --from 'copier>=9.19' copier update --defaults --vcs-ref=<tag>` (conventions §15): the
 update renders the template's files again and never overwrites the files this package
 fills, `__init__.py`, `_client.py`, `errors.py`, `models.py`, `api/`, `parse/`, `tasks.py`,
-`params.py`, `enums.py`, `reference/`, `scripts/refresh_reference.py`,
+`tasks_write.py`, `params.py`, `enums.py`, `reference/`, `scripts/refresh_reference.py`,
 `scripts/refresh_upstream.py`, `tests/test_tasks.py`, `tests/test_live.py`,
 `tests/fixtures/`, `docs/upstream/`, `docs/adr.md`, `docs/adr.json`, `README.md`,
 `CHANGELOG.md` and `CLAUDE.md`. sdk-template's
@@ -207,7 +218,7 @@ semantics or the shape of the public API.
   re-shape esmis's tasks into `Release` (`UpstreamModel.project`: id and time copied,
   files, revision and month parsed from esmis's fields) and keep esmis's `meta.endpoint`
   (`esmis_api_release_findByIdentifier`), `meta.total` and printed release time
-  (`published_at` with `+0000` dropped, `published_at_naive`; sdk-core ADR-0022). A month
+  (`published_at` with `+0000` dropped, `published_at_naive`; sdk-core ADR-0041). A month
   is `"YYYY-MM"`, the printed date's. Since 2024-12 a reposted month is one release whose
   files carry `v2` (`wasde0626v2.xml`; `Release.revision`) and the original is not
   catalogued, so such a month answers its revision. Release 95621 (2013-08) lists the
@@ -272,7 +283,7 @@ semantics or the shape of the public API.
   the world table's U.S. rows for Coarse Grain, Corn, Rice, Soybean, Soybean Meal and
   Soybean Oil, which have no U.S. matrix under that name. A record is kept where its
   page, matrix and title are a packaged matrix's: a month's file that holds none raises
-  `NotFoundError`. The MCP caps (`MCP_CAPS`; sdk-core ADR-0016; Johannes, 2026-10-28, G5
+  `NotFoundError`. The MCP caps (`MCP_CAPS`; sdk-core ADR-0038; Johannes, 2026-10-28, G5
   inside PR 5): `get_table` 400 rows or 128 KB, its note naming `get_balance_sheet` for
   one matrix or region and Python for the whole page; `get_balance_sheet` 300 rows or 128
   KB, its note naming a region on the world pages and Python for the whole matrix;
@@ -306,10 +317,12 @@ semantics or the shape of the public API.
   `download_release_file/` are the recorded exchanges, `wasde1026_xml.json` with the
   sample `sr08_sr35_sr36.xml` as its body, `wasde1026_xml_sr11_sr24.json` with
   `sr11_sr24.xml` and `wasde1026_xls.json` with the XLS sample (base64), each marked
-  `truncated` with the whole file's `original_bytes` and `sha256`, rewritten in the
-  script's own step (sdk-core ADR-0024), and `wasde-07-09-2010_pdf.json` with the whole
-  PDF (base64); detect-secrets reads those sha256 values and base64 bodies as secrets,
-  and `.secrets.baseline` holds them audited, `is_secret: false` (gap, row 124). Release
+  `sample` with the whole file's `original_bytes` and `sha256`, rewritten in the script's
+  own step and written with core's `write_fixture` (sdk-core ADR-0020, amendment
+  2026-11-18, point a; sdk-core ADR-0042, decision 4), and `wasde-07-09-2010_pdf.json`
+  with the whole PDF (base64); the secret scan skips their `sha256` lines and reads the
+  two base64 bodies, the XLS's and the PDF's, as secrets, which `.secrets.baseline`
+  holds audited, `is_secret: false` (gap, row 124). Release
   95659 carries an XLS too, so the PDF path replays it with its XLS left out. `.gitattributes` marks
   `tests/fixtures/files/**` `-text`, so no checkout converts the samples' CRLF (gap,
   row 189). The catalog fixtures are esmis's
@@ -349,7 +362,7 @@ semantics or the shape of the public API.
   the XML and for the XLS), about 3.7 MiB, at esmis's pace. The lists are refreshed
   before each release, in the release train's refresh PR (conventions §12), so each
   release ships the lists of the latest WASDE, its month
-  their vintage (sdk-core ADR-0022 decision 1); a refresh that reproduces them record for
+  their vintage (sdk-core ADR-0041 decision 1); a refresh that reproduces them record for
   record needs no PR: 0.1.1 ships those of ESMIS release 796099 (October 2026), which the
   refresh of 2026-10-28 reproduced. `--keep DIR` keeps the downloaded files with what
   the run learnt of them, `--from DIR` rebuilds from them without a request.

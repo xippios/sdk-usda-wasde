@@ -19,15 +19,15 @@ classifiers = [
 ]
 dependencies = [
   "pypdf>=6.21",
-  "xippios-core~=0.3.0",
-  "xippios-usda-esmis~=0.1.0",
+  "xippios-core~=0.4.0",
+  "xippios-usda-esmis~=0.3.0",
   "xlrd>=2.0.2",
 ]
 
 [project.optional-dependencies]
-mcp = ["xippios-core[mcp]~=0.3.0"]
-http = ["xippios-core[http]~=0.3.0"]
-testing = ["xippios-core[testing]~=0.3.0"]
+mcp = ["xippios-core[mcp]~=0.4.0"]
+http = ["xippios-core[http]~=0.4.0"]
+testing = ["xippios-core[testing]~=0.4.0"]
 
 [project.scripts]
 xippios-usda-wasde-mcp = "xippios.usda.wasde.mcp:run"

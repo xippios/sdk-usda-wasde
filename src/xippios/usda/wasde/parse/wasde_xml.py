@@ -1,4 +1,4 @@
-"""Parse a WASDE release's XML file into one record per value (ADR-0020).
+"""Parse a WASDE release's XML file into one record per value (sdk-core ADR-0020).
 
 The file is the tables of printed pages 8 to 37 as an XML export of a reporting tool
 (``docs/upstream/layout.md``): a root ``<Report Name="wasde">`` holds one ``<srNN>`` per
@@ -45,7 +45,7 @@ October 2026 file uses, its counts in ``layout.md``:
 Any other attribute of a page's ``<Report>`` or of an element inside it raises
 ``ValidationError`` naming the page, the element and the attribute, as does a dimension
 met twice on one path: a layout change upstream breaks the parser loudly, never
-silently (ADR-0020, consequences). So does a file that is not well-formed XML, whose
+silently (sdk-core ADR-0020, consequences). So does a file that is not well-formed XML, whose
 root is not ``<Report Name="wasde">`` with no other attribute, or whose ``<srNN>`` does
 not hold exactly one ``<Report>``; the attributes of ``<srNN>`` itself are not read.
 
@@ -196,9 +196,8 @@ def _by_item(texts: list[str], items: int, kind: str, report: str) -> list[str |
 
 
 def _value(text: str) -> Decimal | None:
-    """The printed text as a number, ``None`` where it is no finite number."""
-    number = parse_decimal(text)
-    return number if number is not None and number.is_finite() else None
+    """The printed text as a number, ``None`` where it is no finite number (core's rule)."""
+    return parse_decimal(text)
 
 
 def _unit(page: _Page, walk: _Walk, statistic: str | None) -> str | None:

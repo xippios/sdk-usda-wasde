@@ -1,11 +1,11 @@
-"""Build the four packaged lists from one WASDE release's files (conventions §3, ADR-0022).
+"""Build the four packaged lists from one WASDE release's files (conventions §3, sdk-core ADR-0041).
 
 ``scripts/refresh_reference.py`` calls these on the latest release's XML and XLS and
 writes what they return to ``reference/`` with ``PackagedList.write``; the live tests
 call them on the current release and compare it with the packaged lists. No task calls
 them: the list tasks answer from the packaged files, and the package reads no XLS at
 call time. So ``block_titles`` reads the XLS and ``tables`` the XML's page headers here,
-beside ``parse/``, which ADR-0020 decision 1 names for the file kinds a task returns:
+beside ``parse/``, which sdk-core ADR-0020 decision 1 names for the file kinds a task returns:
 these read only what the refresh script and the live tests need (the session,
 2026-10-28, rule 7; gap row 195).
 

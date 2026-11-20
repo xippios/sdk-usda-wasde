@@ -1,7 +1,7 @@
 """Pydantic models mirroring what this package returns, one ``UpstreamModel`` per record.
 
 Conventions §3 and ``/add-endpoint`` give the rules; for a file, fidelity applies to the
-file (ADR-0020): labels, units and footnote markers kept as text as printed, nothing
+file (sdk-core ADR-0020): labels, units and footnote markers kept as text as printed, nothing
 renamed, converted or joined across files. A ``WasdeXmlCell`` field is named after the
 file's attribute, snake_cased with the matrix index removed (``m1_commodity1`` is
 ``commodity``, ``attribute_group2`` is ``attribute_group``), with three exceptions
@@ -15,18 +15,18 @@ pages spell several ways is folded into one field (``attr_desc`` into ``attribut
 name into ``statistic``.
 
 ``Release`` is ESMIS's release of WASDE, re-shaped from ``xippios-usda-esmis``'s model
-(ADR-0021); ``WasdeXmlCell`` is one value of a release's XML file, as
+(sdk-core ADR-0021); ``WasdeXmlCell`` is one value of a release's XML file, as
 ``parse.wasde_xml.parse_wasde_xml`` reads it, and ``WasdeTableValue`` its projection
 without the page's labels, which ``get_table`` and ``get_balance_sheet`` answer;
 ``WasdeXlsText`` one paragraph of the
 narrative in its XLS file and ``WasdePdfPage`` one narrative page of its PDF, as
 ``parse.wasde_xls.parse_wasde_xls`` and ``parse.wasde_pdf.parse_wasde_pdf`` read them, text
-only (ADR-0020 decision 4). ``Table``, ``Commodity``, ``Region`` and
+only (sdk-core ADR-0020 decision 4). ``Table``, ``Commodity``, ``Region`` and
 ``Attribute`` are the records of the four packaged lists under ``reference/``, which
 ``scripts/refresh_reference.py`` writes from the latest release's files (conventions §3,
-ADR-0022): labels as the files print them, each record with the ``report_month`` of the
+sdk-core ADR-0041): labels as the files print them, each record with the ``report_month`` of the
 release it was read from. No record here carries a documented personal identifier
-(ADR-0017).
+(sdk-core ADR-0017).
 """
 
 from decimal import Decimal
@@ -258,7 +258,7 @@ class WasdePdfPage(UpstreamModel):
 
     One record per narrative page, from page 1 up to the page headed Interagency
     Commodity Estimates Committees, as ``parse.wasde_pdf.parse_wasde_pdf`` reads it with
-    pypdf: text only, never a number read as a figure (ADR-0020 decision 4).
+    pypdf: text only, never a number read as a figure (sdk-core ADR-0020 decision 4).
 
     Attributes:
         page: The page's number in the file, counted from 1, e.g. ``1``; the narrative

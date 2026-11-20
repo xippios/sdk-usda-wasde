@@ -1,4 +1,4 @@
-"""Parser tests on the PDF sample of ``tests/fixtures/files/wasde_pdf/`` (ADR-0020).
+"""Parser tests on the PDF sample of ``tests/fixtures/files/wasde_pdf/`` (sdk-core ADR-0020).
 
 The sample is the July 2010 release's PDF, whole (release 95659,
 ``tests/fixtures/files/README.md``). The tests assert the narrative rule's shape, never a
@@ -56,7 +56,7 @@ def test_july_2010_prints_its_narrative_on_pages_1_to_5() -> None:
 
 
 def test_no_page_after_the_headings_is_read(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The tables of pages 8 to 37 are never extracted (ADR-0020 decision 4)."""
+    """The tables of pages 8 to 37 are never extracted (sdk-core ADR-0020 decision 4)."""
     read: list[int] = []
     extract = PageObject.extract_text
 

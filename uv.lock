@@ -1466,15 +1466,15 @@ wheels = [
 
 [[package]]
 name = "xippios-core"
-version = "0.3.0"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/d0/ec4dc01cfc5c0beb97fea05defee907baae96fc894a7227ea6d8cb9c4c8c/xippios_core-0.3.0.tar.gz", hash = "sha256:e7a315a943daf8bdc89fdab7e43f5bafa120cf85bc623e63c71b7c1d23ab771c", size = 282204, upload-time = "2026-10-27T17:08:20.136Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/c5/9751088493aaf31466681253c76bc383226fd3e6715e5de8c8e8f89eb6d9/xippios_core-0.4.0.tar.gz", hash = "sha256:2582ec43655e1621696efe1403bf548d69480a6375c3f30e7789b206b71d7e09", size = 540145, upload-time = "2026-11-18T15:14:30.017Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/58/52/a69bc864e92bfb6eb8c856ce9157ee1d4a16ba0970b80bce7798a0b4ef6e/xippios_core-0.3.0-py3-none-any.whl", hash = "sha256:f46248b58e905f29b6307608ebba7b9f1b2ca82287a99bbf3d7b5e8897a0a603", size = 120748, upload-time = "2026-10-27T17:08:18.326Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/6d/c415937b9d321abd0d75b3a3a3d50e1cb1e8ab02f67c8cbdc87ada121584/xippios_core-0.4.0-py3-none-any.whl", hash = "sha256:cc35a55f2700e05b429351c21579a102430088a2b0b516668ac8dc5354f8809d", size = 176291, upload-time = "2026-11-18T15:14:28.301Z" },
 ]
 
 [package.optional-dependencies]
@@ -1494,14 +1494,14 @@ testing = [
 
 [[package]]
 name = "xippios-usda-esmis"
-version = "0.1.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "xippios-core" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/ff/1744dfd6a882802d78d9dd9fc2d72a0e2a5a277f53c84072be8adbb959d8/xippios_usda_esmis-0.1.0.tar.gz", hash = "sha256:978ee032d45dfa30e130c6b8310a1d564c3da04470b6a0023944be615fe3b70b", size = 111448, upload-time = "2026-10-27T19:57:55.073Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/87/0c/bf8eebab86ae34589f5146a337f831dd3d2f88f1afba954891c16ad46fe1/xippios_usda_esmis-0.3.0.tar.gz", hash = "sha256:d953e76ff92fdcb1348a54d7754905bfaae27ac198aa55ff947c78b986bd1109", size = 121779, upload-time = "2026-11-20T13:27:07.58Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/1e/8a0aacf4f6ada7f218c45f918b36fef7976b1890339a329053c3cb67dc23/xippios_usda_esmis-0.1.0-py3-none-any.whl", hash = "sha256:c15f58c7c54efcdc10f876e5ff762247b42c7f7a470715eeb69ae9e9c8f08e8e", size = 119815, upload-time = "2026-10-27T19:57:53.762Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/ac/2306a5adabd08f72da96c619438e430b4b2d924e8a685fcd2089093c9994/xippios_usda_esmis-0.3.0-py3-none-any.whl", hash = "sha256:9b27cd43673033fd8b43dde7bc45a30d1a139dd76921881990f019e1e1f53c5e", size = 122667, upload-time = "2026-11-20T13:27:06.269Z" },
 ]
 
 [[package]]
@@ -1543,11 +1543,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "pypdf", specifier = ">=6.21" },
-    { name = "xippios-core", specifier = "~=0.3.0" },
-    { name = "xippios-core", extras = ["http"], marker = "extra == 'http'", specifier = "~=0.3.0" },
-    { name = "xippios-core", extras = ["mcp"], marker = "extra == 'mcp'", specifier = "~=0.3.0" },
-    { name = "xippios-core", extras = ["testing"], marker = "extra == 'testing'", specifier = "~=0.3.0" },
-    { name = "xippios-usda-esmis", specifier = "~=0.1.0" },
+    { name = "xippios-core", specifier = "~=0.4.0" },
+    { name = "xippios-core", extras = ["http"], marker = "extra == 'http'", specifier = "~=0.4.0" },
+    { name = "xippios-core", extras = ["mcp"], marker = "extra == 'mcp'", specifier = "~=0.4.0" },
+    { name = "xippios-core", extras = ["testing"], marker = "extra == 'testing'", specifier = "~=0.4.0" },
+    { name = "xippios-usda-esmis", specifier = "~=0.3.0" },
     { name = "xlrd", specifier = ">=2.0.2" },
 ]
 provides-extras = ["mcp", "http", "testing"]

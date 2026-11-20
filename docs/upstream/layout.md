@@ -3,11 +3,11 @@
 **Observed, not documented.** No upstream page documents the layout of the files a WASDE
 release carries (`FETCHED.md`, "Not snapshotted"). This file describes them as they were
 observed on 2026-10-28 in the four files of one release and in ESMIS's list of every
-WASDE release, as ADR-0020 decision 2 asks for file-format notes. It is written by hand
+WASDE release, as sdk-core ADR-0020 decision 2 asks for file-format notes. It is written by hand
 from those files, not fetched: `scripts/refresh_upstream.py` neither writes nor checks
 it, and `FETCHED.md` lists it in a row of its own. What it states holds for the files
 below; a parser that relies on it is checked against the current release by its live
-test (ADR-0020 decision 6).
+test (sdk-core ADR-0020 decision 6).
 
 ## What it was written from
 
@@ -36,7 +36,7 @@ the 703 WASDE releases that xippios-usda-esmis's `list_releases("wasde")` return
 | PDF | PDF 1.6, 40 pages | the whole report: narrative, tables, back matter |
 
 The numbers a task returns come from the XML, the XLS or the TXT, never from the PDF
-(ADR-0020 decision 4).
+(sdk-core ADR-0020 decision 4).
 
 ## XML
 

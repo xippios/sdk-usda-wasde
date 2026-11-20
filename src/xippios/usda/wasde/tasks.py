@@ -4,7 +4,7 @@
 
 This package sends no request of its own: ESMIS's catalog and the download are
 ``xippios-usda-esmis``'s tasks, which it imports with their models and nothing else, never
-``api/`` or ``_client`` (ADR-0021), for the publication whose ESMIS identifier is
+``api/`` or ``_client`` (sdk-core ADR-0021), for the publication whose ESMIS identifier is
 ``"wasde"``. The pace is esmis's client's, 30 requests a minute.
 
 What every task follows:
@@ -15,10 +15,10 @@ What every task follows:
   ``meta.endpoint``, the operationId they rest on (``esmis_api_release_findByIdentifier``),
   its ``meta.total`` and, for one release, its release time: ``meta.published_at`` is
   ``release_datetime`` as ESMIS prints it with its ``+0000`` dropped, flagged
-  ``published_at_naive`` (ADR-0022), and ``meta.vintage`` the release id, as esmis's
+  ``published_at_naive`` (sdk-core ADR-0041), and ``meta.vintage`` the release id, as esmis's
   release tasks set them. ``meta.request`` holds the parameters the caller gave, none
   left ``None``.
-- ``get_release`` reads a file (conventions §4, ADR-0020 decision 5):
+- ``get_release`` reads a file (conventions §4, sdk-core ADR-0020, amendment 2026-11-18, point c):
   ``meta.endpoint`` is the file's name as ESMIS catalogs it (``"wasde1026.xml"``),
   ``meta.vintage`` the file's ``Report_Month`` as printed (``"October 2026"``),
   ``meta.published_at`` the release time as above, ``meta.request`` the month given, the
@@ -43,18 +43,18 @@ What every task follows:
   ``InvalidRequestError``, naming the closest (core's ``closest`` on the texts, whatever
   their case). A region is matched as printed with its indent and footnote marker left
   out (gap, row 195). A slice the month's file does not hold raises ``NotFoundError``.
-- ``read_report_text`` reads the narrative (ADR-0020 decision 4): the release's XLS,
+- ``read_report_text`` reads the narrative (sdk-core ADR-0020 decision 4): the release's XLS,
   sheet ``WASDE Text`` (``parse.wasde_xls``), else its PDF's narrative pages
   (``parse.wasde_pdf``), text only, also where the XLS holds no narrative (Johannes,
   2026-10-28, G5 inside PR 5). ``meta.endpoint`` is the file read,
   ``meta.vintage`` the report month the XLS prints (``"October 2026"``), for a PDF the
   ESMIS release id as esmis prints it (``"95659"``; the session, 2026-10-28, rule 7;
-  ADR-0020 decision 5), ``meta.published_at`` the release time as for ``get_release``.
+  sdk-core ADR-0020 decision 5), ``meta.published_at`` the release time as for ``get_release``.
 - The packaged answers: ``list_tables``, ``list_commodities`` and ``list_regions`` answer
   from ``reference/table.json``, ``commodity.json`` and ``region.json``, the lists
   ``scripts/refresh_reference.py`` read from the latest release's files, through core's
   ``PackagedList``, without a request. Their ``meta`` is ``PackagedList.meta``'s
-  (ADR-0022, rule 1): ``retrieved_at`` the list's ``fetched``, ``endpoint`` the file it
+  (sdk-core ADR-0041, decision 1): ``retrieved_at`` the list's ``fetched``, ``endpoint`` the file it
   came from as catalogued (``"wasde1026.xml"``), ``vintage`` the release's
   ``Report_Month`` as printed (``"October 2026"``), which every record carries,
   ``published_at`` and ``total`` empty; ``meta.request`` holds ``search`` when given.
@@ -68,7 +68,6 @@ import tempfile
 from collections.abc import Callable, Iterable, Mapping
 from datetime import date
 from pathlib import Path
-from urllib.parse import urlsplit
 
 from xippios.core import (
     Downloaded,
@@ -113,11 +112,12 @@ __all__ = [
     "read_report_text",
 ]
 
-# A task named here is Python-only: no tool, no route; the adapters skip it (ADR-0019 decision 4).
+# A task named here is Python-only: no tool, no route; the adapters skip it (sdk-core ADR-0040
+# decision 4).
 BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 
 # MCP_CAPS, only where a tool needs a result cap of its own, keyed by the task function's
-# name (conventions §8, ADR-0016). The two slices answer WasdeTableValue, WasdeXmlCell
+# name (conventions §8, sdk-core ADR-0038). The two slices answer WasdeTableValue, WasdeXmlCell
 # without the page's labels (Johannes, 2026-10-28, G5 inside PR 5), about 350 bytes a
 # value, and each has a cap of its own whose note names how to see the rest (the same
 # decision): get_table 400 rows or 128 KB, get_balance_sheet 300 rows or 128 KB. Measured
@@ -167,20 +167,6 @@ _MARKER = re.compile(r"(?:\s+\d+/)+$")
 _REVISION = re.compile(r"v\d+$")
 
 
-def _files(release: EsmisRelease) -> list[ReleaseFile]:
-    """The release's files in ESMIS's order, read from each URL as esmis's tasks read it.
-
-    The name is the URL path's last segment as printed, the format its extension after
-    the last dot, lowercased, ``""`` without one (``list_release_files``).
-    """
-    files = []
-    for url in release.files:
-        name = urlsplit(url).path.rsplit("/", 1)[-1]
-        _, dot, extension = name.rpartition(".")
-        files.append(ReleaseFile(url=url, name=name, format=extension.lower() if dot else ""))
-    return files
-
-
 def _revision(files: list[ReleaseFile]) -> str | None:
     """The ``vN`` suffix every file name's stem carries, ``None`` when not all carry one."""
     suffixes = {
@@ -191,8 +177,12 @@ def _revision(files: list[ReleaseFile]) -> str | None:
 
 
 def _release(release: EsmisRelease) -> Release:
-    """ESMIS's release re-shaped: its id and time copied, files, revision and month parsed."""
-    files = _files(release)
+    """ESMIS's release re-shaped: its id and time copied, files, revision and month parsed.
+
+    The files are esmis's reading of the URLs, ``Release.release_files()``, in ESMIS's
+    order: the name the URL path's last segment, the format its extension, lowercased.
+    """
+    files = release.release_files()
     return Release.project(
         release,
         files=files,
@@ -309,11 +299,12 @@ def _file_meta(
     request: dict[str, object],
     vintage: str | None,
 ) -> ResultMeta:
-    """The meta of a task that reads a release's file (conventions §4, ADR-0020 decision 5).
+    """The meta of a task that reads a release's file (conventions §4).
 
-    ``endpoint`` the file's name as ESMIS catalogs it, ``retrieved_at`` when it was
-    complete, ``published_at`` the release time as printed, naive, ``request`` the
-    arguments the task was given with the release id and the file's URL.
+    ``endpoint`` the file's name as ESMIS catalogs it (sdk-core ADR-0020, amendment
+    2026-11-18, point c), ``retrieved_at`` when it was complete, ``published_at`` the
+    release time as printed, naive, ``request`` the arguments the task was given with the
+    release id and the file's URL.
     """
     return ResultMeta(
         source=SOURCE,
@@ -618,7 +609,8 @@ async def get_table_async(table: str, month: str | None = None) -> Result[list[W
                 },
             ),
             reason="A page is named as the XML names it, 'sr' and its two-digit printed "
-            "number: page 12 is 'sr12'; list_tables lists the pages.",
+            "number: page 12 is 'sr12'; list_tables (over MCP, the tool "
+            "usda_wasde_list_tables) lists the pages.",
             source=SOURCE,
         )
     result = await _read_xml(month, {"table": table, "month": month})
@@ -663,8 +655,9 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
             list_name="commodity",
             fetched=listed.fetched,
             closest=_closest(commodity, {name: ", ".join(on) for name, on in pages.items()}),
-            reason="A commodity is named as list_commodities prints it, its case kept: "
-            "'CORN' is page 12's U.S. corn, 'Corn' the world corn of pages 22 and 23.",
+            reason="A commodity is named as list_commodities (over MCP, the tool "
+            "usda_wasde_list_commodities) prints it, its case kept: 'CORN' is page 12's U.S. "
+            "corn, 'Corn' the world corn of pages 22 and 23.",
             source=SOURCE,
         )
     national = [
@@ -704,8 +697,9 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
         closest=found,
         hint=None if found else f"{commodity!r} is printed for {', '.join(choices)}.",
         reason=f"A region of {commodity!r} is 'United States' or 'Mexico' where it has a U.S. "
-        "or Mexico matrix, else one its world pages print, as list_regions lists it, matched "
-        "without its indent and footnote marker, its case kept.",
+        "or Mexico matrix, else one its world pages print, as list_regions (over MCP, the tool "
+        "usda_wasde_list_regions) lists it, matched without its indent and footnote marker, "
+        "its case kept.",
         source=SOURCE,
     )
 
@@ -778,8 +772,8 @@ async def get_balance_sheet_async(
         raise NotFoundError(
             f"{result.meta.endpoint} of release {result.meta.request['release_id']} holds no "
             f"record of {commodity!r}{f' for {region!r}' if sliced else ''} in {named}, as "
-            f"the packaged list read them from {matrices[0].report_month}; get_table answers "
-            "a page as that month prints it",
+            f"the packaged list read them from {matrices[0].report_month}; get_table (over MCP, "
+            "the tool usda_wasde_get_table) answers a page as that month prints it",
             source=SOURCE,
         )
     return Result(data=_values(records), meta=result.meta)
@@ -789,7 +783,7 @@ async def _narrative(release: Release, request: dict[str, object]) -> Result[lis
     """The release's narrative: its XLS's sheet ``WASDE Text``, else its PDF's pages.
 
     The XLS where the release has one; its PDF where it has none, or where its XLS holds no
-    narrative and it has a PDF (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020 decision
+    narrative and it has a PDF (Johannes, 2026-10-28, G5 inside PR 5; sdk-core ADR-0020 decision
     4). Each file is downloaded into a temporary directory, which is removed.
     """
     formats = {file.format for file in release.files}
@@ -814,7 +808,7 @@ async def _narrative(release: Release, request: dict[str, object]) -> Result[lis
         downloaded = await esmis.download_release_file_async(int(release.id), "pdf", dest)
         pages = parse_wasde_pdf(dest)
     # A PDF prints a date, no month label: its vintage is the ESMIS release id, as esmis
-    # prints it (the session, 2026-10-28, rule 7; ADR-0020 decision 5; gap, row 202).
+    # prints it (the session, 2026-10-28, rule 7; sdk-core ADR-0020 decision 5; gap, row 202).
     meta = _file_meta(downloaded, release, request, release.id)
     return Result(data=[page.text for page in pages], meta=meta)
 
@@ -826,7 +820,7 @@ async def read_report_text_async(month: str | None = None) -> Result[list[str]]:
     text, as printed, the first the report's number (``"WASDE - 676\r"``), then the
     paragraphs from ``WHEAT:`` to cotton, 25 strings and 16,004 characters for October 2026.
     A release without an XLS file, or whose XLS holds no such sheet while it has a PDF, is
-    read from its PDF instead (Johannes, 2026-10-28, G5 inside PR 5; ADR-0020 decision 4):
+    read from its PDF instead (Johannes, 2026-10-28, G5 inside PR 5; sdk-core ADR-0020 decision 4):
     one string per narrative page, the pages before the one headed Interagency Commodity
     Estimates Committees (pages 1 to 5 in July 2010 and October 2026), their text as pypdf
     extracts it; no page after that one is read, and no figure ever comes from a PDF.

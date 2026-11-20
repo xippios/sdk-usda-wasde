@@ -2,7 +2,7 @@
 
 A sample of each file kind the parsers read, `<file_kind>/<case>.<ext>`: a small real
 file, or the first rows of one as conventions §10 allows, never typed in by hand
-(ADR-0020). A binary file carries no comment, so each sample's provenance is one row
+(sdk-core ADR-0020). A binary file carries no comment, so each sample's provenance is one row
 here: the release id, the URL, the bytes and sha256 of the full file as upstream serves
 it, and the UTC time it was fetched, with `Z`.
 
@@ -28,8 +28,9 @@ xippios-usda-esmis, which prints its row below; Kept says what of the file it ho
 The download's replay fixtures under `../download_release_file/` are the recorded GET
 exchanges of the files: `wasde1026_xml.json` carries `wasde_xml/sr08_sr35_sr36.xml` as its
 body, `wasde1026_xml_sr11_sr24.json` `wasde_xml/sr11_sr24.xml` and `wasde1026_xls.json`
-`wasde_xls/wasde_text_page_8.xls` (base64), each marked `truncated` with the whole file's
-bytes and sha256; `wasde-07-09-2010_pdf.json` carries the whole PDF (base64), unmarked.
+`wasde_xls/wasde_text_page_8.xls` (base64), each marked `sample` with the whole file's
+bytes and sha256 (sdk-core ADR-0020, amendment 2026-11-18, point a);
+`wasde-07-09-2010_pdf.json` carries the whole PDF (base64), unmarked.
 
 | File | Release | URL | Bytes | sha256 | Kept | Fetched |
 | --- | --- | --- | --- | --- | --- | --- |

@@ -1,19 +1,25 @@
 """The package's one configured ``AsyncClient`` and its error mapping (conventions §6).
 
-In 0.1.0 it sends nothing: every request this package makes goes through
-``xippios-usda-esmis``'s tasks (ADR-0021), paced by esmis's client. ``SOURCE`` names
-this package in every ``ResultMeta``.
+It sends nothing: every request this package makes goes through ``xippios-usda-esmis``'s
+tasks (sdk-core ADR-0021), paced by esmis's client. ``SOURCE`` names this package in
+every ``ResultMeta``, and ``ENV_VARS`` beside it the variables the package reads, which a
+host reads from the package contract: none, as the API is keyless.
 """
 
 import httpx
-from xippios.core import AsyncClient, ClientConfig, RateLimit, XippiosError
+from xippios.core import AsyncClient, ClientConfig, EnvVar, RateLimit, XippiosError
 
 from xippios.usda.wasde._version import __version__
 
 SOURCE = "usda-wasde"
 BASE_URL = "https://esmis.nal.usda.gov"
 API_KEY_ENV: str | None = None
-# A self-imposed pace: upstream documents no per-second or per-minute limit (ADR-0010 decision 1).
+ENV_VARS: tuple[EnvVar, ...] = ()
+"""The variables the package reads, for a host (conventions §7; sdk-core ADR-0026, amendment
+2026-11-18, point c): none, as the API is keyless. An ``EnvVar`` names a variable and reads
+none; a variable the source reads beside these joins the list."""
+# A self-imposed pace: upstream documents no per-second or per-minute limit (sdk-core ADR-0033
+# decision 1).
 RATE_LIMIT = RateLimit(per_minute=30, burst=1)
 
 
@@ -34,13 +40,14 @@ config = ClientConfig(
 )
 
 # A source with a documented hourly or daily quota installs a QuotaPolicy of its own on
-# config (conventions §6, ADR-0015); core's README shows how.
+# config (conventions §6, sdk-core ADR-0037); core's README shows how.
 
 client = AsyncClient(config)
 
 __all__ = [
     "API_KEY_ENV",
     "BASE_URL",
+    "ENV_VARS",
     "RATE_LIMIT",
     "SOURCE",
     "classify",

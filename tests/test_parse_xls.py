@@ -1,4 +1,4 @@
-r"""Parser tests on the XLS sample of ``tests/fixtures/files/wasde_xls/`` (ADR-0020).
+r"""Parser tests on the XLS sample of ``tests/fixtures/files/wasde_xls/`` (sdk-core ADR-0020).
 
 The sample is the October 2026 release's XLS cut to its sheets ``WASDE Text`` and
 ``Page 8``, copied cell by cell with xlwt (``tests/fixtures/files/README.md``). The tests
