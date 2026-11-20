@@ -374,12 +374,12 @@ semantics or the shape of the public API.
   before each release, in the release train's refresh PR (conventions §12), so each
   release ships the lists of the latest WASDE, its month
   their vintage (sdk-core ADR-0041 decision 1); a refresh that reproduces them record for
-  record needs no PR: 0.1.1 ships those of ESMIS release 796099 (October 2026), which the
-  refresh of 2026-10-28 reproduced, and 0.2.0 those of release 796142 (November 2026),
-  read on 2026-11-20. The samples stay October 2026's, so the offline tests hold them to
-  the lists by `_vocabulary.differences`, as the live tests hold the latest release's
-  files. `--keep DIR` keeps the downloaded files with what
-  the run learnt of them, `--from DIR` rebuilds from them without a request.
+  record needs no PR. 0.1.1 ships those of ESMIS release 796099 (October 2026), which the
+  refresh of 2026-10-28 reproduced. 0.2.0 ships those of release 796142 (November 2026),
+  whose refresh of 2026-11-20 changed records and had a PR of its own. The samples stay
+  October 2026's, so the offline tests hold them to the lists by `_vocabulary.differences`,
+  as the live tests hold the latest release's files. `--keep DIR` keeps the downloaded files
+  with what the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (https://github.com/xippios/sdk-usda-wasde/pull/3 and https://github.com/xippios/sdk-usda-wasde/pull/5): one session
   fixture runs `get_release()` and
