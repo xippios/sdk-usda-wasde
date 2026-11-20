@@ -2,7 +2,7 @@
 
 Notes, written by hand, on what no page of this snapshot documents: the layout of the
 files a WASDE release carries and what ESMIS's list of WASDE releases holds
-(`FETCHED.md`, "Not snapshotted"; sdk-core's conventions §3, sdk-core ADR-0020 decision
+(`FETCHED.md`, "How this is captured"; sdk-core's conventions §3, sdk-core ADR-0020 decision
 2). `scripts/refresh_upstream.py` neither writes nor checks this file, and `FETCHED.md`
 lists it in a row of its own. What a note states holds for the files it was observed
 in; a parser that relies on it is checked against the current release by its live test
