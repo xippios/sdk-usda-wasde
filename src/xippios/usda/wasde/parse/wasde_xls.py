@@ -1,6 +1,6 @@
 r"""Parse the narrative of a WASDE release's XLS into one record per paragraph (sdk-core ADR-0020).
 
-The workbook is Excel 97-2003 (BIFF8), read with xlrd (``docs/upstream/layout.md``). Its
+The workbook is Excel 97-2003 (BIFF8), read with xlrd (``docs/upstream/OBSERVED.md``). Its
 sheet ``WASDE Text`` holds the report's narrative in one column, one paragraph a row, as
 the PDF prints it on its first pages: in October 2026 26 rows, row 0 ``WASDE - 676``
 followed by a carriage return, row 1 empty, rows 2 to 25 the paragraphs from ``WHEAT:``
@@ -22,7 +22,7 @@ A file xlrd cannot open as an XLS raises ``ValidationError``, as does a cell of
 layout the parser does not know. A workbook without the sheet, or whose sheet holds no
 text, raises ``NotFoundError`` naming its sheets: it holds no narrative, which the
 release's PDF may hold. ESMIS lists other workbooks as the XLS of some releases, revision
-tables in 2001 to 2008 (``layout.md``), and the parser does not know which older report
+tables in 2001 to 2008 (``OBSERVED.md``), and the parser does not know which older report
 workbooks carry the sheet.
 """
 
@@ -104,7 +104,7 @@ def _rows(path: Path) -> list[WasdeXlsText]:
                     _refuse(
                         f"sheet {TEXT_SHEET!r}, row {row}, column {column} holds a {kind} "
                         "cell; the narrative is text in the first column "
-                        "(docs/upstream/layout.md)",
+                        "(docs/upstream/OBSERVED.md)",
                         {"sheet": TEXT_SHEET, "row": row, "column": column},
                     )
                 text = str(cell.value)

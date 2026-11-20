@@ -1,13 +1,19 @@
-# WASDE file layouts, as observed
+# WASDE's release files and catalog, as observed
 
-**Observed, not documented.** No upstream page documents the layout of the files a WASDE
-release carries (`FETCHED.md`, "Not snapshotted"). This file describes them as they were
-observed on 2026-10-28 in the four files of one release and in ESMIS's list of every
-WASDE release, as sdk-core ADR-0020 decision 2 asks for file-format notes. It is written by hand
-from those files, not fetched: `scripts/refresh_upstream.py` neither writes nor checks
-it, and `FETCHED.md` lists it in a row of its own. What it states holds for the files
-below; a parser that relies on it is checked against the current release by its live
-test (sdk-core ADR-0020 decision 6).
+Notes, written by hand, on what no page of this snapshot documents: the layout of the
+files a WASDE release carries and what ESMIS's list of WASDE releases holds
+(`FETCHED.md`, "Not snapshotted"; sdk-core's conventions §3, sdk-core ADR-0020 decision
+2). `scripts/refresh_upstream.py` neither writes nor checks this file, and `FETCHED.md`
+lists it in a row of its own. What a note states holds for the files it was observed
+in; a parser that relies on it is checked against the current release by its live test
+(sdk-core ADR-0020 decision 6).
+
+Each note ends with `Observed:`, its date and what it was read from: a file of the
+release below by its name; a sample under `tests/fixtures/files/` or a recording under
+`tests/fixtures/` by its path, a sample being a cut of one file whose provenance
+`tests/fixtures/files/README.md` gives; a file of this snapshot by its path under
+`docs/upstream/`, or by its URL at the commit that holds it where a later capture
+replaced it. A note that no sample holds names the file alone.
 
 ## What it was written from
 
@@ -22,11 +28,15 @@ The October 2026 release, ESMIS release 796099, released 2026-10-09, downloaded 
 | wasde1026.pdf | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.pdf | 939374 | 6cc97c08be7e683b6114ae8e16d49fce2f21dce3ed3f9933b0acbd2d37e6840b |
 
 The sizes agree with those ESMIS's page of the release printed on 2026-10-28 (917.36 KB,
-119.51 KB, 346 KB and 3.4 MB, in units of 1024). The release history below is read from
-the 703 WASDE releases that xippios-usda-esmis's `list_releases("wasde")` returned on
-2026-10-28, every page of the list. No other release file was read for this file.
+119.51 KB, 346 KB and 3.4 MB, in units of 1024;
+https://github.com/xippios/sdk-usda-wasde/blob/eea3bb95b6740f21adc77e4f5c99f19a0fb6a8a2/docs/upstream/pages/release-wasde.md).
+The release history below is read from the 703 WASDE releases that xippios-usda-esmis's
+`list_releases("wasde")` returned on 2026-10-28, every page of the list. No other
+release file was read for this file.
 
 ## The four files
+
+### What each file holds
 
 | Kind | Format | Holds |
 | --- | --- | --- |
@@ -37,6 +47,9 @@ the 703 WASDE releases that xippios-usda-esmis's `list_releases("wasde")` return
 
 The numbers a task returns come from the XML, the XLS or the TXT, never from the PDF
 (sdk-core ADR-0020 decision 4).
+
+Observed: 2026-10-28, in `wasde1026.xml`, `wasde1026.xls`, `wasde1026.txt` and
+`wasde1026.pdf`.
 
 ## XML
 
@@ -65,6 +78,11 @@ On the reliability pages 35 to 37 the footnotes are the `sub_report_footer` of a
 element instead (`table1` on pages 35 and 36, `table4` on page 37). The page elements
 range from 7239 bytes (`sr36`) to 238679 bytes (`sr33`) as they stand in the file.
 
+Observed: 2026-10-28, in `wasde1026.xml`; every sample under
+`tests/fixtures/files/wasde_xml/` keeps the file's bytes up to the root's opening tag and
+its pages whole, among them `tests/fixtures/files/wasde_xml/sr08_sr35_sr36.xml` (pages
+8, 35 and 36) and `tests/fixtures/files/wasde_xml/sr12_sr37.xml` (pages 12 and 37).
+
 ### Structure
 
 The element names (`matrixN`, `TextboxN`, a `<group>_Collection` around the instances of
@@ -88,8 +106,12 @@ A value's labels are therefore the attributes of its ancestors, read from the ma
 down. The names are numbered per matrix (`market_year1` in `matrix1`, `market_year4` in
 the first matrix of page 14) and not consistently: the second matrix of page 11 carries
 its attribute label on `m2_month_group` and its forecast month on `m2_attribute_group`,
-and page 29's third matrix nests `forecast_month2` inside `region6`. The table at the end
-of this section gives each matrix's chain.
+and page 29's third matrix nests `forecast_month2` inside `region6`. The note Pages,
+titles and the path to each value gives each matrix's chain.
+
+Observed: 2026-10-28, in `wasde1026.xml`; samples
+`tests/fixtures/files/wasde_xml/sr08_sr35_sr36.xml` (page 8's groups and cells) and
+`tests/fixtures/files/wasde_xml/sr11_sr24.xml` (page 11's second matrix).
 
 ### Cells
 
@@ -102,6 +124,13 @@ of this section gives each matrix's chain.
 | `TextboxN`, `FormatFillerN`, `ReportFillerN`, `m1_filler2`, `m1_filler4`, `m2_filler2`, `m2_filler4`, `m3_filler2`, `m3_filler4`, `m1_formatfiller10` | most pages | 3126 | `filler` or `Filler` (36 `m1_filler2` cells on page 15 hold `1` to `4`): layout, no value of the table |
 | none | most pages | 1090 | an empty `<Cell />` |
 
+Observed: 2026-10-28, in `wasde1026.xml`, every page counted; samples
+`tests/fixtures/files/wasde_xml/sr09_sr16.xml` (page 16's `wb_value`),
+`tests/fixtures/files/wasde_xml/sr31_sr32.xml` (pages 31 and 32) and
+`tests/fixtures/files/wasde_xml/sr12_sr37.xml` (page 12's unit rows).
+
+### Values as printed
+
 Of the 5913 value cells, 5883 hold a number as printed: digits with a decimal point
 where the page prints one (`2858.26`, `824.20`), a comma as thousands separator (589
 cells, `2,141`), a minus sign (33 cells). The rest are printed marks: on page 17 six
@@ -110,13 +139,25 @@ on pages 26 and 27, 24 cells hold a footnote marker instead of a value (`3/`). A
 be split over several unit cells where the page prints it on two lines
 (`Million 480 ` and ` Pound Bales`).
 
+Observed: 2026-10-28, in `wasde1026.xml`, every value cell counted; no sample holds
+pages 17, 26 or 27.
+
+### Units on elements
+
 Units also stand on elements: `m1_unit_description1` and `m2_unit_description1` (pages
 31, 32), `m2_unit_descr1` (page 11) and `m2_Unit_Description1` (page 16) are attributes
 of the elements in a value's path. Each holds the text of its own column's cell, so a unit
 printed across columns is split over them (`Million` over Broiler and ` Pounds` over
 Turkey on page 31, `Million` and `Bushels` over two of page 11's six classes), and the
 other columns hold an empty one. The XML thus carries no per-row unit for these pages;
-the XLS and the TXT print the unit rows in place (below).
+the XLS and the TXT print the unit rows in place (XLS, below).
+
+Observed: 2026-10-28, in `wasde1026.xml`; samples
+`tests/fixtures/files/wasde_xml/sr31_sr32.xml` (pages 31 and 32),
+`tests/fixtures/files/wasde_xml/sr11_sr24.xml` (page 11) and
+`tests/fixtures/files/wasde_xml/sr09_sr16.xml` (page 16).
+
+### Layout text and the commodity headings
 
 Other attributes on elements are layout text, not labels of a value: `m1_filler1` and its
 like (`Filler`), page 13's `Textbox2` in a value's path (`Million Bushels` in 42 of 168),
@@ -125,7 +166,12 @@ page 31's `Textbox17` and `m2_formatfiller7` (`Annual`, over rows without values
 `commodity_attribute2` (`Percent`, as `Textbox41` and `textbox4` on pages 36 and 37). The
 U.S. pages print a commodity heading over each matrix (`FEED GRAINS` and `CORN` on page
 12, `SORGHUM`, `BARLEY` and `OATS` on page 13) that no attribute of the file holds: there
-the matrix tells the commodities apart, and the XLS prints the heading (below).
+the matrix tells the commodities apart, and the XLS prints the heading (XLS, below).
+
+Observed: 2026-10-28, in `wasde1026.xml`; samples
+`tests/fixtures/files/wasde_xml/sr13_sr34.xml` (pages 13 and 34),
+`tests/fixtures/files/wasde_xml/sr31_sr32.xml` (page 31) and
+`tests/fixtures/files/wasde_xml/sr12_sr37.xml` (page 12).
 
 ### Labels as printed
 
@@ -148,6 +194,10 @@ ones (`Area Harvested `). The year and month labels the October 2026 file uses:
 | `m1_forecast_month1`, `m2_forecast_month1` | quarters `I` to `IV`, with `*` when projected, `Annual`, `Sep Proj.`, `Oct Proj.` | 31 |
 | `m1_forecast_month1` | `Sep`, `Oct`, or empty | 32 |
 
+Observed: 2026-10-28, in `wasde1026.xml`, every label counted; the six samples under
+`tests/fixtures/files/wasde_xml/` hold pages 8, 9, 11, 12, 13, 16, 24, 31, 32 and 34 to
+37 whole.
+
 ### Reliability pages 35 to 37
 
 These pages have tables, not matrices, and no `Cell` elements: each row is one element
@@ -164,6 +214,10 @@ explains the measures. On page 37 the commodity label is `commodity1` on the
 `root_mean_square_error1`, …) and on `commodity_group2` to `commodity_group4` (suffixes
 `2` to `4`). Page 36's footnote says that no WASDE was published in October 2013 or
 October 2025.
+
+Observed: 2026-10-28, in `wasde1026.xml`; samples
+`tests/fixtures/files/wasde_xml/sr08_sr35_sr36.xml` (pages 35 and 36, page 36's
+footnote among them) and `tests/fixtures/files/wasde_xml/sr12_sr37.xml` (page 37).
 
 ### Pages, titles and the path to each value
 
@@ -205,15 +259,33 @@ the projected year, by forecast month, on the second (`(Cont'd.)` in the title o
 19, 21, 23 and 25; page 27 repeats page 26's title); soybeans, soybean meal and soybean
 oil hold all three years on one page each (28 to 30).
 
+Observed: 2026-10-28, in `wasde1026.xml`, every page; the six samples under
+`tests/fixtures/files/wasde_xml/` hold pages 8, 9, 11, 12, 13, 16, 24, 31, 32 and 34 to
+37 whole.
+
 ## XLS
+
+### Sheets
 
 The workbook has 31 sheets: `WASDE Text`, then `Page 8` to `Page 37`, one per printed
 table page, named after it. Strings are stored as UTF-16 (codepage 1200 in the file).
+
+Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd; the sample
+`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls` holds two of its sheets, copied
+cell by cell into a workbook written with xlwt, so it keeps neither the other sheets nor
+the codepage.
+
+### The narrative sheet
 
 `WASDE Text` is one column of 26 rows: row 0 is `WASDE - 676` followed by a carriage
 return, row 1 is empty, and rows 2 to 25 are the report's narrative, one paragraph a
 row, as the PDF prints it on pages 1 to 5 (`WHEAT: The outlook for 2026/27 U.S. wheat …`
 to the cotton paragraphs).
+
+Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd; sample
+`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls`, its sheet `WASDE Text`.
+
+### Page sheets
 
 A page sheet starts with the report month (`October 2026`), the page title
 (` WASDE - 676 - 11`) and the table title (`U.S. Wheat Supply and Use  1/`), one row each
@@ -236,8 +308,13 @@ out as the page prints it, which differs from sheet to sheet:
   29 of `Page 12`; `TOTAL RICE`, `LONG-GRAIN RICE`, `MEDIUM & SHORT-GRAIN RICE` on
   `Page 14`; `SOYBEANS`, `SOYBEAN OIL`, `SOYBEAN MEAL` on `Page 15`), one per matrix of
   the XML's page, in the same order; `Page 11`, `Page 16` and `Page 17` leave column 0
-  of their header row empty (read with xlrd on 2026-10-28 from the file above);
+  of their header row empty;
 - the footnotes in the last row, in column 0.
+
+Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd; sample
+`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls`, its sheet `Page 8`.
+
+### Columns with numbers
 
 Value columns are not contiguous on some sheets: `Page 11` has 13 columns, its first
 table's values in columns 4, 6, 9 and 11. Rows × columns and the columns that hold
@@ -276,7 +353,12 @@ numbers (counted from 0):
 | Page 36 | 44 × 8 | 1, 2, 3, 4, 5, 6, 7 |
 | Page 37 | 50 × 8 | 1, 2, 3, 4, 5, 6, 7 |
 
+Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd, every sheet; sample
+`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls`, its sheet `Page 8`.
+
 ## TXT
+
+### Pages as printed
 
 1824 lines, CRLF, ASCII only, no form feeds, no line longer than 80 characters; six tab
 characters stand in the column headings of the reliability pages. It holds
@@ -288,7 +370,12 @@ then the table title and subtitle centred, the column headings between two rules
 (`824.20`); a market year or commodity that heads several rows stands on a line of its
 own (`    2026/27 (Proj.)`, then `Sep` and `Oct` rows).
 
+Observed: 2026-10-28, in `wasde1026.txt`; no sample holds it, as the package reads no
+TXT.
+
 ## PDF
+
+### Pages
 
 40 pages, made with Acrobat PDFMaker 26 for Word (`Creator`), produced by Adobe PDF
 Library 26.2.171. Page 1 carries the ISSN 1554-9089 and the narrative runs to page 5;
@@ -298,13 +385,25 @@ reliability tables), page 38 lists related USDA reports, page 39 has no text a t
 extractor reads, and page 40 is the back cover with links. Every page but 39 has a text
 layer.
 
+Observed: 2026-10-28, in `wasde1026.pdf`; no sample holds it, the PDF sample being the
+July 2010 release's.
+
 ## The releases ESMIS lists
+
+### Release times
 
 703 releases, the first on 1973-09-17 and the last on 2026-10-09. Every
 `release_datetime` reads `T12:00:00Z`, while WAOB states the release time as noon
 Eastern (on 2026-10-28, `pages/wasde-faqs.md`: "released at 12:00 noon Eastern time";
-`pages/wasde-report.md`: "12:00pm ET"). Releases per year, and the releases that carry at
-least one file of each kind:
+`pages/wasde-report.md`: "12:00pm ET").
+
+Observed: 2026-10-28, in the 703 releases of `list_releases("wasde")`, every page of
+the list; recording `tests/fixtures/release_find_by_identifier/wasde_page0.json`, its
+first page of 25, and the snapshot's `pages/wasde-faqs.md` and `pages/wasde-report.md`.
+
+### Files by year
+
+Releases per year, and the releases that carry at least one file of each kind:
 
 | Year | Releases | PDF | TXT | XLS | XLSX | XML | ZIP | DOC | ASC |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -365,17 +464,27 @@ least one file of each kind:
 
 The first XML is that of 2010-07-09, and every release since 2011 carries an XML and an
 XLS but one, 2014-01-23, which carries an ASC file only. The XLS files of 2001 to 2008
-are revision files (below), not the report's tables. TXT is missing from 2011 to 2015
-and from the first nine releases of 2016 (it is back from 2016-10-12). The one XLSX is
-that of 2010-08-12, the one ZIP (`95501.zip`, with a `readme.txt`) that of 1995-01-31,
-the three DOC files belong to 2006-05-12 and 2006-07-12 (revision notes) and
+are revision files (File names, below), not the report's tables. TXT is missing from 2011
+to 2015 and from the first nine releases of 2016 (it is back from 2016-10-12). The one
+XLSX is that of 2010-08-12, the one ZIP (`95501.zip`, with a `readme.txt`) that of
+1995-01-31, the three DOC files belong to 2006-05-12 and 2006-07-12 (revision notes) and
 2008-07-02, and the one ASC is `wasde-01-23-2014.asc`.
+
+Observed: 2026-10-28, in the 703 releases of `list_releases("wasde")`, every page of
+the list; recording `tests/fixtures/release_find_by_identifier/wasde_page0.json`, the
+releases of 2024-09-12 to 2026-10-09.
+
+### Months without a release
 
 Counting every calendar month from the first release (September 1973) to the last
 (October 2026), eight months have no release in the catalog: 1974-02, 1975-02, 1975-05,
 1976-02, 1977-02, 2013-10, 2019-01 and 2025-10. Page 36's footnote names two of them,
 October 2013 and October 2025, as months without a WASDE, due to a partial government
 shutdown.
+
+Observed: 2026-10-28, in the 703 releases of `list_releases("wasde")`, every page of
+the list, and page 36 of `wasde1026.xml`; sample
+`tests/fixtures/files/wasde_xml/sr08_sr35_sr36.xml`, page 36's footnote.
 
 ### File names
 
@@ -400,6 +509,11 @@ of 2001 and 2008, cotton TXT files of January to April 1996
 (`ORIGwasde-07-11-2013.pdf`, `R1wasde-07-11-2013.pdf`) and the original of August 2013
 (`ORIGwasde-08-12-2013.xml`), and `Pages_from_wasde-06-22-1984-2.pdf`.
 
+Observed: 2026-10-28, in the 703 releases of `list_releases("wasde")`, every page of
+the list, and the snapshot's `New_WASDE_Filename_Format.pdf`; recording
+`tests/fixtures/release_find_by_identifier/wasde_page0.json`, the `wasde<mm><yy>` and
+`v2` names and the `latest.*` files of 2024-11-08.
+
 ### Revisions and several releases in a month
 
 A revised month is one release whose files carry the `v2` suffix only: release 795937
@@ -408,3 +522,7 @@ A revised month is one release whose files carry the `v2` suffix only: release 7
 release; months with more are frequent until 1996, and later 2001-05, 2001-09, 2008-05,
 2008-07, 2008-10, 2008-12, 2009-09, 2010-12, 2014-01, 2018-12 (2018-12-11 and
 2018-12-14) and 2019-11 (three releases on 2019-11-08, each with `latest.*` files).
+
+Observed: 2026-10-28, in the 703 releases of `list_releases("wasde")`, every page of
+the list; recording `tests/fixtures/release_find_by_identifier/wasde_page0.json`,
+release 795937 among them.

@@ -230,7 +230,7 @@ def test_get_release_reads_the_xml(
 def test_get_release_of_a_month_without_one_names_the_latest(
     replay_fixture: ReplayFixture,
 ) -> None:
-    """October 2025 has no WASDE (layout.md): the month's list is empty, then the latest."""
+    """October 2025 has no WASDE (OBSERVED.md): the month's list is empty, then the latest."""
     listed = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
     download = replay_fixture("download_release_file", "wasde1026_xml")
     with pytest.raises(NotFoundError) as caught:
@@ -259,7 +259,7 @@ def without_xml(release: EsmisRelease) -> EsmisRelease:
 
 
 def test_a_month_without_an_xml_file_is_refused_naming_its_formats() -> None:
-    """Every month before 2010-07 has none (layout.md); built from page 0's releases."""
+    """Every month before 2010-07 has none (OBSERVED.md); built from page 0's releases."""
     october = tasks._release(without_xml(page_0()[0]))
     with pytest.raises(NotFoundError) as caught:
         tasks._with_xml([october], "no WASDE release of 2026-10 has an XML file")
@@ -271,7 +271,7 @@ def test_a_month_without_an_xml_file_is_refused_naming_its_formats() -> None:
 
 
 def test_a_month_answers_its_latest_release_with_an_xml_file() -> None:
-    """As 2014-01 does, whose later release carries an ASC file only (layout.md).
+    """As 2014-01 does, whose later release carries an ASC file only (OBSERVED.md).
 
     Built from page 0's releases, no recording: ESMIS's page 0 lists one release a month.
     """
@@ -299,7 +299,7 @@ SLICE_FIELDS = [
     "cell_value",
     "value",
 ]
-"""The fields a slice's record keeps (Johannes, 2026-10-28, G5 inside PR 5)."""
+"""The fields a slice's record keeps (https://github.com/xippios/sdk-usda-wasde/pull/5)."""
 
 
 def values(records: list[WasdeXmlCell]) -> list[WasdeTableValue]:
@@ -717,7 +717,7 @@ async def test_an_xls_without_the_narrative_and_no_pdf_is_not_found(
 
 
 def test_a_month_without_an_xls_or_a_pdf_is_refused_naming_its_formats() -> None:
-    """As 1995 to 1997 are, TXT only (layout.md); built from page 0's releases."""
+    """As 1995 to 1997 are, TXT only (OBSERVED.md); built from page 0's releases."""
     october = page_0()[0]
     txt = october.model_copy(
         update={"files": [url for url in october.files if url.endswith(".txt")]}
@@ -733,7 +733,7 @@ def test_a_month_without_an_xls_or_a_pdf_is_refused_naming_its_formats() -> None
 
 
 def test_the_slices_have_caps_of_their_own() -> None:
-    """Each note says how to see the rest (Johannes, 2026-10-28, G5 inside PR 5).
+    """Each note says how to see the rest (https://github.com/xippios/sdk-usda-wasde/pull/5).
 
     Every other tool keeps the default; none of them is cut but ``list_releases`` called
     without ``since``, whose filters the default note's narrowing names.

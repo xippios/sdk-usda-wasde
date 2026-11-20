@@ -132,7 +132,9 @@ def test_a_cell_the_layout_does_not_know_is_refused(
 ) -> None:
     with pytest.raises(ValidationError) as caught:
         parse_wasde_xls(workbook(tmp_path, {TEXT_SHEET: cells}))
-    assert str(caught.value).startswith(f"wasde.xls: sheet 'WASDE Text', {where}")
+    message = str(caught.value)
+    assert message.startswith(f"wasde.xls: sheet 'WASDE Text', {where}")
+    assert message.endswith("the narrative is text in the first column (docs/upstream/OBSERVED.md)")
 
 
 @pytest.mark.parametrize("content", [b"", b"not a workbook", b"%PDF-1.5\n"])

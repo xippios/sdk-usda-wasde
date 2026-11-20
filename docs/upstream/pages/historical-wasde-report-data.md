@@ -10,13 +10,13 @@ These data do not include subsequent revisions to estimates made to any underlyi
 
 The official supply and demand data series incorporating all historical revisions for periods prior to those reported in the latest WASDE is maintained at the Foreign Agricultural Service’s Production, Supply and Demand (PS&D) data portal available on the [FAS PS&D data](https://apps.fas.usda.gov/psdonline/).
 
-**2026** (Last Updated on 10/09/2026)
+**2026** (Last Updated on 11/10/2026)
 :   |  |  |  |
     | --- | --- | --- |
     | [January 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-01.csv) (CSV, 971 KB) | [February 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-02.csv) (CSV, 976 KB) | [March 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-03.csv) (CSV, 960 KB) |
     | [April 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-04.csv) (CSV, 960 KB) | [May 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-05-V2.csv) (CSV, 936 KB) | [June 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-06-V2.csv) (CSV, 941 KB) |
     | [July 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-07.csv) (CSV, 954 KB) | [August 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-08.csv) (CSV, 965 KB) | [September 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-09.csv) (CSV, 982 KB) |
-    | [October 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-10.csv) (CSV, 976 KB) |  |  |
+    | [October 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-10.csv) (CSV, 976 KB) | [November 2026](https://www.usda.gov/sites/default/files/documents/oce-wasde-report-data-2026-11.csv) (CSV, 981 KB) |  |
 
 **2025** (Last Updated on 12/09/2025)
 :   |  |  |  |

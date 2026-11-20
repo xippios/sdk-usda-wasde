@@ -33,23 +33,26 @@ What every task follows:
   ``get_release("2013-08")`` reads the original.
 - ``get_table`` and ``get_balance_sheet`` read the month's XML as ``get_release`` does,
   one download per call and nothing kept between calls, and answer a slice of its
-  records projected without their page's labels (``WasdeTableValue``; Johannes,
-  2026-10-28, G5 inside PR 5), which ``list_tables`` states once per page, with
-  ``get_release``'s ``meta``, ``meta.request`` holding the arguments given, the release
+  records projected without their page's labels (``WasdeTableValue``, as
+  https://github.com/xippios/sdk-usda-wasde/pull/5 decided), which ``list_tables`` states
+  once per page, with ``get_release``'s ``meta``, ``meta.request`` holding the arguments
+  given, the release
   id and the file's URL; they are tools, each with a cap of its own (``MCP_CAPS``). The
   slice is checked against the packaged lists before anything is sent: a page
   ``list_tables`` lacks, a commodity ``list_commodities`` lacks, or a region the
   commodity's pages do not print, raises core's ``UnknownCode``, an
   ``InvalidRequestError``, naming the closest (core's ``closest`` on the texts, whatever
   their case). A region is matched as printed with its indent and footnote marker left
-  out (gap, row 195). A slice the month's file does not hold raises ``NotFoundError``.
+  out (https://github.com/xippios/sdk-usda-wasde/pull/4). A slice the month's file does
+  not hold raises ``NotFoundError``.
 - ``read_report_text`` reads the narrative (sdk-core ADR-0020 decision 4): the release's XLS,
   sheet ``WASDE Text`` (``parse.wasde_xls``), else its PDF's narrative pages
-  (``parse.wasde_pdf``), text only, also where the XLS holds no narrative (Johannes,
-  2026-10-28, G5 inside PR 5). ``meta.endpoint`` is the file read,
+  (``parse.wasde_pdf``), text only, also where the XLS holds no narrative
+  (https://github.com/xippios/sdk-usda-wasde/pull/5). ``meta.endpoint`` is the file read,
   ``meta.vintage`` the report month the XLS prints (``"October 2026"``), for a PDF the
-  ESMIS release id as esmis prints it (``"95659"``; the session, 2026-10-28, rule 7;
-  sdk-core ADR-0020 decision 5), ``meta.published_at`` the release time as for ``get_release``.
+  ESMIS release id as esmis prints it (``"95659"``;
+  https://github.com/xippios/sdk-usda-wasde/pull/5, sdk-core ADR-0020 decision 5),
+  ``meta.published_at`` the release time as for ``get_release``.
 - The packaged answers: ``list_tables``, ``list_commodities`` and ``list_regions`` answer
   from ``reference/table.json``, ``commodity.json`` and ``region.json``, the lists
   ``scripts/refresh_reference.py`` read from the latest release's files, through core's
@@ -118,11 +121,12 @@ BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 
 # MCP_CAPS, only where a tool needs a result cap of its own, keyed by the task function's
 # name (conventions §8, sdk-core ADR-0038). The two slices answer WasdeTableValue, WasdeXmlCell
-# without the page's labels (Johannes, 2026-10-28, G5 inside PR 5), about 350 bytes a
-# value, and each has a cap of its own whose note names how to see the rest (the same
-# decision): get_table 400 rows or 128 KB, get_balance_sheet 300 rows or 128 KB. Measured
-# on the October 2026 XML through the MCP server, the tool's text in UTF-8 bytes, every
-# answer fits whole: the largest page, sr28, 364 values and 129,899 bytes, 1,173 under
+# without the page's labels, about 350 bytes a value, and each has a cap of its own whose
+# note names how to see the rest, both decided in
+# https://github.com/xippios/sdk-usda-wasde/pull/5: get_table 400 rows or 128 KB,
+# get_balance_sheet 300 rows or 128 KB. Measured on the October 2026 XML through the MCP
+# server, the tool's text in UTF-8 bytes, every answer fits whole: the largest page, sr28,
+# 364 values and 129,899 bytes, 1,173 under
 # the bound (sr19, 322 values, 118,553 bytes, the next); the largest balance sheet,
 # Meats, 280 values and 90,850 bytes, then U.S. Milk, 96 and 30,700; a world region's
 # rows, 24 to 28 values, about 11 KB at most (all 160 commodity and region answers). A
@@ -152,7 +156,7 @@ PUBLICATION = "wasde"
 
 FIRST_XML_RELEASE = "the first with an XML file is that of 2010-07-09 (release 95659)"
 """The earliest WASDE release ESMIS lists with an XML file, as observed on 2026-10-28
-(``docs/upstream/layout.md``), for the refusal of a release without one."""
+(``docs/upstream/OBSERVED.md``), for the refusal of a release without one."""
 
 WORLD = "World"
 """The ``region`` of the world pages' matrices in the packaged commodity list."""
@@ -208,7 +212,8 @@ def _bare(region: str | None) -> str | None:
     """A region text without its indent and footnote marker, as a region slice matches it.
 
     ``"        European Union  5/"`` gives ``"European Union"``, ``"World  3/"`` gives
-    ``"World"``; the case and the inner spaces are kept (gap, row 195).
+    ``"World"``; the case and the inner spaces are kept
+    (https://github.com/xippios/sdk-usda-wasde/pull/4).
     """
     return None if region is None else _MARKER.sub("", region.strip())
 
@@ -261,9 +266,10 @@ def _carrying(
 def _with_xml(releases: list[Release], refusal: str) -> Release:
     """Of the releases checked, the latest that carries an XML file; none is refused.
 
-    The latest by release time, the first ESMIS lists where several share it (Johannes,
-    2026-10-28, G5 inside PR 3): in 2010-12 and 2014-01 a later release carries a TXT or
-    an ASC file only, and the month answers the earlier release's XML. ``refusal`` opens
+    The latest by release time, the first ESMIS lists where several share it
+    (https://github.com/xippios/sdk-usda-wasde/pull/3): in 2010-12 and 2014-01 a later
+    release carries a TXT or an ASC file only, and the month answers the earlier release's
+    XML. ``refusal`` opens
     the message by what was checked, e.g. ``"no WASDE release of 2009-06 has an XML
     file"`` or ``"the latest WASDE release has no XML file"``.
     """
@@ -563,7 +569,7 @@ async def get_table_async(table: str, month: str | None = None) -> Result[list[W
     printed page 12, U.S. feed grains and corn, ``"sr18"`` page 18, world wheat. Each
     record (``WasdeTableValue``) is one value with the labels of its row and column as
     printed, its table's title and its matrix: ``get_release``'s record without the
-    page's own labels (Johannes, 2026-10-28, G5 inside PR 5). The page's subtitle and
+    page's own labels. The page's subtitle and
     footnotes, to which a footnote marker in a label refers (``"Trade 2/"``), are
     ``list_tables``'s, stated once per page; the report month is ``meta.vintage``. 112
     values on page 12 of October 2026, 364 on page 28, the most. The release is the
@@ -729,7 +735,7 @@ async def get_balance_sheet_async(
     the October 2026 release: a record is kept where its page, matrix and title are a
     matrix's. Each record (``WasdeTableValue``) is one value with the labels of its row
     and column as printed, its table's title and its matrix: ``get_release``'s record
-    without the page's own labels (Johannes, 2026-10-28, G5 inside PR 5). The page's
+    without the page's own labels. The page's
     subtitle and footnotes, to which a footnote marker in a label refers (``"World  3/"``,
     ``"Trade 2/"``), are ``list_tables``'s, stated once per page; the report month is
     ``meta.vintage``. 60 values for ``"CORN"``, 280 for ``"Meats"``, the most, 28 for
@@ -783,8 +789,8 @@ async def _narrative(release: Release, request: dict[str, object]) -> Result[lis
     """The release's narrative: its XLS's sheet ``WASDE Text``, else its PDF's pages.
 
     The XLS where the release has one; its PDF where it has none, or where its XLS holds no
-    narrative and it has a PDF (Johannes, 2026-10-28, G5 inside PR 5; sdk-core ADR-0020 decision
-    4). Each file is downloaded into a temporary directory, which is removed.
+    narrative and it has a PDF (https://github.com/xippios/sdk-usda-wasde/pull/5; sdk-core ADR-0020
+    decision 4). Each file is downloaded into a temporary directory, which is removed.
     """
     formats = {file.format for file in release.files}
     with tempfile.TemporaryDirectory(prefix="xippios-usda-wasde-") as directory:
@@ -808,7 +814,7 @@ async def _narrative(release: Release, request: dict[str, object]) -> Result[lis
         downloaded = await esmis.download_release_file_async(int(release.id), "pdf", dest)
         pages = parse_wasde_pdf(dest)
     # A PDF prints a date, no month label: its vintage is the ESMIS release id, as esmis
-    # prints it (the session, 2026-10-28, rule 7; sdk-core ADR-0020 decision 5; gap, row 202).
+    # prints it (https://github.com/xippios/sdk-usda-wasde/pull/5; sdk-core ADR-0020 decision 5).
     meta = _file_meta(downloaded, release, request, release.id)
     return Result(data=[page.text for page in pages], meta=meta)
 
@@ -820,7 +826,7 @@ async def read_report_text_async(month: str | None = None) -> Result[list[str]]:
     text, as printed, the first the report's number (``"WASDE - 676\r"``), then the
     paragraphs from ``WHEAT:`` to cotton, 25 strings and 16,004 characters for October 2026.
     A release without an XLS file, or whose XLS holds no such sheet while it has a PDF, is
-    read from its PDF instead (Johannes, 2026-10-28, G5 inside PR 5; sdk-core ADR-0020 decision 4):
+    read from its PDF instead (sdk-core ADR-0020 decision 4):
     one string per narrative page, the pages before the one headed Interagency Commodity
     Estimates Committees (pages 1 to 5 in July 2010 and October 2026), their text as pypdf
     extracts it; no page after that one is read, and no figure ever comes from a PDF.

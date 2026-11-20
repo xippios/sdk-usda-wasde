@@ -60,7 +60,7 @@ def test_the_packaged_footers_are_the_parsers_by_page() -> None:
 
 
 def test_a_reliability_page_states_the_footer_of_its_item() -> None:
-    """Pages 35 to 37 carry their footer on an item (layout.md): ``table1``, ``table4``."""
+    """Pages 35 to 37 carry their footer on an item (OBSERVED.md): ``table1``, ``table4``."""
     footers = {table.report: table for table in packaged("table", Table)}
     for report in ("sr35", "sr36", "sr37"):
         assert footers[report].sub_report_footer, report
@@ -151,7 +151,10 @@ def test_the_commodity_rule_gives_the_packaged_list() -> None:
 
 
 def test_the_commodity_list_reads_the_supply_and_use_pages() -> None:
-    """Pages 11 to 30, 32 and 33 (G5; the session, 2026-10-28, rule 7), every item each."""
+    """Pages 11 to 30, 32 and 33, every item each.
+
+    As https://github.com/xippios/sdk-usda-wasde/pull/4 decided.
+    """
     rows = packaged("commodity", Commodity)
     assert list(dict.fromkeys(int(row.report[2:]) for row in rows)) == [
         *range(11, 31),

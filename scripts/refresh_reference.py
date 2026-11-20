@@ -1,8 +1,8 @@
 """Refresh the packaged reference lists from the latest WASDE release (``/refresh-reference-data``).
 
 WASDE packages four lists, each read from the latest release's files, never typed in,
-and written with core's ``PackagedList.write`` (conventions §3, sdk-core ADR-0041; decided by
-Johannes on 2026-10-28, G5):
+and written with core's ``PackagedList.write`` (conventions §3, sdk-core ADR-0041; decided in
+https://github.com/xippios/sdk-usda-wasde/pull/4):
 
 - ``reference/table.json``: one record per page of the XML (``Table``);
 - ``reference/commodity.json``: one record per supply-and-use matrix, pages 11 to 30, 32

@@ -14,13 +14,13 @@ The World Agricultural Supply and Demand Estimates (WASDE) is prepared and relea
 
 **In 2027 the WASDE report will be released on Jan. 12, Feb. 10, Mar.  10, Apr.  9, May  12, Jun. 11, Jul.  9, Aug. 12, Sep.  10, Oct.  8, Nov. 10, and Dec. 10.**
 
-### October 2026 WASDE Report (Release time: 12:00 PM ET, October 9)
+### November 2026 WASDE Report (Release time: 12:00 PM ET, November 10)
+
+[PDF](https://www.usda.gov/oce/commodity/wasde/wasde1126.pdf) [XML](https://www.usda.gov/oce/commodity/wasde/wasde1126.xml) [Excel](https://www.usda.gov/oce/commodity/wasde/wasde1126.xls) [Text](https://www.usda.gov/oce/commodity/wasde/wasde1126.txt)
+
+### October 2026 WASDE Report
 
 [PDF](https://www.usda.gov/oce/commodity/wasde/wasde1026.pdf) [XML](https://www.usda.gov/oce/commodity/wasde/wasde1026.xml) [Excel](https://www.usda.gov/oce/commodity/wasde/wasde1026.xls) [Text](https://www.usda.gov/oce/commodity/wasde/wasde1026.txt)
-
-### September 2026 WASDE Report
-
-[PDF](https://www.usda.gov/oce/commodity/wasde/wasde0926.pdf) [XML](https://www.usda.gov/oce/commodity/wasde/wasde0926.xml) [Excel](https://www.usda.gov/oce/commodity/wasde/wasde0926.xls) [Text](https://www.usda.gov/oce/commodity/wasde/wasde0926.txt)
 
 #####
 

@@ -4,14 +4,15 @@ Four lists ship here as packaged lists, versioned with the package, each read fr
 latest WASDE release's files by `scripts/refresh_reference.py` (`/refresh-reference-data`)
 and written with core's `PackagedList.write`, never by hand, in the file shape of
 `PackagedList` (`param`, `endpoint`, `fetched`, `note`, `records`; conventions §3,
-sdk-core ADR-0041; decided by Johannes on 2026-10-28, G5). Each file is named after its `param`,
-the parameter the list serves:
+sdk-core ADR-0041; decided in https://github.com/xippios/sdk-usda-wasde/pull/4). Each
+file is named after its `param`, the parameter the list serves:
 
 - `table.json`: one record per page of the XML, `sr08` to `sr37` (`models.Table`): its
   `Name`, the printed page number, its titles, subtitles and footers as printed, stated
   once for the page (`sub_report_footer` to `sub_report_footer3` of its `<Report>`, on
-  pages 35 to 37 the one report item's `sub_report_footer`; Johannes, 2026-10-28, G5
-  inside PR 5), its report items; `list_tables` answers from it, and `get_table` checks
+  pages 35 to 37 the one report item's `sub_report_footer`;
+  https://github.com/xippios/sdk-usda-wasde/pull/4), its report items; `list_tables`
+  answers from it, and `get_table` checks
   its `table` against it before anything is sent.
 - `commodity.json`: one record per supply-and-use matrix of the U.S. pages 11 to 17, 32
   and 33 and the world pages 18 to 30 (`models.Commodity`): the commodity, the region the

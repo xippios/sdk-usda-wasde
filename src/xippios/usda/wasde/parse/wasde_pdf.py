@@ -1,6 +1,6 @@
 """Parse the narrative pages of a WASDE release's PDF, text only (sdk-core ADR-0020 decision 4).
 
-The PDF is the whole report (``docs/upstream/layout.md``): the narrative on its first
+The PDF is the whole report (``docs/upstream/OBSERVED.md``): the narrative on its first
 pages, then a page that lists the Interagency Commodity Estimates Committees, the
 contents, the tables of pages 8 to 37 and the back matter. This parser reads the
 narrative only, with pypdf, and never a number as a figure: a figure a task returns comes
