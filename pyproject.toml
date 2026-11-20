@@ -18,8 +18,10 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
+  "pypdf>=6.21",
   "xippios-core~=0.4.0",
   "xippios-usda-esmis~=0.3.0",
+  "xlrd>=2.0.2",
 ]
 
 [project.optional-dependencies]
