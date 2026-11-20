@@ -37,10 +37,11 @@ file); a recording script may use esmis's client, the package never does (ADR-00
 case ``--case`` names, the exchange esmis's ``download_release_file`` task sends, recorded
 by core's ``fixture_from_response`` (a binary body stored base64, ``allow_binary``). Where
 the sample ``<case>`` is not the whole file, the script rewrites the fixture in its own
-step before the write (ADR-0024, decision 4): the response body becomes the sample and
-the response is marked ``truncated`` with the whole file's ``original_bytes`` and
-``sha256``, as a fixture whose body is not the whole answer is (ADR-0019 decision 5).
-Everything else is the recorded exchange as core keeps it. The fixture file escapes its
+step before the write (sdk-core ADR-0042, decision 4): the response body becomes the
+sample and the response is marked ``sample`` with the whole file's ``original_bytes`` and
+``sha256`` (sdk-core ADR-0020, amendment 2026-11-18, point a), never ``truncated``, which
+is the recorder's cut. Everything else is the recorded exchange as core keeps it, and
+core's ``write_fixture`` writes it as ``record`` writes a fixture. The fixture file escapes its
 body, so an XML sample of about 240 KB or less, or a binary one of about 190 KB or less
 in base64, keeps it under 256 KiB; a larger one is refused.
 
@@ -62,7 +63,6 @@ import base64
 import dataclasses
 import hashlib
 import io
-import json
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -74,7 +74,13 @@ import httpx
 import xlrd
 import xlwt
 from xippios.core import AsyncClient, RetryPolicy, sync
-from xippios.core.testing import Scrub, fixture_from_response, fixture_path
+from xippios.core.testing import (
+    Scrub,
+    fixture_from_response,
+    fixture_path,
+    fixture_text,
+    write_fixture,
+)
 from xippios.usda.esmis import tasks as esmis
 from xippios.usda.esmis._client import config
 
@@ -247,11 +253,14 @@ async def fetch(release_id: int, format: str) -> tuple[str, httpx.Response, date
     return chosen.url, response, fetched
 
 
-def write_fixture(response: httpx.Response, sample: bytes, case: str, *, binary: bool) -> Path:
+def write_download_fixture(
+    response: httpx.Response, sample: bytes, case: str, *, binary: bool
+) -> Path:
     """The download's replay fixture: the recorded exchange, its body the sample.
 
     A sample that is the whole file leaves the exchange as recorded; another becomes the
-    body, marked as the cut it is, with the whole file's size and sha256.
+    body, marked ``sample`` with the whole file's size and sha256. Core's ``write_fixture``
+    writes it; a fixture of 256 KiB or more is refused and nothing written.
     """
     recorded = fixture_from_response(response, scrub=Scrub(allow_binary=binary))
     content = response.content
@@ -262,18 +271,17 @@ def write_fixture(response: httpx.Response, sample: bytes, case: str, *, binary:
             update={
                 "body": body,
                 "body_base64": binary,
-                "truncated": True,
+                "sample": True,
                 "original_bytes": len(content),
                 "sha256": hashlib.sha256(content).hexdigest(),
             }
         )
         fixture = recorded.model_copy(update={"response": rewritten})
     path = fixture_path(FIXTURES, FIXTURE_DIRECTORY, case)
-    text = json.dumps(fixture.model_dump(mode="json"), indent=2, sort_keys=True) + "\n"
-    if len(text.encode()) >= CAP:
-        raise SystemExit(f"the fixture would be {len(text.encode())} bytes, over 256 KiB")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    size = len(fixture_text(fixture).encode())
+    if size >= CAP:
+        raise SystemExit(f"the fixture would be {size} bytes, over 256 KiB")
+    write_fixture(fixture, path)
     return path
 
 
@@ -331,7 +339,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.fixture:
         case = args.case or f"{stem}_{extension.lower()}"
         binary = args.format != "xml"
-        path = write_fixture(response, by_case[args.fixture].content, case, binary=binary)
+        path = write_download_fixture(response, by_case[args.fixture].content, case, binary=binary)
         print(f"fixture: {path.relative_to(ROOT)} ({path.stat().st_size} bytes)")  # noqa: T201
     return 0
 

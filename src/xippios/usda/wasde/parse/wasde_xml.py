@@ -196,9 +196,8 @@ def _by_item(texts: list[str], items: int, kind: str, report: str) -> list[str |
 
 
 def _value(text: str) -> Decimal | None:
-    """The printed text as a number, ``None`` where it is no finite number."""
-    number = parse_decimal(text)
-    return number if number is not None and number.is_finite() else None
+    """The printed text as a number, ``None`` where it is no finite number (core's rule)."""
+    return parse_decimal(text)
 
 
 def _unit(page: _Page, walk: _Walk, statistic: str | None) -> str | None:

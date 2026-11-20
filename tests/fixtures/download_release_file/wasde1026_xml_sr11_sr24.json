@@ -58,8 +58,8 @@
     ],
     "original_bytes": 3569419,
     "original_count": null,
+    "sample": true,
     "sha256": "85e67ec8e8ec8eb98462596a4e784c170534630108cd51f4f42037756a9e50b9",
-    "status": 200,
-    "truncated": true
+    "status": 200
   }
 }

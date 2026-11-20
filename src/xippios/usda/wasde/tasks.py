@@ -68,7 +68,6 @@ import tempfile
 from collections.abc import Callable, Iterable, Mapping
 from datetime import date
 from pathlib import Path
-from urllib.parse import urlsplit
 
 from xippios.core import (
     Downloaded,
@@ -167,20 +166,6 @@ _MARKER = re.compile(r"(?:\s+\d+/)+$")
 _REVISION = re.compile(r"v\d+$")
 
 
-def _files(release: EsmisRelease) -> list[ReleaseFile]:
-    """The release's files in ESMIS's order, read from each URL as esmis's tasks read it.
-
-    The name is the URL path's last segment as printed, the format its extension after
-    the last dot, lowercased, ``""`` without one (``list_release_files``).
-    """
-    files = []
-    for url in release.files:
-        name = urlsplit(url).path.rsplit("/", 1)[-1]
-        _, dot, extension = name.rpartition(".")
-        files.append(ReleaseFile(url=url, name=name, format=extension.lower() if dot else ""))
-    return files
-
-
 def _revision(files: list[ReleaseFile]) -> str | None:
     """The ``vN`` suffix every file name's stem carries, ``None`` when not all carry one."""
     suffixes = {
@@ -191,8 +176,12 @@ def _revision(files: list[ReleaseFile]) -> str | None:
 
 
 def _release(release: EsmisRelease) -> Release:
-    """ESMIS's release re-shaped: its id and time copied, files, revision and month parsed."""
-    files = _files(release)
+    """ESMIS's release re-shaped: its id and time copied, files, revision and month parsed.
+
+    The files are esmis's reading of the URLs, ``Release.release_files()``, in ESMIS's
+    order: the name the URL path's last segment, the format its extension, lowercased.
+    """
+    files = release.release_files()
     return Release.project(
         release,
         files=files,
@@ -618,7 +607,8 @@ async def get_table_async(table: str, month: str | None = None) -> Result[list[W
                 },
             ),
             reason="A page is named as the XML names it, 'sr' and its two-digit printed "
-            "number: page 12 is 'sr12'; list_tables lists the pages.",
+            "number: page 12 is 'sr12'; list_tables (over MCP, the tool "
+            "usda_wasde_list_tables) lists the pages.",
             source=SOURCE,
         )
     result = await _read_xml(month, {"table": table, "month": month})
@@ -663,8 +653,9 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
             list_name="commodity",
             fetched=listed.fetched,
             closest=_closest(commodity, {name: ", ".join(on) for name, on in pages.items()}),
-            reason="A commodity is named as list_commodities prints it, its case kept: "
-            "'CORN' is page 12's U.S. corn, 'Corn' the world corn of pages 22 and 23.",
+            reason="A commodity is named as list_commodities (over MCP, the tool "
+            "usda_wasde_list_commodities) prints it, its case kept: 'CORN' is page 12's U.S. "
+            "corn, 'Corn' the world corn of pages 22 and 23.",
             source=SOURCE,
         )
     national = [
@@ -704,8 +695,9 @@ def _balance_sheet(commodity: str, region: str) -> tuple[list[Commodity], bool]:
         closest=found,
         hint=None if found else f"{commodity!r} is printed for {', '.join(choices)}.",
         reason=f"A region of {commodity!r} is 'United States' or 'Mexico' where it has a U.S. "
-        "or Mexico matrix, else one its world pages print, as list_regions lists it, matched "
-        "without its indent and footnote marker, its case kept.",
+        "or Mexico matrix, else one its world pages print, as list_regions (over MCP, the tool "
+        "usda_wasde_list_regions) lists it, matched without its indent and footnote marker, "
+        "its case kept.",
         source=SOURCE,
     )
 
@@ -778,8 +770,8 @@ async def get_balance_sheet_async(
         raise NotFoundError(
             f"{result.meta.endpoint} of release {result.meta.request['release_id']} holds no "
             f"record of {commodity!r}{f' for {region!r}' if sliced else ''} in {named}, as "
-            f"the packaged list read them from {matrices[0].report_month}; get_table answers "
-            "a page as that month prints it",
+            f"the packaged list read them from {matrices[0].report_month}; get_table (over MCP, "
+            "the tool usda_wasde_get_table) answers a page as that month prints it",
             source=SOURCE,
         )
     return Result(data=_values(records), meta=result.meta)
