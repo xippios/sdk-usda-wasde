@@ -1,22 +1,29 @@
 """The packaged lists against the XML samples, and the rules that build them (``_vocabulary``).
 
-The packaged lists in ``reference/`` were read from the whole October 2026 release by
-``scripts/refresh_reference.py``; the samples under ``tests/fixtures/files/wasde_xml/``
-are verbatim cuts of the same file, pages 8, 9, 11, 12, 13, 16, 24 and 31 to 37. On the
-pages the samples hold, the builder gives the packaged tables, regions and attributes,
-and every packaged commodity matrix and region is one the samples print. The commodity
-rule is checked on records shaped as the whole file's from the packaged list, since the
-samples lack pages 14, 15, 17 to 23, 25 to 30 and 33, and no XLS sample exists: the XLS's
-block titles are read by the live test only. The refusals are tested on records changed
-in the test, and on small XML texts the test writes to ``tmp_path``, never on a fixture
-file.
+The packaged lists in ``reference/`` are read from the whole latest release by
+``scripts/refresh_reference.py`` before each release, for 0.2.0 from the November 2026
+release (ESMIS release 796142); the samples under ``tests/fixtures/files/wasde_xml/`` are
+verbatim cuts of the October 2026 file, pages 8, 9, 11, 12, 13, 16, 24 and 31 to 37. Once
+a refresh reads a later release than the samples', the two are held together in what no
+release changes, as the live tests compare the packaged lists with the latest release's
+(``_vocabulary.differences``): every field but ``report_month``, the month word of the
+reliability titles masked, each footer compared for being set, never its text
+(https://github.com/xippios/sdk-usda-wasde/pull/4). So on the pages the samples hold, the
+builder gives the packaged tables, regions and attributes in all but those, the footers'
+text is the parser's on the samples themselves, the builder's month is the samples', and
+every packaged commodity matrix and region is one the samples print. The commodity rule is
+checked on records shaped as the whole file's from the packaged list, since the samples
+lack pages 14, 15, 17 to 23, 25 to 30 and 33, and no XLS sample exists: the XLS's block
+titles are read by the live test only. The refusals are tested on records changed in the
+test, and on small XML texts the test writes to ``tmp_path``, never on a fixture file.
 """
 
 import re
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
-from xippios.core import PackagedList, ValidationError
+from xippios.core import PackagedList, UpstreamModel, ValidationError
 
 from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde._client import SOURCE
@@ -39,23 +46,187 @@ def test_the_samples_hold_these_pages() -> None:
     assert {vocabulary.report_name(page) for page in pages} == SAMPLED
 
 
+BUILT = sorted(
+    (table for path in SAMPLES for table in vocabulary.tables(path)), key=lambda table: table.page
+)
+"""The tables the builder reads from the samples, in page order."""
+
+
 def test_the_builder_gives_the_packaged_tables_of_the_sampled_pages() -> None:
-    built = [table for path in SAMPLES for table in vocabulary.tables(path)]
+    """In what no release changes: the samples and the lists may come from two releases."""
     expected = [table for table in packaged("table", Table) if table.report in SAMPLED]
-    assert sorted(built, key=lambda table: table.page) == expected
+    assert not vocabulary.differences(
+        [vocabulary.footers_set(vocabulary.month_masked(table)) for table in expected],
+        [vocabulary.footers_set(vocabulary.month_masked(table)) for table in BUILT],
+        vocabulary.by_report,
+    )
+    assert {table.report_month for table in BUILT} == {cell.report_month for cell in CELLS}
 
 
-def test_the_packaged_footers_are_the_parsers_by_page() -> None:
-    """A page's footers, stated once, are the ones ``parse_wasde_xml`` gives its items."""
+def test_the_month_is_masked_in_the_reliability_titles_alone() -> None:
+    """Pages 35 to 37 name the release's month in their titles; no other title is touched."""
+    tables = packaged("table", Table) + BUILT
+    masked = {table.report for table in tables if vocabulary.month_masked(table) != table}
+    assert masked == {"sr35", "sr36", "sr37"}
+    for table in tables:
+        if table.report in masked:
+            assert "Reliability of " in vocabulary.month_masked(table).sub_report_title, table
+
+
+def test_a_reliability_title_names_its_lists_month() -> None:
+    """The month word ``month_masked`` hides is the month of the table's own ``report_month``.
+
+    So the packaged titles of pages 35 to 37 name the packaged release's month, and the
+    samples' name the samples', whichever releases they are.
+    """
     checked = 0
-    for table in packaged("table", Table):
-        if table.report in SAMPLED:
-            given = [cell.sub_report_footer for cell in CELLS if cell.report == table.report]
-            stated = [table.sub_report_footer, table.sub_report_footer2, table.sub_report_footer3]
-            expected: list[str | None] = [footer for footer in stated if footer is not None]
-            expected = expected or [None]
-            assert list(dict.fromkeys(given)) == expected, table.report
+    for table in packaged("table", Table) + BUILT:
+        masked = vocabulary.month_masked(table)
+        if masked != table:
+            month = table.report_month.split()[0]
+            assert masked.sub_report_title.replace("<month>", month) == table.sub_report_title, (
+                table.report
+            )
             checked += 1
+    assert checked == 6, "pages 35 to 37 of the packaged list and of the samples"
+
+
+@pytest.mark.parametrize(
+    ("title", "masked"),
+    [
+        ("Reliability of October Projections 1/", "Reliability of <month> Projections 1/"),
+        (
+            "Reliability of November Projections  (Continued) 1/",
+            "Reliability of <month> Projections  (Continued) 1/",
+        ),
+        (
+            "Reliability of United States November Projections  1/",
+            "Reliability of United States <month> Projections  1/",
+        ),
+        ("U.S. Wheat Supply and Use  1/", "U.S. Wheat Supply and Use  1/"),
+    ],
+)
+def test_month_masked_replaces_the_month_word_alone(title: str, masked: str) -> None:
+    table = packaged("table", Table)[0].model_copy(update={"sub_report_title": title})
+    assert vocabulary.month_masked(table).sub_report_title == masked
+
+
+def test_footers_set_keeps_an_unset_footer_unset() -> None:
+    """A set footer reads ``<set>`` whatever its text, an unset one stays ``None``."""
+    table = packaged("table", Table)[0].model_copy(
+        update={
+            "sub_report_footer": "1/ Marketing year beginning June 1.",
+            "sub_report_footer2": None,
+            "sub_report_footer3": "3/ Projected.",
+        }
+    )
+    reduced = vocabulary.footers_set(table)
+    assert [getattr(reduced, name) for name in vocabulary.FOOTERS] == ["<set>", None, "<set>"]
+    others = set(vocabulary.FOOTERS)
+    assert reduced.model_dump(exclude=others) == table.model_dump(exclude=others)
+    reworded = table.model_copy(update={"sub_report_footer": "1/ Marketing year beginning May 1."})
+    assert vocabulary.footers_set(reworded) == reduced, "a footer's text is not compared"
+    unset = table.model_copy(update={"sub_report_footer3": None})
+    assert vocabulary.footers_set(unset) != reduced, "a footer set on one side only is"
+
+
+def region(text: str, *reports: str) -> Region:
+    """A region row made in the test, of October 2026."""
+    return Region(region=text, reports=list(reports), report_month="October 2026")
+
+
+def test_differences_names_nothing_between_two_releases_equal_rows() -> None:
+    """Rows that differ in ``report_month`` alone, the release they were read from, are equal."""
+    october = [region("World", "sr09"), region("U.S.", "sr18")]
+    november = [row.model_copy(update={"report_month": "November 2026"}) for row in october]
+    assert vocabulary.differences(october, november, vocabulary.by_region) == []
+
+
+def test_differences_names_a_missing_a_new_a_changed_and_a_moved_row() -> None:
+    before = [
+        region("World", "sr09"),
+        region("U.S.", "sr18"),
+        region("    China", "sr20"),
+        region("    Japan", "sr21"),
+    ]
+    after = [
+        region("World", "sr09"),
+        region("    China", "sr20", "sr22"),
+        region("U.S.", "sr18"),
+        region("    Brazil", "sr23"),
+    ]
+    assert vocabulary.differences(before, after, vocabulary.by_region) == [
+        "missing now: '    Japan'",
+        "new: '    Brazil'",
+        "changed: '    China'",
+        "the order of the rows changed",
+    ]
+
+
+def assert_every_field_compared(
+    row: UpstreamModel, keys: set[str], name: Callable[[UpstreamModel], str]
+) -> None:
+    """Each field of ``row`` but the ones that name it and ``report_month``, changed alone,
+    makes ``differences`` name the row as changed."""
+    for field in type(row).model_fields:
+        if field in keys | {"report_month"}:
+            continue  # the row's name, and the release
+        value = getattr(row, field)
+        other: object
+        if isinstance(value, int):
+            other = value + 1
+        elif isinstance(value, list):
+            other = [*value, "matrix9"]
+        else:
+            other = f"{value} 9/"
+        changed = row.model_copy(update={field: other})
+        assert vocabulary.differences([row], [changed], name) == [f"changed: {name(row)}"], field
+
+
+def test_differences_compares_every_field_of_a_table_but_its_month() -> None:
+    assert_every_field_compared(packaged("table", Table)[0], {"report"}, vocabulary.by_report)
+
+
+def test_differences_compares_every_field_of_a_commodity_but_its_month() -> None:
+    commodity = packaged("commodity", Commodity)[0]
+    assert_every_field_compared(commodity, {"report", "matrix"}, vocabulary.by_matrix)
+
+
+def test_the_namers_tell_two_matrices_of_one_page_apart() -> None:
+    """``by_matrix`` and ``by_attribute`` name each row of their list once.
+
+    Page 12's two matrices, ``FEED GRAINS`` and ``CORN``, are two commodities, and a row
+    label is named by its page, its matrix and its text.
+    """
+    commodities = packaged("commodity", Commodity)
+    feed_grains, corn = (row for row in commodities if row.report == "sr12")
+    assert vocabulary.by_matrix(feed_grains) != vocabulary.by_matrix(corn)
+    assert len({vocabulary.by_matrix(row) for row in commodities}) == len(commodities)
+    attributes = packaged("attribute", Attribute)
+    first = attributes[0]
+    rows = [
+        first,
+        first.model_copy(update={"matrix": "matrix9"}),
+        first.model_copy(update={"attribute": f"{first.attribute} 9/"}),
+    ]
+    assert len({vocabulary.by_attribute(row) for row in rows}) == len(rows)
+    assert len({vocabulary.by_attribute(row) for row in attributes}) == len(attributes)
+
+
+def test_the_built_footers_are_the_parsers_by_page() -> None:
+    """A page's footers, stated once, are the ones ``parse_wasde_xml`` gives its items.
+
+    Both read from the samples, so the text is compared; the packaged footers, read from
+    the latest release, are held to these for being set (above).
+    """
+    checked = 0
+    for table in BUILT:
+        given = [cell.sub_report_footer for cell in CELLS if cell.report == table.report]
+        stated = [table.sub_report_footer, table.sub_report_footer2, table.sub_report_footer3]
+        expected: list[str | None] = [footer for footer in stated if footer is not None]
+        expected = expected or [None]
+        assert list(dict.fromkeys(given)) == expected, table.report
+        checked += 1
     assert checked == len(SAMPLED)
 
 
@@ -80,21 +251,16 @@ def test_the_packaged_tables_name_the_samples_matrices() -> None:
 
 
 def test_the_builder_gives_the_packaged_attributes_of_the_sampled_pages() -> None:
-    built = {
-        (row.report, row.matrix, row.attribute): row
-        for path in SAMPLES
-        for row in vocabulary.attributes(parse_wasde_xml(path))
-    }
-    expected = {
-        (row.report, row.matrix, row.attribute): row
-        for row in packaged("attribute", Attribute)
-        if row.report in SAMPLED
-    }
-    assert built == expected
-    # Within a page, the file's order.
+    """In what no release changes, page by page: within a page, the file's order."""
+    built = [row for path in SAMPLES for row in vocabulary.attributes(parse_wasde_xml(path))]
+    expected = [row for row in packaged("attribute", Attribute) if row.report in SAMPLED]
     for report in SAMPLED:
-        order = [key for key in built if key[0] == report]
-        assert order == [key for key in expected if key[0] == report], report
+        assert not vocabulary.differences(
+            [row for row in expected if row.report == report],
+            [row for row in built if row.report == report],
+            vocabulary.by_attribute,
+        ), report
+    assert {row.report_month for row in built} == {cell.report_month for cell in CELLS}
 
 
 def test_the_builder_gives_the_packaged_regions_of_the_sampled_pages() -> None:
@@ -147,7 +313,11 @@ def titles() -> dict[str, list[str]]:
 
 
 def test_the_commodity_rule_gives_the_packaged_list() -> None:
-    assert vocabulary.commodities(whole_file(), titles()) == packaged("commodity", Commodity)
+    """In what no release changes: the records take a sample's month, the list its own."""
+    built = vocabulary.commodities(whole_file(), titles())
+    expected = packaged("commodity", Commodity)
+    assert not vocabulary.differences(expected, built, vocabulary.by_matrix)
+    assert {row.report_month for row in built} == {CELLS[0].report_month}
 
 
 def test_the_commodity_list_reads_the_supply_and_use_pages() -> None:

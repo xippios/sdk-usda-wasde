@@ -1,8 +1,8 @@
 {
   "param": "commodity",
-  "endpoint": "wasde1026.xml",
-  "fetched": "2026-10-28T16:26:51Z",
-  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z, and from wasde1026.xls of the same release, complete at 2026-10-28T16:26:56Z: one record per report item of the supply-and-use pages 11 to 30, 32 and 33, its table the title parse_wasde_xml gives the item, its region the region the title starts with (U.S. as 'United States', Mexico, World). The commodity on pages 12 to 15 is the XLS's block title by position: sheet 'Page N' prints a title in column 0 of each block's header row (a row whose other cells hold market years, such as '2024/25'), in the order of the XML's report items of page N, and the Nth title is the Nth item's; the script writes only when every page has as many titles as report items (sr12 2, sr13 3, sr14 3, sr15 3). On pages 11, 16 to 30, 32 and 33 the commodity is the title's words between its region and 'Supply and Use' (a 'by Class:' before it left out), as printed.",
+  "endpoint": "wasde1126.xml",
+  "fetched": "2026-11-20T18:03:38Z",
+  "note": "Read from wasde1126.xml of ESMIS release 796142 (released 2026-11-10, Report_Month 'November 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-11-20T18:03:38Z, and from wasde1126.xls of the same release, complete at 2026-11-20T18:03:42Z: one record per report item of the supply-and-use pages 11 to 30, 32 and 33, its table the title parse_wasde_xml gives the item, its region the region the title starts with (U.S. as 'United States', Mexico, World). The commodity on pages 12 to 15 is the XLS's block title by position: sheet 'Page N' prints a title in column 0 of each block's header row (a row whose other cells hold market years, such as '2024/25'), in the order of the XML's report items of page N, and the Nth title is the Nth item's; the script writes only when every page has as many titles as report items (sr12 2, sr13 3, sr14 3, sr15 3). On pages 11, 16 to 30, 32 and 33 the commodity is the title's words between its region and 'Supply and Use' (a 'by Class:' before it left out), as printed.",
   "records": [
     {
       "commodity": "Wheat",
@@ -10,7 +10,7 @@
       "report": "sr11",
       "matrix": "matrix1",
       "table": "U.S. Wheat Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Wheat",
@@ -18,7 +18,7 @@
       "report": "sr11",
       "matrix": "matrix2",
       "table": "U.S. Wheat by Class: Supply and Use",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "FEED GRAINS",
@@ -26,7 +26,7 @@
       "report": "sr12",
       "matrix": "matrix1",
       "table": "U.S. Feed Grain and Corn Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "CORN",
@@ -34,7 +34,7 @@
       "report": "sr12",
       "matrix": "matrix2",
       "table": "U.S. Feed Grain and Corn Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "SORGHUM",
@@ -42,7 +42,7 @@
       "report": "sr13",
       "matrix": "matrix1",
       "table": "U.S. Sorghum, Barley, and Oats Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "BARLEY",
@@ -50,7 +50,7 @@
       "report": "sr13",
       "matrix": "matrix2",
       "table": "U.S. Sorghum, Barley, and Oats Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "OATS",
@@ -58,7 +58,7 @@
       "report": "sr13",
       "matrix": "matrix3",
       "table": "U.S. Sorghum, Barley, and Oats Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "TOTAL RICE",
@@ -66,7 +66,7 @@
       "report": "sr14",
       "matrix": "matrix1",
       "table": "U.S. Rice Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "LONG-GRAIN RICE",
@@ -74,7 +74,7 @@
       "report": "sr14",
       "matrix": "matrix2",
       "table": "U.S. Rice Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "MEDIUM & SHORT-GRAIN RICE",
@@ -82,7 +82,7 @@
       "report": "sr14",
       "matrix": "matrix3",
       "table": "U.S. Rice Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "SOYBEANS",
@@ -90,7 +90,7 @@
       "report": "sr15",
       "matrix": "matrix1",
       "table": "U.S. Soybeans and Products Supply and Use (Domestic Measure)  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "SOYBEAN OIL",
@@ -98,7 +98,7 @@
       "report": "sr15",
       "matrix": "matrix2",
       "table": "U.S. Soybeans and Products Supply and Use (Domestic Measure)  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "SOYBEAN MEAL",
@@ -106,7 +106,7 @@
       "report": "sr15",
       "matrix": "matrix3",
       "table": "U.S. Soybeans and Products Supply and Use (Domestic Measure)  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Sugar",
@@ -114,7 +114,7 @@
       "report": "sr16",
       "matrix": "matrix1",
       "table": "U.S. Sugar Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Sugar",
@@ -122,7 +122,7 @@
       "report": "sr16",
       "matrix": "matrix2",
       "table": "Mexico Sugar Supply and Use and High Fructose Corn Syrup Consumption 1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Cotton",
@@ -130,7 +130,7 @@
       "report": "sr17",
       "matrix": "matrix1",
       "table": "U.S. Cotton Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Wheat",
@@ -138,7 +138,7 @@
       "report": "sr18",
       "matrix": "matrix1",
       "table": "World Wheat Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Wheat",
@@ -146,7 +146,7 @@
       "report": "sr18",
       "matrix": "matrix2",
       "table": "World Wheat Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Wheat",
@@ -154,7 +154,7 @@
       "report": "sr19",
       "matrix": "matrix1",
       "table": "World Wheat Supply and Use  1/  (Cont'd.)",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Coarse Grain",
@@ -162,7 +162,7 @@
       "report": "sr20",
       "matrix": "matrix1",
       "table": "World Coarse Grain Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Coarse Grain",
@@ -170,7 +170,7 @@
       "report": "sr20",
       "matrix": "matrix2",
       "table": "World Coarse Grain Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Coarse Grain",
@@ -178,7 +178,7 @@
       "report": "sr21",
       "matrix": "matrix1",
       "table": "World Coarse Grain Supply and Use  1/  (Cont'd.)",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Corn",
@@ -186,7 +186,7 @@
       "report": "sr22",
       "matrix": "matrix1",
       "table": "World Corn Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Corn",
@@ -194,7 +194,7 @@
       "report": "sr22",
       "matrix": "matrix2",
       "table": "World Corn Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Corn",
@@ -202,7 +202,7 @@
       "report": "sr23",
       "matrix": "matrix1",
       "table": "World Corn Supply and Use  1/  (Cont'd.)",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Rice",
@@ -210,7 +210,7 @@
       "report": "sr24",
       "matrix": "matrix1",
       "table": "World Rice Supply and Use  (Milled Basis)  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Rice",
@@ -218,7 +218,7 @@
       "report": "sr24",
       "matrix": "matrix2",
       "table": "World Rice Supply and Use  (Milled Basis)  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Rice",
@@ -226,7 +226,7 @@
       "report": "sr25",
       "matrix": "matrix1",
       "table": "World Rice Supply and Use  (Milled Basis)  1/  (Cont'd.)",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Cotton",
@@ -234,7 +234,7 @@
       "report": "sr26",
       "matrix": "matrix3",
       "table": "World Cotton Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Cotton",
@@ -242,7 +242,7 @@
       "report": "sr26",
       "matrix": "matrix4",
       "table": "World Cotton Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Cotton",
@@ -250,7 +250,7 @@
       "report": "sr27",
       "matrix": "matrix2",
       "table": "World Cotton Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean",
@@ -258,7 +258,7 @@
       "report": "sr28",
       "matrix": "matrix4",
       "table": "World Soybean Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean",
@@ -266,7 +266,7 @@
       "report": "sr28",
       "matrix": "matrix5",
       "table": "World Soybean Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean",
@@ -274,7 +274,7 @@
       "report": "sr28",
       "matrix": "matrix3",
       "table": "World Soybean Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean Meal",
@@ -282,7 +282,7 @@
       "report": "sr29",
       "matrix": "matrix4",
       "table": "World Soybean Meal Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean Meal",
@@ -290,7 +290,7 @@
       "report": "sr29",
       "matrix": "matrix5",
       "table": "World Soybean Meal Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean Meal",
@@ -298,7 +298,7 @@
       "report": "sr29",
       "matrix": "matrix6",
       "table": "World Soybean Meal Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean Oil",
@@ -306,7 +306,7 @@
       "report": "sr30",
       "matrix": "matrix4",
       "table": "World Soybean Oil Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean Oil",
@@ -314,7 +314,7 @@
       "report": "sr30",
       "matrix": "matrix5",
       "table": "World Soybean Oil Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Soybean Oil",
@@ -322,7 +322,7 @@
       "report": "sr30",
       "matrix": "matrix6",
       "table": "World Soybean Oil Supply and Use  1/",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Meats",
@@ -330,7 +330,7 @@
       "report": "sr32",
       "matrix": "matrix1",
       "table": "U.S. Meats Supply and Use",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Egg",
@@ -338,7 +338,7 @@
       "report": "sr33",
       "matrix": "matrix1",
       "table": "U.S. Egg Supply and Use",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "commodity": "Milk",
@@ -346,7 +346,7 @@
       "report": "sr33",
       "matrix": "matrix2",
       "table": "U.S. Milk Supply and Use",
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     }
   ]
 }

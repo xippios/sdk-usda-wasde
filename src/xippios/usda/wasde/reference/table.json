@@ -1,8 +1,8 @@
 {
   "param": "table",
-  "endpoint": "wasde1026.xml",
-  "fetched": "2026-10-28T16:26:51Z",
-  "note": "Read from wasde1026.xml of ESMIS release 796099 (released 2026-10-09, Report_Month 'October 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-10-28T16:26:51Z: one record per page element of the XML, the attributes of the page's <Report> as printed (Name, Report_Month, sub_report_title to sub_report_title3, sub_report_subtitle to sub_report_subtitle3, sub_report_footer to sub_report_footer3; on a page whose <Report> holds no footer, the sub_report_footer of its one report item that carries it, pages 35 to 37), the number that ends page_title, and the element names of the page's report items in document order.",
+  "endpoint": "wasde1126.xml",
+  "fetched": "2026-11-20T18:03:38Z",
+  "note": "Read from wasde1126.xml of ESMIS release 796142 (released 2026-11-10, Report_Month 'November 2026'), downloaded through xippios-usda-esmis's download_release_file, complete at 2026-11-20T18:03:38Z: one record per page element of the XML, the attributes of the page's <Report> as printed (Name, Report_Month, sub_report_title to sub_report_title3, sub_report_subtitle to sub_report_subtitle3, sub_report_footer to sub_report_footer3; on a page whose <Report> holds no footer, the sub_report_footer of its one report item that carries it, pages 35 to 37), the number that ends page_title, and the element names of the page's report items in document order.",
   "records": [
     {
       "report": "sr08",
@@ -20,7 +20,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr09",
@@ -38,7 +38,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr10",
@@ -57,7 +57,7 @@
         "matrix2",
         "matrix3"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr11",
@@ -75,7 +75,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr12",
@@ -86,14 +86,14 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
-      "sub_report_footer": "Note:  Totals may not add due to rounding.  1/ Marketing year beginning September 1 for corn and sorghum; June 1 for barley and oats.  2/ For a breakout of FSI corn uses, see Feed Outlook table 5.  3/ Corn processed in ethanol plants to produce ethanol and by-products including distillers' grains, corn gluten feed, corn gluten meal, and corn oil.  4/ Marketing-year weighted average price received by farmers.  * For July, corn planted and harvested area as reported in the June 30, 2026, \"Acreage.\"  The yield projection is based on a weather-adjusted trend assuming normal planting progress and summer growing season weather.",
+      "sub_report_footer": "Note:  Totals may not add due to rounding.  1/ Marketing year beginning September 1 for corn and sorghum; June 1 for barley and oats.  2/ For a breakout of FSI corn uses, see Feed Outlook table 5.  3/ Corn processed in ethanol plants to produce ethanol and by-products including distillers' grains, corn gluten feed, corn gluten meal, and corn oil.  4/ Marketing-year weighted average price received by farmers.",
       "sub_report_footer2": null,
       "sub_report_footer3": null,
       "matrices": [
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr13",
@@ -104,7 +104,7 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
-      "sub_report_footer": "Note:  Totals may not add due to rounding.  1/ Marketing year beginning September 1 for sorghum; June 1 for barley and oats.  2/ Marketing-year weighted average price received by farmers.  * For July sorghum planted and harvested acres reported in the June 30, 2026, \"Acreage.\" The yield is the median yield for 2006-2025.  Barley and oats area planted, area harvested, yield, and production as reported in the July 10, 2026, \"Crop Production.\"",
+      "sub_report_footer": "Note: Totals may not add due to rounding.  1/ Marketing year beginning September 1 for sorghum; June 1 for barley and oats.  2/ Marketing-year weighted average price received by farmers.  ",
       "sub_report_footer2": null,
       "sub_report_footer3": null,
       "matrices": [
@@ -112,7 +112,7 @@
         "matrix2",
         "matrix3"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr14",
@@ -131,7 +131,7 @@
         "matrix2",
         "matrix3"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr15",
@@ -142,7 +142,7 @@
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
-      "sub_report_footer": "Note:  Totals may not add due to rounding.  Reliability calculations at end of report.  1/ Marketing year beginning September 1 for soybeans; October 1 for soybean oil and soybean meal.  2/ Prices: soybeans, marketing year weighted average price received by farmers; oil, simple average of crude soybean oil, Decatur; meal, simple average of 48 percent protein, Decatur.  3/ Reflects soybean oil used for biofuels as reported by the U.S. Energy Information Administration.  4/ Based on an October year crush of 2,650 million bushels for 2025/26 and 2,780 million bushels for 2026/27. ",
+      "sub_report_footer": "Note:  Totals may not add due to rounding.  Reliability calculations at end of report.  1/ Marketing year beginning September 1 for soybeans; October 1 for soybean oil and soybean meal.  2/ Prices: soybeans, marketing year weighted average price received by farmers; oil, simple average of crude soybean oil, Decatur; meal, simple average of 48 percent protein, Decatur.  3/ Reflects soybean oil used for biofuels as reported by the U.S. Energy Information Administration.   4/ Based on an October year crush of 2,640 million bushels for 2025/26 and 2,780 million bushels for 2026/27. ",
       "sub_report_footer2": null,
       "sub_report_footer3": null,
       "matrices": [
@@ -150,7 +150,7 @@
         "matrix2",
         "matrix3"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr16",
@@ -163,12 +163,12 @@
       "sub_report_subtitle3": null,
       "sub_report_footer": "1/ Fiscal years beginning Oct 1. Data and projections correspond to category components from \"Sweetener Market Data\" (SMD). 2/  Production projections for 2025/26 and 2026/27 are based on Crop Production and/or processor projections/industry data and/or sugar ICEC analysis where appropriate.  3/ For 2025/26, WTO raw sugar TRQ shortfall (187) and for 2026/27 (96). 4/ Composed of sugar under the re-export and polyhydric alcohol programs.  5/ Transfers accompanying deliveries for sugar-containing products to be exported (SCP) and polyhydric alcohol manufacture (POLY), and deliveries for livestock feed and ethanol. Total refiner license transfers for SCP and POLY inclusive of WASDE-reported deliveries: 2024/25 -- 300; estimated 2025/26 -- 296; projected 2026/27 -- 295.",
       "sub_report_footer2": null,
-      "sub_report_footer3": "1/ HFCS consumption by Mexico (1,000 metric tons, dry basis): Estimated 2025/26 = 1,545; Estimated Oct.2025-Aug 2026 =1,414; Projected 2026/27 = 1,510. Footnote source for estimate: Comite Nacional para el Desarollo Sustentable de la Cana de Azucar. 2/Includes deliveries for consumption, Mexico's products export program (IMMEX), and Other Deliveries/Ending Year Statistical Adjustments.  IMMEX:  estimated 2025/26 (334 est = 321 dom.+13 import). Projected  2026/27 ( 316 proj = 302 dom.+14 import). Statistical Adjustments:  2025/26 (0); 2026/276 (0).",
+      "sub_report_footer3": "1/ HFCS consumption by Mexico (1,000 metric tons, dry basis): Estimated 2025/26 = 1,551; ; Projected 2026/27 = 1,507. Footnote source for estimate: Comite Nacional para el Desarollo Sustentable de la Cana de Azucar. 2/Includes deliveries for consumption, Mexico's products export program (IMMEX), and Other Deliveries/Ending Year Statistical Adjustments.  IMMEX:  estimated 2025/26 = 353. Projected  2026/27 = 359. Statistical Adjustments:  2025/26 (-25); 2026/276 (0).",
       "matrices": [
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr17",
@@ -181,11 +181,11 @@
       "sub_report_subtitle3": null,
       "sub_report_footer": null,
       "sub_report_footer2": null,
-      "sub_report_footer3": "Note: Reliability calculations at end of report. 1/ Upland and extra-long staple; marketing year beginning August 1. Totals may not add due to rounding. 2/ Reflects the difference between the previous season's supply less total use and ending stocks. 3/ Cents per pound for upland cotton. *September planted area, harvested, yield, and production as reported in the September 11, 2026 Crop Production report. **October planted area, harvested, yield, and production as reported in the October 9, 2026 Crop Production report. ",
+      "sub_report_footer3": "Note: Reliability calculations at end of report. 1/ Upland and extra-long staple; marketing year beginning August 1. Totals may not add due to rounding. 2/ Reflects the difference between the previous season's supply less total use and ending stocks. 3/ Cents per pound for upland cotton. 2026/27 Projection for October: planted area, harvested, yield, and production as reported in the October 9, 2026 Crop Production report. 2026/27 Projection for November: planted area, harvested, yield, and production as reported in the November 10, 2026 Crop Production report. ",
       "matrices": [
         "matrix1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr18",
@@ -203,7 +203,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr19",
@@ -220,7 +220,7 @@
       "matrices": [
         "matrix1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr20",
@@ -238,7 +238,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr21",
@@ -255,7 +255,7 @@
       "matrices": [
         "matrix1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr22",
@@ -273,7 +273,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr23",
@@ -290,7 +290,7 @@
       "matrices": [
         "matrix1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr24",
@@ -308,7 +308,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr25",
@@ -325,7 +325,7 @@
       "matrices": [
         "matrix1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr26",
@@ -343,7 +343,7 @@
         "matrix3",
         "matrix4"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr27",
@@ -360,7 +360,7 @@
       "matrices": [
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr28",
@@ -379,7 +379,7 @@
         "matrix5",
         "matrix3"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr29",
@@ -398,7 +398,7 @@
         "matrix5",
         "matrix6"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr30",
@@ -417,7 +417,7 @@
         "matrix5",
         "matrix6"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr31",
@@ -435,7 +435,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr32",
@@ -452,7 +452,7 @@
       "matrices": [
         "matrix1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr33",
@@ -470,7 +470,7 @@
         "matrix1",
         "matrix2"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr34",
@@ -487,52 +487,52 @@
       "matrices": [
         "matrix1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr35",
       "page": 35,
-      "sub_report_title": "Reliability of October Projections 1/",
+      "sub_report_title": "Reliability of November Projections 1/",
       "sub_report_title2": null,
       "sub_report_title3": null,
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
-      "sub_report_footer": " Note: Tables on pages 35-37 present a record of the October projection and the final Estimate. Using world wheat production as an example, the \"root mean square error\" means that chances are 2 out of 3 that the current forecast will not be above or below the final estimate by more than 1.6 percent.  Chances are 9 out of 10 (90% confidence level) that the difference will not exceed 2.8 percent. The average difference between the October projection and the final estimate is 7.5 million tons, ranging from 0.1 million to 27.8 million tons. The October projection has been below the estimate 32 times and above 11 times.  ",
+      "sub_report_footer": " Note: Tables on pages 35-37 present a record of the November projection and the final Estimate. Using world wheat production as an example, the \"root mean square error\" means that chances are 2 out of 3 that the current forecast will not be above or below the final estimate by more than 1.2 percent.  Chances are 9 out of 10 (90% confidence level) that the difference will not exceed 2 percent. The average difference between the November projection and the final estimate is 5.6 million tons, ranging from 0.1 million to 18.1 million tons. The November projection has been below the estimate 34 times and above 11 times.  ",
       "sub_report_footer2": null,
       "sub_report_footer3": null,
       "matrices": [
         "table1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr36",
       "page": 36,
-      "sub_report_title": "Reliability of October Projections  (Continued) 1/",
+      "sub_report_title": "Reliability of November Projections  (Continued) 1/",
       "sub_report_title2": null,
       "sub_report_title3": null,
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
-      "sub_report_footer": "1/ Marketing years 1981/82 through 2025/26 for grains, soybeans (U.S. only), and cotton. There was no WASDE published in October 2013 or October 2025, due to a partial government shutdown, so no 2013/14 or 2025/26 forecasts in that month were published for grains, soybeans, and cotton, and no 2013 or 2025 forecast was published in that month for animal products. Final for grains, soybeans, and cotton is defined as the first November estimate following the marketing year for 1981/82 through 2024/25, and for 2025/26 the last month’s estimate. 2/ Includes corn, sorghum, barley, oats, rye, millet, and mixed grain.  ",
+      "sub_report_footer": "1/ Marketing years 1981/82 through 2025/26 for grains, soybeans (U.S. only), and cotton.  Final for grains, soybeans, and cotton is defined as the first November estimate following the marketing year for 1981/82 through 2024/25, and for 2025/26 the last month’s estimate. 2/ Includes corn, sorghum, barley, oats, rye, millet, and mixed grain.  ",
       "sub_report_footer2": null,
       "sub_report_footer3": null,
       "matrices": [
         "table1"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     },
     {
       "report": "sr37",
       "page": 37,
-      "sub_report_title": "Reliability of United States October Projections  1/",
+      "sub_report_title": "Reliability of United States November Projections  1/",
       "sub_report_title2": null,
       "sub_report_title3": null,
       "sub_report_subtitle": null,
       "sub_report_subtitle2": null,
       "sub_report_subtitle3": null,
-      "sub_report_footer": "1/ See pages 35 and 36 for record of reliability for U.S. wheat, rice, soybeans, and cotton. Marketing years 1981/82 through 2025/26 for grains, soybeans, and cotton. Final for grains, soybeans, and cotton is defined as the first November estimate following the marketing year for 1981/82 through 2025/26. Calendar years 1982 through 2025 for meats, eggs, and milk. Final for animal products is defined as the latest annual production estimate published by NASS for 1982-2025. There was no WASDE published in October 2013 or October 2025, due to a partial government shutdown, so no 2013/14 or 2025/26 forecasts in that month were published for grains, soybeans, and cotton, and no 2013 or 2025 forecast was published in that month for animal products.",
+      "sub_report_footer": "1/ See pages 35 and 36 for record of reliability for U.S. wheat, rice, soybeans, and cotton. Marketing years 1981/82 through 2025/26 for grains, soybeans, and cotton. Final for grains, soybeans, and cotton is defined as the first November estimate following the marketing year for 1981/82 through 2025/26. Calendar years 1982 through 2025 for meats, eggs, and milk. Final for animal products is defined as the latest annual production estimate published by NASS for 1982-2025. ",
       "sub_report_footer2": null,
       "sub_report_footer3": null,
       "matrices": [
@@ -541,7 +541,7 @@
         "table3",
         "table4"
       ],
-      "report_month": "October 2026"
+      "report_month": "November 2026"
     }
   ]
 }

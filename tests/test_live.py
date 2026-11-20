@@ -16,10 +16,11 @@ downloads the session's copy of the file instead of fetching it again: each stil
 ESMIS for the latest release and for the release, so its lookups are live, and core's
 ``AsyncClient.download`` copies the file of the format its URL names. The three
 list tasks send nothing: their live tests build the lists from the latest files with
-the refresh script's rules (``_vocabulary``) and compare them with the packaged ones,
-every field but ``report_month``, the month word of the reliability titles masked
-(``Reliability of <Month> Projections``, pages 35 to 37), since every release names its
-own month there and the lists carry the release they came from (sdk-core ADR-0041 decision 1;
+the refresh script's rules (``_vocabulary``) and compare them with the packaged ones by
+its ``differences``, every field but ``report_month``, the month word of the reliability
+titles masked (``Reliability of <Month> Projections``, pages 35 to 37), since every
+release names its own month there and the lists carry the release they came from
+(sdk-core ADR-0041 decision 1;
 https://github.com/xippios/sdk-usda-wasde/pull/4); each footer of a table,
 ``sub_report_footer`` to ``sub_report_footer3``, is compared only for whether it is set
 on both sides, never its text, which changes every release (the projection month on
@@ -40,7 +41,6 @@ value, as every live run takes ``--tb=short``.
 
 import re
 import shutil
-from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from os import PathLike
@@ -50,13 +50,13 @@ from typing import Any
 import httpx
 import pytest
 from pypdf import PdfReader
-from xippios.core import AsyncClient, Downloaded, Result, UpstreamModel
+from xippios.core import AsyncClient, Downloaded, Result
 from xippios.usda.esmis import tasks as esmis
 
 from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import BASE_URL, config
-from xippios.usda.wasde.models import Table, WasdeXmlCell
+from xippios.usda.wasde.models import WasdeXmlCell
 from xippios.usda.wasde.parse import parse_wasde_pdf, parse_wasde_xls, parse_wasde_xml
 from xippios.usda.wasde.parse.wasde_pdf import HEADING
 from xippios.usda.wasde.parse.wasde_xls import MONTH_NAMES
@@ -212,72 +212,6 @@ def test_parse_wasde_xml_live(latest: Latest) -> None:
     assert numbers > 0.9 * len(records), "most values are numbers as printed"
 
 
-def differences(
-    packaged: Sequence[UpstreamModel],
-    current: Sequence[UpstreamModel],
-    name: Callable[[UpstreamModel], str],
-) -> list[str]:
-    """The rows of the packaged list that the current release's differs in, by name only.
-
-    Every field is compared but ``report_month``, which names the release the list was
-    read from; a row missing, added, changed or moved is named, never its values.
-    """
-
-    def fields(row: UpstreamModel) -> dict[str, object]:
-        return row.model_dump(exclude={"report_month"})
-
-    before = {name(row): fields(row) for row in packaged}
-    after = {name(row): fields(row) for row in current}
-    found = [f"missing now: {key}" for key in before if key not in after]
-    found += [f"new: {key}" for key in after if key not in before]
-    found += [f"changed: {key}" for key in before if key in after and before[key] != after[key]]
-    shared = [key for key in before if key in after]
-    if shared != [key for key in after if key in before]:
-        found.append("the order of the rows changed")
-    return found
-
-
-RELIABILITY_TITLE = re.compile(
-    rf"(Reliability of (?:United States )?)(?:{'|'.join(MONTH_NAMES)})( Projections)"
-)
-"""A reliability page's title, its month word the release's own: ``Reliability of October
-Projections 1/`` (page 35), ``Reliability of United States October Projections  1/`` (37)."""
-
-
-def month_masked(table: Table) -> Table:
-    """The table with the month word of a reliability title replaced by ``<month>``."""
-    titles = ("sub_report_title", "sub_report_title2", "sub_report_title3")
-    return table.model_copy(
-        update={
-            name: RELIABILITY_TITLE.sub(r"\1<month>\2", text)
-            for name in titles
-            if (text := getattr(table, name)) is not None
-        }
-    )
-
-
-FOOTERS = ("sub_report_footer", "sub_report_footer2", "sub_report_footer3")
-
-
-def footers_set(table: Table) -> Table:
-    """The table with each footer reduced to whether it is set: its text changes monthly."""
-    return table.model_copy(
-        update={name: "<set>" for name in FOOTERS if getattr(table, name) is not None}
-    )
-
-
-def by_report(row: UpstreamModel) -> str:
-    return str(getattr(row, "report", ""))
-
-
-def by_matrix(row: UpstreamModel) -> str:
-    return f"{getattr(row, 'report', '')} {getattr(row, 'matrix', '')}"
-
-
-def by_region(row: UpstreamModel) -> str:
-    return repr(getattr(row, "region", ""))
-
-
 def test_block_titles_live(latest: Latest) -> None:
     """The positional match still holds: each page of 12 to 15 has a title per matrix."""
     titles = vocabulary.block_titles(latest.xls)
@@ -299,11 +233,14 @@ async def test_list_tables_live(latest: Latest) -> None:
     whether it is set on both sides, never its text.
     """
     result = await tasks.list_tables_async()
-    masked = [month_masked(table) for table in result.data]
+    masked = [vocabulary.month_masked(table) for table in result.data]
     assert sum(table != month for table, month in zip(result.data, masked, strict=True)) == 3
-    packaged = [footers_set(table) for table in masked]
-    current = [footers_set(month_masked(table)) for table in vocabulary.tables(latest.xml)]
-    assert not differences(packaged, current, by_report)
+    packaged = [vocabulary.footers_set(table) for table in masked]
+    current = [
+        vocabulary.footers_set(vocabulary.month_masked(table))
+        for table in vocabulary.tables(latest.xml)
+    ]
+    assert not vocabulary.differences(packaged, current, vocabulary.by_report)
     assert result.meta.endpoint.endswith(".xml")
 
 
@@ -311,14 +248,14 @@ async def test_list_commodities_live(latest: Latest) -> None:
     result = await tasks.list_commodities_async()
     records = parse_wasde_xml(latest.xml)
     current = vocabulary.commodities(records, vocabulary.block_titles(latest.xls))
-    assert not differences(result.data, current, by_matrix)
+    assert not vocabulary.differences(result.data, current, vocabulary.by_matrix)
     assert result.meta.vintage
 
 
 async def test_list_regions_live(latest: Latest) -> None:
     result = await tasks.list_regions_async()
     current = vocabulary.regions(parse_wasde_xml(latest.xml))
-    assert not differences(result.data, current, by_region)
+    assert not vocabulary.differences(result.data, current, vocabulary.by_region)
     assert result.meta.vintage
 
 

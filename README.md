@@ -59,8 +59,8 @@ is what the file states: the subtitle of the world and summary pages (8 to 10, 1
 the label of a reliability table for its average, smallest and largest; on the U.S.
 pages it is `None`, since the XML does not say which of its repeated unit rows the page
 shows (the XLS and the TXT print them in place). `list_tables`, `list_commodities` and
-`list_regions` answer from lists packaged with the package, read from the October 2026
-release's files (ESMIS release 796099) by `scripts/refresh_reference.py`
+`list_regions` answer from lists packaged with the package, read from the November 2026
+release's files (ESMIS release 796142) by `scripts/refresh_reference.py`
 (`reference/README.md`) and refreshed before each release: its 30 table pages with
 their titles, subtitles and footnotes, the
 43 supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, and its

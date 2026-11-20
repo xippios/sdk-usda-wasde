@@ -55,10 +55,10 @@ compared only for whether it is set on both sides, never its text, which changes
 release (the projection month on page 35, the months of the estimates on pages 13 and
 16); any other difference fails, naming the rows.
 
-`endpoint` is the XML's name as ESMIS catalogs it (`wasde1026.xml`), the file every
+`endpoint` is the XML's name as ESMIS catalogs it (`wasde1126.xml`), the file every
 record's page, matrix and labels come from; the commodity file's `note` names the XLS as
 well. `fetched` is the UTC time the XML was complete. Every record carries the release's
-`report_month` (`October 2026`), which the list tasks give as `meta.vintage`.
+`report_month` (`November 2026`), which the list tasks give as `meta.vintage`.
 
 They load through `xippios.core.PackagedList`, which also builds the answer's `meta`:
 
@@ -77,7 +77,7 @@ was read from, Fetched the file's `fetched`, the UTC time the XML was complete.
 
 | File | Origin | Fetched |
 | --- | --- | --- |
-| `table.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its pages' `<Report>` attributes and the reliability items' footers (30 records) | 2026-10-28T16:26:51Z |
-| `commodity.json` | `wasde1026.xml` and `wasde1026.xls`, ESMIS release 796099 of 2026-10-09, the XML's report items of pages 11 to 30, 32 and 33 and the XLS's block titles of pages 12 to 15 (43 records) | 2026-10-28T16:26:51Z |
-| `region.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its `region` texts (70 records) | 2026-10-28T16:26:51Z |
-| `attribute.json` | `wasde1026.xml`, ESMIS release 796099 of 2026-10-09, its `attribute` texts by page and item (451 records) | 2026-10-28T16:26:51Z |
+| `table.json` | `wasde1126.xml`, ESMIS release 796142 of 2026-11-10, its pages' `<Report>` attributes and the reliability items' footers (30 records) | 2026-11-20T18:03:38Z |
+| `commodity.json` | `wasde1126.xml` and `wasde1126.xls`, ESMIS release 796142 of 2026-11-10, the XML's report items of pages 11 to 30, 32 and 33 and the XLS's block titles of pages 12 to 15 (43 records) | 2026-11-20T18:03:38Z |
+| `region.json` | `wasde1126.xml`, ESMIS release 796142 of 2026-11-10, its `region` texts (70 records) | 2026-11-20T18:03:38Z |
+| `attribute.json` | `wasde1126.xml`, ESMIS release 796142 of 2026-11-10, its `attribute` texts by page and item (451 records) | 2026-11-20T18:03:38Z |
