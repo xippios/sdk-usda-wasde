@@ -63,7 +63,7 @@ class Release(UpstreamModel):
         release_datetime: ``release_datetime`` as ESMIS prints it, an aware ``datetime``
             at ``+00:00``, e.g. ``2026-10-09T12:00:00+00:00``. ESMIS labels every WASDE
             release ``T12:00:00`` with ``+0000`` while WAOB releases at noon Eastern
-            (``docs/upstream/layout.md``); the value is upstream's text, never converted.
+            (``docs/upstream/OBSERVED.md``); the value is upstream's text, never converted.
         files: The release's files in ESMIS's order, each an
             ``xippios.usda.esmis.models.ReleaseFile`` with its ``url``, its ``name`` as the
             URL prints it (``"wasde1026.xml"``) and its ``format``, the extension
@@ -96,7 +96,7 @@ class WasdeXmlCell(UpstreamModel):
     Labels are the attributes of the value's ancestors, read from the page down, as
     printed: line breaks (``"Total\r\nSupply"``), double spaces, leading and trailing
     spaces and footnote markers (``"Trade 2/"``) are kept. A field the value's path
-    carries no attribute for is ``None``. ``docs/upstream/layout.md`` describes the file.
+    carries no attribute for is ``None``. ``docs/upstream/OBSERVED.md`` describes the file.
 
     Attributes:
         report: The page's ``Name``, e.g. ``"sr12"`` (printed page 12).
@@ -231,14 +231,14 @@ class WasdeXlsText(UpstreamModel):
     r"""One paragraph of a WASDE release's narrative: a row of its XLS file's sheet ``WASDE Text``.
 
     One record per row of the sheet whose cell holds text, in sheet order, as
-    ``parse.wasde_xls.parse_wasde_xls`` reads it with xlrd; ``docs/upstream/layout.md``
+    ``parse.wasde_xls.parse_wasde_xls`` reads it with xlrd; ``docs/upstream/OBSERVED.md``
     describes the workbook. The text is the narrative the PDF prints on its first pages,
     one paragraph a row, as printed: line breaks, spaces and the carriage return after
     the report's number kept.
 
     Attributes:
         sheet: The sheet's name as printed, ``"WASDE Text"``.
-        row: The row in the sheet, counted from 0 as xlrd and ``layout.md`` count, e.g.
+        row: The row in the sheet, counted from 0 as xlrd and ``OBSERVED.md`` count, e.g.
             ``0`` for ``"WASDE - 676\r"``, ``2`` for the first paragraph.
         text: The cell's text as printed, e.g. ``"WASDE - 676\r"``, ``"WHEAT: The outlook
             for 2026/27 U.S. wheat this month is for higher supplies, ..."``.

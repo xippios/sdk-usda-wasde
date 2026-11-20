@@ -12,11 +12,11 @@ follows, sdk-core's conventions among them, are listed under
 | --- | --- |
 | Upstream | USDA WAOB World Agricultural Supply and Demand Estimates, https://www.usda.gov/oce/commodity/wasde |
 | API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.1.1 |
-| Documentation | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates and WAOB's pages under https://www.usda.gov/oce/commodity/wasde, snapshotted in `docs/upstream/` by `scripts/refresh_upstream.py` (`/refresh-upstream`); a page www.usda.gov refuses to automated requests is kept from USDA's CDN origin, usda.azureedge.us; no page names an OpenAPI or Swagger document, so `SPEC_URL` is `None`; the file layouts, as observed, in `docs/upstream/layout.md` |
+| Documentation | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates and WAOB's pages under https://www.usda.gov/oce/commodity/wasde, snapshotted in `docs/upstream/` by `scripts/refresh_upstream.py` (`/refresh-upstream`); a page www.usda.gov refuses to automated requests is kept from USDA's CDN origin, usda.azureedge.us; no page names an OpenAPI or Swagger document, so `SPEC_URL` is `None`; the file layouts, as observed, in `docs/upstream/OBSERVED.md`, each note with the release file or sample it was read from |
 | Credentials | none; the API is open |
 | Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; sdk-core ADR-0033), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
 | Write tools | no, this package is read-only |
-| Files | a release carries XML, XLS, TXT and PDF since 2016-10 (`docs/upstream/layout.md`); parsed in `parse/`, one module per file kind: the XML with the standard library's `xml.etree.ElementTree` (`parse/wasde_xml.py`); the XLS's narrative, sheet `WASDE Text`, with xlrd, a dependency (`parse/wasde_xls.py`), whose block titles of pages 12 to 15 the refresh script reads as well (`_vocabulary.py`); the PDF's narrative pages with pypdf, a dependency, text only (`parse/wasde_pdf.py`; sdk-core ADR-0020 decision 4); the TXT is not read; the parser tests read the samples under `tests/fixtures/files/`, their provenance in its `README.md` (sdk-core ADR-0020) |
+| Files | a release carries XML, XLS, TXT and PDF since 2016-10 (`docs/upstream/OBSERVED.md`); parsed in `parse/`, one module per file kind: the XML with the standard library's `xml.etree.ElementTree` (`parse/wasde_xml.py`); the XLS's narrative, sheet `WASDE Text`, with xlrd, a dependency (`parse/wasde_xls.py`), whose block titles of pages 12 to 15 the refresh script reads as well (`_vocabulary.py`); the PDF's narrative pages with pypdf, a dependency, text only (`parse/wasde_pdf.py`; sdk-core ADR-0020 decision 4); the TXT is not read; the parser tests read the samples under `tests/fixtures/files/`, their provenance in its `README.md` (sdk-core ADR-0020) |
 | Depends on | `xippios-usda-esmis~=0.3.0`: the task layer and its models only, never `api/` or `_client`; this package's servers serve its own tasks, and an agent that wants a dependency's tools runs that package's server (sdk-core ADR-0021); used to list WASDE's releases in ESMIS's catalog and to download their files |
 
 The snapshot listed in `docs/upstream/FETCHED.md` is the reference for names, parameters and
@@ -87,11 +87,16 @@ tests/
                    on the packaged files
   test_reference.py  the packaged lists against the samples, the list rules and refusals
   test_cut_sample.py  cut_sample.py's download fixture, its sample marked, written offline
+  test_refresh_upstream.py  FETCHED.md as the capture script renders it, offline, with the
+                   row of OBSERVED.md, which a snapshot leaves as written
+  test_observed.py docs/upstream/OBSERVED.md as committed: the release files it was
+                   written from, each note's date and file, every cited file present
   test_live.py     @pytest.mark.live smoke tests, one per task, the live parser tests on the
                    latest XML, XLS and PDF, and the packaged lists against the latest XML and
                    XLS, which one session fixture fetches once with the PDF
 docs/
-  upstream/        documentation snapshot and FETCHED.md
+  upstream/        documentation snapshot, FETCHED.md, and OBSERVED.md, the notes written
+                   by hand: the release files' layouts and the catalog as observed
   adr/             this package's design decisions, one NNNN-<slug>.md record each, laid
                    out in its README.md
   adr.md           the index of the decisions, written by scripts/adr_index.py, never by hand
@@ -184,9 +189,10 @@ and counts, never on a raw payload.
 - Never rename or re-map an upstream concept to another source's (sdk-core ADR-0028).
 - Never return a documented personal identifier in a task's projection, echo one in
   `meta.request`, or commit one in a fixture (sdk-core ADR-0017).
-- Never edit `docs/upstream/` by hand but `docs/upstream/layout.md`, the notes on what
-  upstream does but never documents, the file layouts as observed: `/refresh-upstream`
-  fetches the rest, and the pull request shows its diff (conventions §3).
+- Never edit `docs/upstream/` by hand but `docs/upstream/OBSERVED.md`, the notes on what
+  upstream does but never documents, here the file layouts as observed:
+  `/refresh-upstream` fetches the rest, and the pull request shows its diff (conventions
+  §3).
 - Never add `src/xippios/__init__.py`, nor an `__init__.py` at a level between it and the
   package (sdk-core ADR-0006).
 - Never push a tag by hand: a release's tag comes from `publish.yml` alone (conventions §12).

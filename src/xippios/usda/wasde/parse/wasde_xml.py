@@ -1,7 +1,7 @@
 """Parse a WASDE release's XML file into one record per value (sdk-core ADR-0020).
 
 The file is the tables of printed pages 8 to 37 as an XML export of a reporting tool
-(``docs/upstream/layout.md``): a root ``<Report Name="wasde">`` holds one ``<srNN>`` per
+(``docs/upstream/OBSERVED.md``): a root ``<Report Name="wasde">`` holds one ``<srNN>`` per
 page, each one ``<Report>`` whose attributes are the page's (``Name``, ``Report_Month``,
 ``page_title``, ``sub_report_title``, ``sub_report_subtitle``, ``sub_report_footer`` and
 their numbered twins), whose children are the page's report items (``matrix1`` to
@@ -10,7 +10,7 @@ of the rows and columns as attributes, and the values sit at the end of each pat
 
 One generic walker reads every page: it never looks at an element's name, only at the
 names of its attributes, which it sorts into five kinds. The vocabulary is the one the
-October 2026 file uses, its counts in ``layout.md``:
+October 2026 file uses, its counts in ``OBSERVED.md``:
 
 - **dimensions**, the labels a value carries into its record, field by field:
   ``commodity_headerN``; ``region_headerN``; ``commodityN``, ``mN_commodityN``,
@@ -83,7 +83,7 @@ footer, on ``table4``, goes to its four tables.
   rows; a unit on a value's path is the text of its column's cell, one part of a unit
   printed across several columns (``"Million"`` over Broiler and ``" Pounds"`` over
   Turkey on page 31). The XLS and the TXT print the unit rows in place
-  (``docs/upstream/layout.md``). Page 14 prints unit rows in its first matrix, so none
+  (``docs/upstream/OBSERVED.md``). Page 14 prints unit rows in its first matrix, so none
   of its three takes its subtitle, ``" (Rough Equivalent of Rough and Milled Rice)"``,
   which stays on its records as ``sub_report_subtitle``, as every subtitle does.
 
@@ -237,7 +237,7 @@ def _walk(element: ET.Element, labels: dict[str, str], walk: _Walk, *, item: boo
             _refuse(
                 f"{walk.page.report} {walk.page.matrix}: unknown attribute {name!r} on "
                 f"<{element.tag}>: not a label, a value, a unit or a filler of the layout "
-                "the parser knows (docs/upstream/layout.md)",
+                "the parser knows (docs/upstream/OBSERVED.md)",
                 {"report": walk.page.report, "element": element.tag, "attribute": name},
             )
     page = walk.page

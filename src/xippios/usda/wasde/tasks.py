@@ -152,7 +152,7 @@ PUBLICATION = "wasde"
 
 FIRST_XML_RELEASE = "the first with an XML file is that of 2010-07-09 (release 95659)"
 """The earliest WASDE release ESMIS lists with an XML file, as observed on 2026-10-28
-(``docs/upstream/layout.md``), for the refusal of a release without one."""
+(``docs/upstream/OBSERVED.md``), for the refusal of a release without one."""
 
 WORLD = "World"
 """The ``region`` of the world pages' matrices in the packaged commodity list."""

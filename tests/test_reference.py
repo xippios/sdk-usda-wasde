@@ -60,7 +60,7 @@ def test_the_packaged_footers_are_the_parsers_by_page() -> None:
 
 
 def test_a_reliability_page_states_the_footer_of_its_item() -> None:
-    """Pages 35 to 37 carry their footer on an item (layout.md): ``table1``, ``table4``."""
+    """Pages 35 to 37 carry their footer on an item (OBSERVED.md): ``table1``, ``table4``."""
     footers = {table.report: table for table in packaged("table", Table)}
     for report in ("sr35", "sr36", "sr37"):
         assert footers[report].sub_report_footer, report

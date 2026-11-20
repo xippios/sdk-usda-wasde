@@ -62,7 +62,7 @@ from xippios.usda.wasde.parse.wasde_xls import MONTH_NAMES
 pytestmark = [pytest.mark.live, pytest.mark.anyio]
 
 PAGES = {f"sr{number:02d}" for number in range(8, 38)}
-"""The pages the October 2026 file holds, printed pages 8 to 37 (``docs/upstream/layout.md``)."""
+"""The pages the October 2026 file holds, printed pages 8 to 37 (``docs/upstream/OBSERVED.md``)."""
 RELIABILITY = {"sr35", "sr36", "sr37"}
 STATISTICS = {
     "root_mean_square_error",
