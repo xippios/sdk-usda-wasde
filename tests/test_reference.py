@@ -72,6 +72,115 @@ def test_the_month_is_masked_in_the_reliability_titles_alone() -> None:
             assert "Reliability of " in vocabulary.month_masked(table).sub_report_title, table
 
 
+def test_a_reliability_title_names_its_lists_month() -> None:
+    """The month word ``month_masked`` hides is the month of the table's own ``report_month``.
+
+    So the packaged titles of pages 35 to 37 name the packaged release's month, and the
+    samples' name the samples', whichever releases they are.
+    """
+    checked = 0
+    for table in packaged("table", Table) + BUILT:
+        masked = vocabulary.month_masked(table)
+        if masked != table:
+            month = table.report_month.split()[0]
+            assert masked.sub_report_title.replace("<month>", month) == table.sub_report_title, (
+                table.report
+            )
+            checked += 1
+    assert checked == 6, "pages 35 to 37 of the packaged list and of the samples"
+
+
+@pytest.mark.parametrize(
+    ("title", "masked"),
+    [
+        ("Reliability of October Projections 1/", "Reliability of <month> Projections 1/"),
+        (
+            "Reliability of November Projections  (Continued) 1/",
+            "Reliability of <month> Projections  (Continued) 1/",
+        ),
+        (
+            "Reliability of United States November Projections  1/",
+            "Reliability of United States <month> Projections  1/",
+        ),
+        ("U.S. Wheat Supply and Use  1/", "U.S. Wheat Supply and Use  1/"),
+    ],
+)
+def test_month_masked_replaces_the_month_word_alone(title: str, masked: str) -> None:
+    table = packaged("table", Table)[0].model_copy(update={"sub_report_title": title})
+    assert vocabulary.month_masked(table).sub_report_title == masked
+
+
+def test_footers_set_keeps_an_unset_footer_unset() -> None:
+    """A set footer reads ``<set>`` whatever its text, an unset one stays ``None``."""
+    table = packaged("table", Table)[0].model_copy(
+        update={
+            "sub_report_footer": "1/ Marketing year beginning June 1.",
+            "sub_report_footer2": None,
+            "sub_report_footer3": "3/ Projected.",
+        }
+    )
+    reduced = vocabulary.footers_set(table)
+    assert [getattr(reduced, name) for name in vocabulary.FOOTERS] == ["<set>", None, "<set>"]
+    others = set(vocabulary.FOOTERS)
+    assert reduced.model_dump(exclude=others) == table.model_dump(exclude=others)
+    reworded = table.model_copy(update={"sub_report_footer": "1/ Marketing year beginning May 1."})
+    assert vocabulary.footers_set(reworded) == reduced, "a footer's text is not compared"
+    unset = table.model_copy(update={"sub_report_footer3": None})
+    assert vocabulary.footers_set(unset) != reduced, "a footer set on one side only is"
+
+
+def region(text: str, *reports: str) -> Region:
+    """A region row made in the test, of October 2026."""
+    return Region(region=text, reports=list(reports), report_month="October 2026")
+
+
+def test_differences_names_nothing_between_two_releases_equal_rows() -> None:
+    """Rows that differ in ``report_month`` alone, the release they were read from, are equal."""
+    october = [region("World", "sr09"), region("U.S.", "sr18")]
+    november = [row.model_copy(update={"report_month": "November 2026"}) for row in october]
+    assert vocabulary.differences(october, november, vocabulary.by_region) == []
+
+
+def test_differences_names_a_missing_a_new_a_changed_and_a_moved_row() -> None:
+    before = [
+        region("World", "sr09"),
+        region("U.S.", "sr18"),
+        region("    China", "sr20"),
+        region("    Japan", "sr21"),
+    ]
+    after = [
+        region("World", "sr09"),
+        region("    China", "sr20", "sr22"),
+        region("U.S.", "sr18"),
+        region("    Brazil", "sr23"),
+    ]
+    assert vocabulary.differences(before, after, vocabulary.by_region) == [
+        "missing now: '    Japan'",
+        "new: '    Brazil'",
+        "changed: '    China'",
+        "the order of the rows changed",
+    ]
+
+
+def test_differences_compares_every_field_of_a_table_but_its_month() -> None:
+    table = packaged("table", Table)[0]
+    for name in Table.model_fields:
+        if name in {"report", "report_month"}:
+            continue  # the row's name, and the release
+        value = getattr(table, name)
+        other: object
+        if isinstance(value, int):
+            other = value + 1
+        elif isinstance(value, list):
+            other = [*value, "matrix9"]
+        else:
+            other = f"{value} 9/"
+        changed = table.model_copy(update={name: other})
+        assert vocabulary.differences([table], [changed], vocabulary.by_report) == [
+            f"changed: {table.report}"
+        ], name
+
+
 def test_the_built_footers_are_the_parsers_by_page() -> None:
     """A page's footers, stated once, are the ones ``parse_wasde_xml`` gives its items.
 
