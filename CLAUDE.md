@@ -88,8 +88,8 @@ tests/
                    on the packaged files
   test_reference.py  the packaged lists against the samples, the list rules and refusals
   test_cut_sample.py  cut_sample.py's download fixture, its sample marked, written offline
-  test_refresh_upstream.py  FETCHED.md as the capture script renders it, offline, with the
-                   row of OBSERVED.md, which a snapshot leaves as written
+  test_refresh_upstream.py  FETCHED.md as the capture script renders it, offline: the row of
+                   OBSERVED.md, the table Not fetched, each linked page fetched or a row
   test_observed.py docs/upstream/OBSERVED.md as committed: the release files it was
                    written from, each note's date and file, every cited file present
   test_live.py     @pytest.mark.live smoke tests, one per task, the live parser tests on the
@@ -395,4 +395,4 @@ semantics or the shape of the public API.
   difference naming the rows. `get_table`,
   `get_balance_sheet` and `read_report_text` run live through the fixture `served`,
   their lookups live, core's `AsyncClient.download` copying the session's file. Sixteen
-  keyless requests, three of them downloads, about 4.7 MB.
+  keyless requests, three of them downloads, about 3.3 MB for the November 2026 release.

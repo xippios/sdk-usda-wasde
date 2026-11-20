@@ -34,8 +34,8 @@ from xippios.usda.wasde import (
 )
 
 latest = get_latest_release()  # the newest WASDE release in ESMIS
-latest.data.id, latest.data.month  # "796099", "2026-10"
-latest.meta.published_at  # 2026-10-09 12:00:00: ESMIS's printed time, no zone (sdk-core ADR-0041)
+latest.data.id, latest.data.month  # "796142", "2026-11"
+latest.meta.published_at  # 2026-11-10 12:00:00: ESMIS's printed time, no zone (sdk-core ADR-0041)
 
 releases = list_releases(since=date(2026, 1, 1))  # bound it: without since, 29 requests
 [release.month for release in releases.data if release.revision]  # ["2026-06", "2026-05"]
@@ -44,7 +44,7 @@ page_12 = list_commodities(search="sr12")  # packaged with the package: no reque
 [row.commodity for row in page_12.data]  # ["FEED GRAINS", "CORN"]: matrix1 and matrix2
 
 corn = get_balance_sheet("CORN")  # page 12's U.S. corn matrix, read from the latest XML
-corn.meta.endpoint, corn.meta.vintage, len(corn.data)  # "wasde1026.xml", "October 2026", 60
+corn.meta.endpoint, corn.meta.vintage, len(corn.data)  # "wasde1126.xml", "November 2026", 60
 corn.data[0].attribute, corn.data[0].cell_value  # "Area Planted", "90.9" (2024/25)
 # its subtitle and footnotes are page 12's in list_tables(search="sr12"), stated once
 
