@@ -61,6 +61,7 @@ from xippios.usda.esmis.models import Release as EsmisRelease
 from xippios.usda.esmis.models import ReleaseFile, ReleaseResults
 
 from xippios.usda.wasde import _client, tasks
+from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde import mcp as wasde_mcp
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.http import router
@@ -318,15 +319,23 @@ def test_a_slice_record_is_the_xml_record_without_its_pages_labels() -> None:
 
 
 def test_the_pages_labels_are_list_tables_s() -> None:
-    """What a slice leaves out is stated once per page, as the page's records carry it."""
-    tables = {table.report: table for table in tasks.list_tables().data}
+    """What a slice leaves out is stated once per page, as the page's records carry it.
+
+    The replayed records are October 2026's and the packaged list the latest release's, so
+    they are held together in what no release changes, as ``_vocabulary.differences``
+    compares two releases: the month left out, the reliability titles' month masked, a
+    footer compared for being set (https://github.com/xippios/sdk-usda-wasde/pull/4).
+    """
+    tables = {
+        table.report: vocabulary.footers_set(vocabulary.month_masked(table))
+        for table in tasks.list_tables().data
+    }
     for record in parse_wasde_xml(SR11_SR24):
         table = tables[record.report]
-        assert record.report_month == table.report_month
         assert record.table in {table.sub_report_title, table.sub_report_title2}
         assert record.sub_report_subtitle in {table.sub_report_subtitle, None}
-        footers = {table.sub_report_footer, table.sub_report_footer2, table.sub_report_footer3}
-        assert record.sub_report_footer in footers
+        footers = {getattr(table, name) for name in vocabulary.FOOTERS}
+        assert ("<set>" if record.sub_report_footer is not None else None) in footers
 
 
 def replay_october(replay_fixture: ReplayFixture, download: str) -> list[respx.Route]:
