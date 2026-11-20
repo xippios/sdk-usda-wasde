@@ -21,6 +21,8 @@ the MCP server; the bulk task is neither a tool nor a route.
 """
 
 import json
+import subprocess
+import sys
 import tempfile
 from collections.abc import Callable
 from datetime import UTC, date, datetime
@@ -1043,6 +1045,35 @@ def test_build_is_the_tool_set_the_server_serves() -> None:
     assert [task.__name__ for task in tools.tasks] == served
     assert tools.source == SOURCE
     assert dict(tools.caps or {}) == dict(tasks.MCP_CAPS)
+
+
+ENTRY_POINT = Path(sys.executable).parent / "xippios-usda-wasde-mcp"
+"""The installed entry point, ``[project.scripts]`` of ``pyproject.toml``."""
+
+
+def entry_point(*arguments: str) -> subprocess.CompletedProcess[str]:
+    """The entry point run with ``arguments``, which stop it before it serves."""
+    return subprocess.run(
+        [str(ENTRY_POINT), *arguments], capture_output=True, text=True, timeout=120, check=False
+    )
+
+
+def test_the_entry_point_names_itself_in_its_usage_and_errors() -> None:
+    """Core 0.4.0 names the entry point that runs, where 0.1 named the server's slug."""
+    run = entry_point("--bogus")
+    assert run.returncode == 2
+    assert run.stderr.startswith("usage: xippios-usda-wasde-mcp [-h]")
+    assert run.stderr.splitlines()[-1] == (
+        "xippios-usda-wasde-mcp: error: unrecognized arguments: --bogus"
+    )
+
+
+def test_allow_remote_changes_nothing_on_this_read_server() -> None:
+    run = entry_point("--help")
+    assert run.returncode == 0
+    assert "--allow-remote changes nothing: this read server is not held to loopback" in (
+        " ".join(run.stdout.split())
+    )
 
 
 SAMPLED = [
