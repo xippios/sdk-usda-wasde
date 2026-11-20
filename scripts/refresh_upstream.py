@@ -22,7 +22,9 @@ the same Drupal site (``UsdaPage``). The script writes:
 - ``FETCHED.md``: regenerated whole, one row per file and per page recorded without a
   file, and, where it exists, a row for ``OBSERVED.md``, the one file under
   ``docs/upstream/`` written by hand: what upstream does but never documents, here the
-  release files' layouts as observed, which this script neither writes nor checks.
+  release files' layouts as observed, which this script neither writes nor checks; then
+  the table ``Not fetched``, a row with its reason for each page the documentation links
+  that the snapshot deliberately does not request (``NOT_FETCHED``, conventions §3).
 
 Everything is fetched before anything is written, one request at a time after a pause,
 each URL retried at most once after a network error or a 5xx. ``FETCHED.md`` records the
@@ -150,6 +152,20 @@ class UsdaPage:
         return f"{USDA}{self.path}"
 
 
+@dataclass(frozen=True)
+class NotFetched:
+    """A page the documentation links that the snapshot deliberately does not request.
+
+    Attributes:
+        url: The page.
+        reason: Why: a feed, a third-party specification (cited, not snapshotted), an API
+            answer, a page that is no API documentation.
+    """
+
+    url: str
+    reason: str
+
+
 _CONVERTED = "converted to Markdown; Bytes and sha256 are the HTML page's"
 _DENIED = (
     "403 Access Denied at the CDN edge; the body carries a per-request reference, so "
@@ -211,6 +227,339 @@ The ESMIS page of the newest release follows the publication page; its URL is re
 the publication page on every run (``latest_release``). A ``UsdaPage`` has one row or two,
 as www.usda.gov answers (``capture_usda``).
 """
+
+_ESMIS = "https://esmis.nal.usda.gov"
+_DOCUMENTS = f"{USDA}/sites/default/files/documents"
+_ERS = "https://www.ers.usda.gov"
+_CORNELL = "https://usda.library.cornell.edu/concern/publications"
+
+EARLIER_RELEASES = (
+    "2026-10-09",
+    "2026-09-11",
+    "2026-08-12",
+    "2026-07-10",
+    "2026-06-11",
+    "2026-05-12-0",
+    "2026-04-09",
+    "2026-03-10",
+    "2026-02-10",
+)
+"""The rows of the publication page's release list after the first, each by its View link's
+last path segment. The list shows the newest releases, so a capture after a release sets
+these anew; ``tests/test_refresh_upstream.py`` names a linked page that is no row."""
+
+REPORT_FILES = (("wasde1126", "November 2026"), ("wasde1026", "October 2026"))
+"""The reports whose files the WASDE page links on www.usda.gov, by the files' stem: the
+newest two, which a capture after a release sets anew."""
+
+_MONTHS = tuple(f"{month:02}" for month in range(1, 13))
+HISTORICAL_DATA: tuple[str, ...] = (
+    *(
+        f"2026-{month}.csv"
+        for month in ("01", "02", "03", "04", "05-V2", "06-V2", "07", "08", "09", "10", "11")
+    ),
+    *(f"2025-{month}.csv" for month in _MONTHS if month != "10"),
+    *(f"{year}-{month}.csv" for year in (2024, 2023, 2022, 2021) for month in _MONTHS),
+    "2010-04-to-2015-12.zip",
+    "2016-01-to-2020-12.zip",
+)
+"""The files the historical data page links, by their names after ``oce-wasde-report-data-``,
+in the page's order: a CSV a month since 2021, none for 2025-10 and the reposted one
+(``V2``) for May and June 2026, then two ZIPs of the months before. The page adds a CSV
+after each release, which a capture then adds here."""
+
+NOT_FETCHED: tuple[NotFetched, ...] = (
+    NotFetched(
+        f"{_ESMIS}/release-calendar",
+        "ESMIS's release calendar, the release dates of every report ESMIS catalogs, WASDE's "
+        "among them: a calendar, no API documentation; xippios-usda-esmis, whose tasks this "
+        "package uses, keeps it as an excerpt",
+    ),
+    NotFetched(
+        f"{_ESMIS}/sites/default/release-files/",
+        "the folder of the release files that the publication page's release list and the "
+        "newest release's page link, a folder per release with its XML, XLS, TXT and PDF: "
+        f"data, no documentation; `{OBSERVED}` notes their layouts as observed, and "
+        "xippios-usda-esmis's `download_release_file` fetches one on a caller's request",
+    ),
+    *(
+        NotFetched(
+            f"{DOCS_URL}/{path}",
+            "the page of an earlier release, which the publication page's release list links, "
+            "its date and its files: a catalogue entry, no API documentation; the snapshot "
+            "keeps the newest release's page",
+        )
+        for path in EARLIER_RELEASES
+    ),
+    *(
+        NotFetched(
+            f"{USDA}/oce/commodity/wasde/{stem}.{extension}",
+            f"the {extension.upper()} of the {month} report, which the WASDE page links on "
+            "www.usda.gov: data, no documentation; ESMIS's folder of release files holds a "
+            "file of the same name",
+        )
+        for stem, month in REPORT_FILES
+        for extension in ("pdf", "xml", "xls", "txt")
+    ),
+    NotFetched(
+        f"{_ERS}/topics/farm-economy/commodity-outlook/wasde-projections-at-a-glance/",
+        "ERS's WASDE Visualization, which the WASDE page links among its related content: "
+        "charts of the projections, no API documentation",
+    ),
+    NotFetched(
+        f"{USDA}/oce/commodity-markets/cotton-estimates",
+        "WAOB's Upland and Extra Long Staple Cotton Estimates, which the WASDE page links "
+        "among its related content: another report, no API documentation",
+    ),
+    NotFetched(
+        f"{_ESMIS}/publication/weekly-weather-and-crop-bulletin",
+        "ESMIS's page of the Weekly Weather and Crop Bulletin, which the WASDE page links "
+        "among its related content: another report, no API documentation",
+    ),
+    NotFetched(
+        "https://public.govdelivery.com/accounts/USDAOC/subscriber/topics",
+        "the sign-up for WAOB's notifications, which the WASDE page links: a subscription "
+        "form on a third party's site, no API documentation",
+    ),
+    NotFetched(
+        f"{USDA}/secretarys-briefing",
+        "the Secretary's briefings after each report, which the WASDE page links: no API "
+        "documentation",
+    ),
+    *(
+        NotFetched(
+            url,
+            f"{name}, which About WASDE lists among the secretarial directives: no API "
+            "documentation",
+        )
+        for url, name in (
+            (
+                f"{_DOCUMENTS}/Secretary-Memo-1769-1972-03-07-ICEC-Creation.pdf",
+                "ICEC Creation, the Secretary's memorandum of 1972-03-07",
+            ),
+            (
+                f"{_DOCUMENTS}/Secretary-Memo-1920-1977-06-03-WAOB-Established.pdf",
+                "WAOB Creation, the Secretary's memorandum of 1977-06-03",
+            ),
+            (f"{USDA}/directives/sm-1077-014", "ICEC Reaffirmation"),
+        )
+    ),
+    NotFetched(
+        "https://us02web.zoom.us/rec/share/4MXKn9OVlomI215KxKIR-zPfLs90fRRh3sxtuFyAvNRPJEJt_ZFJQ4_"
+        "BbFFHh9Jr.i0gv825vjh0JDZnW",
+        "the recording of WAOB's webinar on its forecasting methodology, which the FAQ "
+        "links: a video on a third party's site, no API documentation",
+    ),
+    NotFetched(
+        f"{_CORNELL}/3t945q76s?locale=en&page=62",
+        "a page of the archive of WASDE reports since 1974 at Cornell's Mann Library, which "
+        "the FAQ links for the reports before the consolidated data: a list of reports, no "
+        "API documentation",
+    ),
+    *(
+        NotFetched(
+            url,
+            f"{name}, which the FAQ lists among the reports that follow each WASDE: another "
+            "report, no API documentation",
+        )
+        for url, name in (
+            (f"{_ERS}/publications/pub-details/?pubid=108981", "ERS's Feed Outlook"),
+            (f"{_ERS}/publications/pub-details/?pubid=108990", "ERS's Rice Outlook"),
+            (f"{_ERS}/publications/pub-details/?pubid=108962", "ERS's Oil Crops Outlook"),
+            (
+                f"{_ERS}/topics/crops/cotton-and-wool/market-outlook/",
+                "ERS's Cotton and Wool Outlook",
+            ),
+            (f"{_ERS}/publications/pub-details/?pubid=108973", "ERS's Wheat Outlook"),
+            (
+                f"{_ERS}/publications/pub-details/?pubid=109020",
+                "ERS's Sugar and Sweeteners Outlook",
+            ),
+            (
+                f"{_ERS}/publications/pub-details/?pubid=108793",
+                "ERS's Livestock, Poultry and Dairy Outlook",
+            ),
+            (f"{_CORNELL}/5q47rn72z?locale=en", "FAS's World Agricultural Production"),
+            (f"{_CORNELL}/tx31qh68h?locale=en", "FAS's Oilseeds: World Markets and Trade"),
+            (
+                "https://apps.fas.usda.gov/psdonline/circulars/grain.pdf",
+                "FAS's Grain: World Markets and Trade",
+            ),
+            (
+                "https://apps.fas.usda.gov/psdonline/circulars/cotton.pdf",
+                "FAS's Cotton: World Markets and Trade",
+            ),
+        )
+    ),
+    *(
+        NotFetched(
+            url,
+            f"{name}, which the FAQ lists among its data resources: another agency's data, no "
+            "API documentation",
+        )
+        for url, name in (
+            (
+                "http://apps.fas.usda.gov/psdonline/psdHome.aspx",
+                "FAS's Production, Supply and Distribution Database (PSD Online)",
+            ),
+            (
+                "http://apps.fas.usda.gov/gats/default.aspx",
+                "FAS's Global Agricultural Trade System (U.S. Exports and Imports)",
+            ),
+            ("http://apps.fas.usda.gov/esrquery/", "FAS's Export Sales Report"),
+            (
+                "http://gain.fas.usda.gov/Pages/Default.aspx",
+                "FAS's Global Agricultural Information Network (Agricultural Attaché Reports)",
+            ),
+            ("https://quickstats.nass.usda.gov/", "NASS's Quick Stats"),
+            (f"{_ERS}/data-products/feed-grains-database/", "ERS's Feed Grains Database"),
+            (f"{_CORNELL}/tm70mv177", "the Crop Production Report at Cornell's Mann Library"),
+            (
+                f"{_ERS}/data-products/livestock-and-meat-domestic-data/",
+                "ERS's Livestock and Meat Domestic Data",
+            ),
+            (
+                f"{_ERS}/publications/?page=1&topicId=0&authorId=0&seriesCode=LDPM"
+                "&sort=CopyrightDate&sortDir=desc",
+                "ERS's list of the Livestock, Dairy, and Poultry Outlook, whose link runs the "
+                "address of the report's archive at Cornell's Mann Library into its fragment",
+            ),
+            (f"{_ERS}/data-products/dairy-data/", "ERS's Dairy Data"),
+            ("https://www.ams.usda.gov/market-news", "AMS's USDA Market News"),
+        )
+    ),
+    *(
+        NotFetched(
+            url,
+            f"{what}, which Historical Changes & Revisions links under {when}: printed pages of "
+            "a past change, which the page describes in its text, no API documentation",
+        )
+        for url, what, when in (
+            (
+                f"{_DOCUMENTS}/wasde-636-mockup-tables.pdf",
+                "the mock tables of the report with the revised wheat by-class table",
+                "May 2023",
+            ),
+            (
+                f"{_DOCUMENTS}/wasde-624-mockup-tables.pdf",
+                "the mock tables of the report",
+                "May 2022",
+            ),
+            (
+                f"{_DOCUMENTS}/wasde-612-mockup-tables-V4.pdf",
+                "the mock tables of the report",
+                "May 2021",
+            ),
+            (
+                f"{_DOCUMENTS}/WASDE052015_SamplePgs.pdf",
+                "two sample pages of the report",
+                "May 2015",
+            ),
+            (
+                f"{USDA}/oce/commodity/wasde/revisions/May2013ExamplePages.pdf",
+                "five sample pages of the report",
+                "May 2013",
+            ),
+            (
+                f"{_DOCUMENTS}/May WASDE 2012-Final.pdf",
+                "the changes to the soybean and products and milk supply and use tables",
+                "May 2012",
+            ),
+        )
+    ),
+    *(
+        NotFetched(
+            url,
+            f"{what}, which Historical Changes & Revisions links under {when}: data, no "
+            "documentation",
+        )
+        for url, what, when in (
+            (
+                f"{_DOCUMENTS}/october-2020-egg-su-table.xlsx",
+                "the U.S. egg supply and use tables as adjusted",
+                "October 2020",
+            ),
+            (
+                f"{_DOCUMENTS}/China_Grain_Revisions_Nov_2018.xlsx",
+                "China's grain revisions, the revised and previous data and their differences",
+                "November 2018",
+            ),
+            (
+                f"{_DOCUMENTS}/China_Oilseeds_and_Products_Revisions_Nov_2018.xlsx",
+                "China's oilseed revisions, the revised and previous data and their differences",
+                "November 2018",
+            ),
+            (f"{_DOCUMENTS}/Egg SU Table.xlsx", "the egg supply and use as adjusted", "May 2018"),
+            (f"{_DOCUMENTS}/Dairy S&Us.xlsx", "the dairy supply and use as adjusted", "May 2017"),
+            (
+                f"{_DOCUMENTS}/ChinaNov2015ConsumptionandStocksChanges.xlsx",
+                "China's corn feeding and stocks as revised",
+                "November 2015",
+            ),
+            (
+                f"{_DOCUMENTS}/BrazilNov2015StockFeedChange.xlsx",
+                "Brazil's corn feeding and stocks as revised",
+                "November 2015",
+            ),
+            (f"{_DOCUMENTS}/Historical_Turkey.xls", "the historical turkey data, XLS", "May 2010"),
+            (f"{_DOCUMENTS}/Historical_Turkey.pdf", "the historical turkey data, PDF", "May 2010"),
+            (
+                f"{_DOCUMENTS}/Historical 5-Area.xls",
+                "the historical five-area steer prices, XLS",
+                "May 2010",
+            ),
+            (
+                f"{_DOCUMENTS}/Historical 5-Area.pdf",
+                "the historical five-area steer prices, PDF",
+                "May 2010",
+            ),
+            (f"{_DOCUMENTS}/Historical_Dairy.xls", "the historical dairy imports, XLS", "May 2010"),
+            (f"{_DOCUMENTS}/Historical_Dairy.pdf", "the historical dairy imports, PDF", "May 2010"),
+        )
+    ),
+    NotFetched(
+        "https://www.eia.gov/pressroom/releases/press477.php",
+        "the U.S. Energy Information Administration's release on its changed biofuels data, "
+        "which Historical Changes & Revisions cites under May 2021: a third party's page, no "
+        "API documentation",
+    ),
+    NotFetched(
+        "https://www.eia.gov/biofuels/update/table2.pdf",
+        "Table 2C of the U.S. Energy Information Administration's Monthly Biofuels Capacity "
+        "and Feedstocks Update, which WASDE follows for soybean oil used for biofuel, as "
+        "Historical Changes & Revisions says under May 2021: a third party's data, no "
+        "documentation",
+    ),
+    NotFetched(
+        "https://www.fsa.usda.gov/FSA/epasReports?area=home&subject=ecpa&topic=foa-rp",
+        "the Farm Service Agency's reports, which publish the outstanding loans that the "
+        "report dropped, as Historical Changes & Revisions says under May 2015: another "
+        "agency's data, no API documentation",
+    ),
+    NotFetched(
+        "https://eia.gov/biofuels/biodiesel/production/",
+        "the U.S. Energy Information Administration's Monthly Biodiesel Production Report, "
+        "which Historical Changes & Revisions cites under October 2012: a third party's data, "
+        "no documentation",
+    ),
+    NotFetched(
+        "https://apps.fas.usda.gov/psdonline/",
+        "FAS's Production, Supply and Distribution data portal, which the historical data page "
+        "names as the official series with every revision: another agency's data, no API "
+        "documentation",
+    ),
+    *(
+        NotFetched(
+            f"{_DOCUMENTS}/oce-wasde-report-data-{name}",
+            "a file of WASDE report data, which the historical data page links, a CSV a month "
+            "or a ZIP of earlier months: data, no documentation",
+        )
+        for name in HISTORICAL_DATA
+    ),
+)
+"""Every page the documentation links that the snapshot deliberately does not request, in
+the order of the pages that link them; a URL ending in ``/`` is a folder, its row the
+files under it."""
 
 SPEC_URL: str | None = None
 """The machine-readable API document (OpenAPI, Swagger) the documentation names: none.
@@ -281,16 +630,15 @@ CONVERSION = " ".join(
 )
 """How a page becomes Markdown, for ``FETCHED.md``."""
 
-LEFT_OUT = " ".join(
+UNDOCUMENTED = " ".join(
     (
-        "Not snapshotted: ESMIS's release calendar, which xippios-usda-esmis keeps as an",
-        "excerpt; the data files the historical data page links (CSV, ZIP); the release",
-        "files themselves. No upstream page documents the layout of the XML, XLS or TXT",
-        f"files: `{OBSERVED}` describes them as observed in release files, by hand, and",
-        "says what it was written from; its row records no fetch.",
+        "No upstream page documents the layout of the XML, XLS or TXT files:",
+        f"`{OBSERVED}` describes them as observed in release files, by hand, and says what",
+        "it was written from; its row records no fetch.",
     )
 )
-"""What the snapshot leaves out, for ``FETCHED.md``."""
+"""What no upstream page documents, for ``FETCHED.md``: the pages the snapshot leaves out
+are rows of the table ``Not fetched`` (``NOT_FETCHED``)."""
 
 _STATEMENT = re.compile(
     r"\N{COPYRIGHT SIGN}|copyright|licen[cs]e|terms of (?:use|service)|public domain",
@@ -809,7 +1157,7 @@ def render_fetched(rows: Sequence[Row], fetched: str, observed: bool = False) ->
         "",
         *_paragraph(CAPTURE, _usda_answers(rows)),
         *_paragraph(CONVERSION),
-        *_paragraph(LEFT_OUT),
+        *_paragraph(UNDOCUMENTED),
         *_paragraph(
             "Fetched is the UTC time the run started, in ISO 8601 with an explicit Z, the",
             "same for every row. Bytes and sha256 are those of the body as fetched: a",
@@ -843,6 +1191,12 @@ def render_fetched(rows: Sequence[Row], fetched: str, observed: bool = False) ->
     if observed:
         hand = "written by hand: what upstream does but never documents; not fetched or checked"
         lines.append("| " + " | ".join([OBSERVED, *["-"] * 7, hand]) + " |")
+    if NOT_FETCHED:
+        lines += ["", "## Not fetched", "", "| URL | HTTP | Redirects to | Reason |"]
+        lines.append("| --- | --- | --- | --- |")
+        for page in NOT_FETCHED:
+            cells = [page.url, "(not requested)", "-", page.reason]
+            lines.append("| " + " | ".join(_cell(cell) for cell in cells) + " |")
     lines += ["", f"Regenerate: `{COMMAND}`"]
     return "\n".join(lines) + "\n"
 
