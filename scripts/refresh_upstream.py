@@ -467,7 +467,7 @@ NOT_FETCHED: tuple[NotFetched, ...] = (
                 "May 2013",
             ),
             (
-                f"{_DOCUMENTS}/May WASDE 2012-Final.pdf",
+                f"{_DOCUMENTS}/May%20WASDE%202012-Final.pdf",
                 "the changes to the soybean and products and milk supply and use tables",
                 "May 2012",
             ),
@@ -495,8 +495,12 @@ NOT_FETCHED: tuple[NotFetched, ...] = (
                 "China's oilseed revisions, the revised and previous data and their differences",
                 "November 2018",
             ),
-            (f"{_DOCUMENTS}/Egg SU Table.xlsx", "the egg supply and use as adjusted", "May 2018"),
-            (f"{_DOCUMENTS}/Dairy S&Us.xlsx", "the dairy supply and use as adjusted", "May 2017"),
+            (
+                f"{_DOCUMENTS}/Egg%20SU%20Table.xlsx",
+                "the egg supply and use as adjusted",
+                "May 2018",
+            ),
+            (f"{_DOCUMENTS}/Dairy%20S&Us.xlsx", "the dairy supply and use as adjusted", "May 2017"),
             (
                 f"{_DOCUMENTS}/ChinaNov2015ConsumptionandStocksChanges.xlsx",
                 "China's corn feeding and stocks as revised",
@@ -510,12 +514,12 @@ NOT_FETCHED: tuple[NotFetched, ...] = (
             (f"{_DOCUMENTS}/Historical_Turkey.xls", "the historical turkey data, XLS", "May 2010"),
             (f"{_DOCUMENTS}/Historical_Turkey.pdf", "the historical turkey data, PDF", "May 2010"),
             (
-                f"{_DOCUMENTS}/Historical 5-Area.xls",
+                f"{_DOCUMENTS}/Historical%205-Area.xls",
                 "the historical five-area steer prices, XLS",
                 "May 2010",
             ),
             (
-                f"{_DOCUMENTS}/Historical 5-Area.pdf",
+                f"{_DOCUMENTS}/Historical%205-Area.pdf",
                 "the historical five-area steer prices, PDF",
                 "May 2010",
             ),
@@ -565,7 +569,8 @@ NOT_FETCHED: tuple[NotFetched, ...] = (
 )
 """Every page the documentation links that the snapshot deliberately does not request, in
 the order of the pages that link them; a row that ``FOLDERS`` names is the row of the files
-under it."""
+under it. A space in an address is written ``%20``: a table cell's URL is no Markdown link,
+and GitHub links it only up to a space."""
 
 SPEC_URL: str | None = None
 """The machine-readable API document (OpenAPI, Swagger) the documentation names: none.
