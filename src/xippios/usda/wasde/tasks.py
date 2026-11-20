@@ -58,8 +58,8 @@ What every task follows:
   ``scripts/refresh_reference.py`` read from the latest release's files, through core's
   ``PackagedList``, without a request. Their ``meta`` is ``PackagedList.meta``'s
   (sdk-core ADR-0041, decision 1): ``retrieved_at`` the list's ``fetched``, ``endpoint`` the file it
-  came from as catalogued (``"wasde1026.xml"``), ``vintage`` the release's
-  ``Report_Month`` as printed (``"October 2026"``), which every record carries,
+  came from as catalogued (``"wasde1126.xml"``), ``vintage`` the release's
+  ``Report_Month`` as printed (``"November 2026"``), which every record carries,
   ``published_at`` and ``total`` empty; ``meta.request`` holds ``search`` when given.
   ``search`` keeps a record where the text occurs in one of its fields, ignoring case
   (core's ``matches``).
@@ -134,8 +134,9 @@ BULK_TASKS: frozenset[str] = frozenset({"get_release"})
 # default, 200 rows or 64 KB, and none of them reaches it but list_releases called without
 # since, which answers every WASDE release (703 on 2026-10-28) and whose docstring tells
 # an agent to bound it with since and until, the narrowing the default note names:
-# read_report_text measured 16,436 bytes, the three packaged lists 30, 43 and 70 rows,
-# the largest result list_tables's 29,639 bytes, its footnotes included (October 2026).
+# read_report_text measured 16,436 bytes (October 2026), the three packaged lists 30, 43
+# and 70 rows, the largest result list_tables's 28,604 bytes, its footnotes included
+# (the November 2026 lists).
 MCP_CAPS: Mapping[str, ResultCap] = {
     "get_table": ResultCap(
         max_rows=400,
@@ -459,8 +460,8 @@ def _packaged[M: (Table, Commodity, Region)](
 async def list_tables_async(search: str | None = None) -> Result[list[Table]]:
     """WASDE's table pages with their titles, subtitles, footnotes and matrices, from the package.
 
-    Answered without a request from the list the package read from the October 2026
-    release's XML (``wasde1026.xml``, ``reference/table.json``): 30 pages, printed pages
+    Answered without a request from the list the package read from the November 2026
+    release's XML (``wasde1126.xml``, ``reference/table.json``): 30 pages, printed pages
     8 to 37, each with its ``report`` (``"sr12"``, the page as a ``WasdeXmlCell``'s
     ``report`` names it), its printed ``page`` number, its titles, subtitles and
     footnotes (``sub_report_footer`` to ``sub_report_footer3``) as printed, stated once
@@ -471,7 +472,7 @@ async def list_tables_async(search: str | None = None) -> Result[list[Table]]:
     18 to 30 the world supply and use by region, 31 to 34 U.S. animal products, eggs,
     milk and dairy prices, 35 to 37 the reliability of the month's projections. A page
     WAOB changed since is as it was until the package's next refresh. ``meta.vintage``
-    is the release's ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when
+    is the release's ``Report_Month`` (``"November 2026"``), ``meta.retrieved_at`` when
     the file was downloaded and ``meta.endpoint`` the file.
 
     Args:
@@ -501,7 +502,7 @@ async def list_tables_async(search: str | None = None) -> Result[list[Table]]:
 async def list_commodities_async(search: str | None = None) -> Result[list[Commodity]]:
     """WASDE's supply-and-use matrices with their commodities, from the packaged list.
 
-    Answered without a request from the list the package read from the October 2026
+    Answered without a request from the list the package read from the November 2026
     release's XML and XLS (``reference/commodity.json``): 43 matrices of 23 commodities,
     each with its ``commodity`` as the files print it, its ``region`` (``"United
     States"`` on the U.S. pages 11 to 17, 32 and 33, ``"Mexico"`` for page 16's second matrix,
@@ -520,7 +521,7 @@ async def list_commodities_async(search: str | None = None) -> Result[list[Commo
     page of three matrices (soybean, soybean meal, soybean oil). Pages 8 to 10 (the
     aggregates), 31 (quarterly production and prices), 34 (dairy prices) and 35 to 37
     (reliability) are not in the list. ``meta.vintage`` is the release's
-    ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when the XML was
+    ``Report_Month`` (``"November 2026"``), ``meta.retrieved_at`` when the XML was
     downloaded and ``meta.endpoint`` the XML.
 
     Args:
@@ -540,7 +541,7 @@ async def list_commodities_async(search: str | None = None) -> Result[list[Commo
 async def list_regions_async(search: str | None = None) -> Result[list[Region]]:
     """The regions WASDE's tables print, as printed, with their pages, from the packaged list.
 
-    Answered without a request from the list the package read from the October 2026
+    Answered without a request from the list the package read from the November 2026
     release's XML (``reference/region.json``): 70 distinct ``region`` texts of the world
     pages 18 to 30, page 9's cotton table and the reliability pages 35 and 36, in the
     order of their first appearance, each with its ``reports``, the pages that print it.
@@ -550,7 +551,7 @@ async def list_regions_async(search: str | None = None) -> Result[list[Region]]:
     and ``"    China"``. ``get_balance_sheet`` matches a region against the text
     stripped of its indent and its footnote marker, so an agent passes ``"Argentina"`` or
     ``"World"``. The U.S. pages 11 to 17 and 31 to 34 print none. ``meta.vintage``
-    is the release's ``Report_Month`` (``"October 2026"``), ``meta.retrieved_at`` when
+    is the release's ``Report_Month`` (``"November 2026"``), ``meta.retrieved_at`` when
     the XML was downloaded and ``meta.endpoint`` the XML.
 
     Args:
@@ -732,7 +733,7 @@ async def get_balance_sheet_async(
     ``"Coarse Grain"``, ``"Corn"``, ``"Rice"``, ``"Soybean"``, ``"Soybean Meal"`` and
     ``"Soybean Oil"``, and the U.S. page for ``"Wheat"`` and ``"Cotton"``. Nothing is
     mapped onto another source's names. The matrices are the packaged list's, read from
-    the October 2026 release: a record is kept where its page, matrix and title are a
+    the November 2026 release: a record is kept where its page, matrix and title are a
     matrix's. Each record (``WasdeTableValue``) is one value with the labels of its row
     and column as printed, its table's title and its matrix: ``get_release``'s record
     without the page's own labels. The page's

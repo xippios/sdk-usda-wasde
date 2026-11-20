@@ -47,8 +47,9 @@ src/xippios/usda/wasde/
                    wasde_xml.py, parse_wasde_xml; wasde_xls.py, parse_wasde_xls (the
                    narrative sheet); wasde_pdf.py, parse_wasde_pdf (the narrative pages)
   _vocabulary.py   the rules that build the four packaged lists from a release's XML records
-                   and its XLS's block titles (xlrd); the refresh script and the live tests
-                   call them, no task does
+                   and its XLS's block titles (xlrd), and differences, which compares two
+                   releases' lists in what no release changes; the refresh script and the
+                   tests call them, no task does
   tasks.py         task functions; __all__ is what the adapters register, but BULK_TASKS,
                    the Python-only ones; MCP_CAPS any per-tool result caps
   mcp.py           xippios-usda-wasde-mcp entry point: build() the tool set, server
@@ -348,7 +349,8 @@ semantics or the shape of the public API.
   XLS and the positional rule), and every record carries `report_month`, which the list
   tasks give as `meta.vintage`. `list_tables`, `list_commodities` and `list_regions`
   answer from them without a request, `meta` from `PackagedList.meta`, `search` through
-  core's `matches`, the default MCP cap (the largest answer 29,639 bytes); the attribute
+  core's `matches`, the default MCP cap (the largest answer 28,604 bytes, `list_tables`
+  on the November 2026 lists); the attribute
   list has no task in 0.1.1 and is kept for the tasks that name a table's rows. The
   commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
   32 and 33; the XML names none
@@ -372,7 +374,10 @@ semantics or the shape of the public API.
   release ships the lists of the latest WASDE, its month
   their vintage (sdk-core ADR-0041 decision 1); a refresh that reproduces them record for
   record needs no PR: 0.1.1 ships those of ESMIS release 796099 (October 2026), which the
-  refresh of 2026-10-28 reproduced. `--keep DIR` keeps the downloaded files with what
+  refresh of 2026-10-28 reproduced, and 0.2.0 those of release 796142 (November 2026),
+  read on 2026-11-20. The samples stay October 2026's, so the offline tests hold them to
+  the lists by `_vocabulary.differences`, as the live tests hold the latest release's
+  files. `--keep DIR` keeps the downloaded files with what
   the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (https://github.com/xippios/sdk-usda-wasde/pull/3 and https://github.com/xippios/sdk-usda-wasde/pull/5): one session
