@@ -139,6 +139,7 @@ attribution: `docs/upstream/FETCHED.md`.
 - sdk-core: [docs/review-checklist.md](https://github.com/xippios/sdk-core/blob/main/docs/review-checklist.md) — what the review of a pull request checks, in order.
 - sdk-usda-wasde: [docs/adr.md](https://github.com/xippios/sdk-usda-wasde/blob/main/docs/adr.md) — the index of this package's own decisions, generated from the records in `docs/adr/`.
 - sdk-usda-wasde: [docs/upstream/FETCHED.md](https://github.com/xippios/sdk-usda-wasde/blob/main/docs/upstream/FETCHED.md) — the snapshot of the upstream documentation, the reference for names, parameters and semantics.
+- sdk-usda-wasde: [docs/upstream/OBSERVED.md](https://github.com/xippios/sdk-usda-wasde/blob/main/docs/upstream/OBSERVED.md) — what no upstream page documents: the layouts of a release's XML, XLS, TXT and PDF and ESMIS's list of releases, as observed, each note with the file it was read from.
 
 ## Licence
 
