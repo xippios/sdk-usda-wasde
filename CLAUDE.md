@@ -11,7 +11,7 @@ follows, sdk-core's conventions among them, are listed under
 | | |
 | --- | --- |
 | Upstream | USDA WAOB World Agricultural Supply and Demand Estimates, https://www.usda.gov/oce/commodity/wasde |
-| API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.1.1 |
+| API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.2.0 |
 | Documentation | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates and WAOB's pages under https://www.usda.gov/oce/commodity/wasde, snapshotted in `docs/upstream/` by `scripts/refresh_upstream.py` (`/refresh-upstream`); a page www.usda.gov refuses to automated requests is kept from USDA's CDN origin, usda.azureedge.us; no page names an OpenAPI or Swagger document, so `SPEC_URL` is `None`; the file layouts, as observed, in `docs/upstream/OBSERVED.md`, each note with the release file or sample it was read from |
 | Credentials | none; the API is open |
 | Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; sdk-core ADR-0033), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
@@ -351,7 +351,7 @@ semantics or the shape of the public API.
   answer from them without a request, `meta` from `PackagedList.meta`, `search` through
   core's `matches`, the default MCP cap (the largest answer 28,604 bytes, `list_tables`
   on the November 2026 lists); the attribute
-  list has no task in 0.1.1 and is kept for the tasks that name a table's rows. The
+  list has no task in 0.2.0 and is kept for the tasks that name a table's rows. The
   commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
   32 and 33; the XML names none
   of their commodities as a whole: only page 32's records carry a `commodity`, one per
