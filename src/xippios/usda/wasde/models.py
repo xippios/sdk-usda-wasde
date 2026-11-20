@@ -5,8 +5,9 @@ file (sdk-core ADR-0020): labels, units and footnote markers kept as text as pri
 renamed, converted or joined across files. A ``WasdeXmlCell`` field is named after the
 file's attribute, snake_cased with the matrix index removed (``m1_commodity1`` is
 ``commodity``, ``attribute_group2`` is ``attribute_group``), with three exceptions
-(gap, row 195): the page's and the table's names are kept on the record under names of
-their own, as conventions §3 keeps sheet and table names (``report`` holds the page's
+(https://github.com/xippios/sdk-usda-wasde/pull/3): the page's and the table's names
+are kept on the record under names of their own, as conventions §3 keeps sheet and
+table names (``report`` holds the page's
 ``Name``, ``table`` its ``sub_report_title``, ``sub_report_title2`` or
 ``sub_report_title3``, ``matrix`` the report item's element name); a dimension the
 pages spell several ways is folded into one field (``attr_desc`` into ``attribute``,
@@ -129,10 +130,11 @@ class WasdeXmlCell(UpstreamModel):
             table, e.g. ``"Hard Red\r\nWinter"``, ``"Total"``.
         statistic: On the reliability pages the name of the value's attribute, the
             table index removed by the naming rule (``average1`` is ``"average"``;
-            Johannes, 2026-10-28, G5 inside PR 3), e.g. ``"root_mean_square_error"``,
-            ``"below_final"``; ``None`` on pages 8 to 34.
-        unit: What the file states for the row or the page (Johannes, 2026-10-28, G5
-            inside PR 3): on the reliability pages, for ``average``, ``smallest`` and
+            https://github.com/xippios/sdk-usda-wasde/pull/3), e.g.
+            ``"root_mean_square_error"``, ``"below_final"``; ``None`` on pages 8 to 34.
+        unit: What the file states for the row or the page
+            (https://github.com/xippios/sdk-usda-wasde/pull/3): on the reliability
+            pages, for ``average``, ``smallest`` and
             ``largest`` only, the nearest ``commodity_label`` of the table at or before
             the value, e.g. ``"Million Bushels"``; on pages 8 to 10 and 18 to 30 the
             table's ``sub_report_subtitle`` as printed, e.g. ``"(Million Metric
@@ -170,8 +172,8 @@ class WasdeTableValue(UpstreamModel):
     r"""One value of a WASDE table with the labels of its row and column: a slice's record.
 
     A projection of ``WasdeXmlCell`` built with ``UpstreamModel.project`` (conventions §3;
-    Johannes, 2026-10-28, G5 inside PR 5): the fields that label the value and the value,
-    copied unchanged under their names, in ``WasdeXmlCell``'s order. Left out are the
+    https://github.com/xippios/sdk-usda-wasde/pull/5): the fields that label the value and
+    the value, copied unchanged under their names, in ``WasdeXmlCell``'s order. Left out are the
     page's own labels, the same on every value of a page: ``page_title``,
     ``sub_report_subtitle`` and ``sub_report_footer``, which ``list_tables`` states once
     per page with its titles (``reference/table.json``), and ``report_month``, the
@@ -303,7 +305,7 @@ class Table(UpstreamModel):
             reliability pages 35 to 37, whose ``<Report>`` holds none, the
             ``sub_report_footer`` of the one report item that carries it (``table1``,
             ``table4``); ``None`` where the page has none. Stated once here for the page
-            (Johannes, 2026-10-28, G5 inside PR 5).
+            (https://github.com/xippios/sdk-usda-wasde/pull/4).
         sub_report_footer2: ``sub_report_footer2`` as printed, the second table's
             footnotes, e.g. on pages 9, 25, 27, 31 and 32 (October 2026); ``None`` where
             the page has none.

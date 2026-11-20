@@ -3,7 +3,8 @@
 ``/add-endpoint`` adds them.
 
 The nightly run fetches the latest release only, each file kind once, through one
-session-scoped fixture, ``latest`` (decided by Johannes on 2026-10-28): it runs
+session-scoped fixture, ``latest``, as https://github.com/xippios/sdk-usda-wasde/pull/3
+and https://github.com/xippios/sdk-usda-wasde/pull/5 decided: it runs
 ``get_release()`` once, which downloads the latest XML through xippios-usda-esmis, and
 keeps a copy of the file in a temporary directory for the live parser test, which
 checks shape, page names and fields, never values (sdk-core ADR-0020 decision 6); then it
@@ -19,10 +20,11 @@ the refresh script's rules (``_vocabulary``) and compare them with the packaged 
 every field but ``report_month``, the month word of the reliability titles masked
 (``Reliability of <Month> Projections``, pages 35 to 37), since every release names its
 own month there and the lists carry the release they came from (sdk-core ADR-0041 decision 1;
-gap row 195); each footer of a table, ``sub_report_footer`` to ``sub_report_footer3``,
-is compared only for whether it is set on both sides, never its text, which changes
-every release (the projection month on page 35, the months of the estimates on pages
-13 and 16; the session, 2026-10-28, rule 7; gap row 195). The packaged lists are
+https://github.com/xippios/sdk-usda-wasde/pull/4); each footer of a table,
+``sub_report_footer`` to ``sub_report_footer3``, is compared only for whether it is set
+on both sides, never its text, which changes every release (the projection month on
+page 35, the months of the estimates on pages 13 and 16; the same pull request). The
+packaged lists are
 refreshed before each release, in the release train's refresh PR (conventions §12), so
 a difference between releases is a change upstream made: it fails, naming the rows, and
 the lists are refreshed

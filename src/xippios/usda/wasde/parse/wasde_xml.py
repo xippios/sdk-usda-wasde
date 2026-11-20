@@ -20,8 +20,9 @@ October 2026 file uses, its counts in ``OBSERVED.md``:
   (the class columns of page 11's wheat-by-class table). A field is named after the
   attribute with the matrix index removed, the spellings of one dimension across pages
   folded into one field (``attr_desc`` into ``attribute``, ``wb_forecast_month_desc``
-  into ``forecast_month``; gap, row 195), and is set by the attribute wherever it sits,
-  whatever the element is called: page 11's second matrix carries ``attribute2`` on
+  into ``forecast_month``; https://github.com/xippios/sdk-usda-wasde/pull/3), and is set
+  by the attribute wherever it sits, whatever the element is called: page 11's second
+  matrix carries ``attribute2`` on
   ``m2_month_group`` and ``forecast_month2`` on ``m2_attribute_group``;
 - **values**: ``cell_valueN``, ``mN_cell_valueN`` and ``wb_value`` on a ``<Cell>``, one
   record each; on the reliability pages 35 to 37 the seven statistics
@@ -62,8 +63,8 @@ footer2) and 33 (title and title2, one footer3), each with two items, whose seco
 item's labels and footnotes are those of the second title's table; page 37's one
 footer, on ``table4``, goes to its four tables.
 
-**Units.** ``unit`` carries only what the file states for the row or the page (Johannes,
-2026-10-28, G5 inside PR 3):
+**Units.** ``unit`` carries only what the file states for the row or the page
+(https://github.com/xippios/sdk-usda-wasde/pull/3):
 
 - on the reliability pages, ``average``, ``smallest`` and ``largest`` take the nearest
   ``commodity_label`` of their table at or before them, the way a reader reads the page

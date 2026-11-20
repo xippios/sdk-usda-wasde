@@ -6,8 +6,8 @@ call them on the current release and compare it with the packaged lists. No task
 them: the list tasks answer from the packaged files, and the package reads no XLS at
 call time. So ``block_titles`` reads the XLS and ``tables`` the XML's page headers here,
 beside ``parse/``, which sdk-core ADR-0020 decision 1 names for the file kinds a task returns:
-these read only what the refresh script and the live tests need (the session,
-2026-10-28, rule 7; gap row 195).
+these read only what the refresh script and the live tests need
+(https://github.com/xippios/sdk-usda-wasde/pull/4).
 
 - ``tables``: one ``Table`` per page element of the XML, ``sr08`` to ``sr37``, from the
   attributes of the page's ``<Report>`` (``Name``, ``Report_Month``, the number that ends
@@ -16,13 +16,13 @@ these read only what the refresh script and the live tests need (the session,
   element names of its report items, as printed. A page whose ``<Report>`` holds no
   footer takes the ``sub_report_footer`` of its one report item that carries it (the
   reliability pages 35 to 37: ``table1``, ``table1``, ``table4``), so the page's
-  footnotes are stated once here (Johannes, 2026-10-28, G5 inside PR 5).
+  footnotes are stated once here (https://github.com/xippios/sdk-usda-wasde/pull/4).
 - ``commodities``: one ``Commodity`` per report item of the supply-and-use pages, the
-  U.S. pages 11 to 17, 32 and 33 and the world pages 18 to 30, in file order (Johannes,
-  2026-10-28, G5; pages 32 and 33 by the session, 2026-10-28, rule 7). Its ``table`` is
-  the title ``parse_wasde_xml`` gives the item; its ``region`` the region that title
-  starts with, ``U.S.`` read as ``"United States"`` (as the world pages' rows print it),
-  ``Mexico`` and ``World`` as printed (Johannes, 2026-10-28, G5). Its ``commodity`` names
+  U.S. pages 11 to 17, 32 and 33 and the world pages 18 to 30, in file order. Its
+  ``table`` is the title ``parse_wasde_xml`` gives the item; its ``region`` the region
+  that title starts with, ``U.S.`` read as ``"United States"`` (as the world pages' rows
+  print it), ``Mexico`` and ``World`` as printed; the pages and the region rule were
+  decided in https://github.com/xippios/sdk-usda-wasde/pull/4. Its ``commodity`` names
   the matrix as a whole, which the XML does for none of these items: only page 32's
   records carry a ``commodity``, one per row (e.g. ``Beef``, ``Pork``, ``Broiler``,
   ``Turkey``, ``Red Meat & Poultry``), and its matrix is ``Meats`` here, so a search
@@ -84,7 +84,8 @@ BLOCK_PAGES = (12, 13, 14, 15)
 commodity of none of their report items, and their titles name several
 (``"U.S. Feed Grain and Corn Supply and Use  1/"``)."""
 REGIONS = {"U.S.": "United States", "Mexico": "Mexico", "World": "World"}
-"""A title's leading region to the ``region`` of its commodities (Johannes, 2026-10-28, G5):
+"""A title's leading region to the ``region`` of its commodities
+(https://github.com/xippios/sdk-usda-wasde/pull/4):
 ``U.S.`` as the world pages' rows print the country, the others as printed."""
 
 _TITLE = re.compile(

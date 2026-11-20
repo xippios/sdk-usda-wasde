@@ -127,7 +127,8 @@ class UsdaPage:
 
     The run asks www.usda.gov first. Where it answers 200, the page is kept from there and
     has one row. Where it answers 403, that URL gets a row by its status and the page is
-    kept from the same path on USDA's CDN origin, the row after it (Johannes, 2026-10-28).
+    kept from the same path on USDA's CDN origin, the row after it
+    (https://github.com/xippios/sdk-usda-wasde/pull/2).
 
     Attributes:
         path: The page's path, the same on www.usda.gov and on USDA's CDN origin.

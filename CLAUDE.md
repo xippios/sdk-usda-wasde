@@ -229,11 +229,12 @@ semantics or the shape of the public API.
   files carry `v2` (`wasde0626v2.xml`; `Release.revision`) and the original is not
   catalogued, so such a month answers its revision. Release 95621 (2013-08) lists the
   original's XML, `ORIGwasde-08-12-2013.xml`, before the revision's,
-  `wasde-08-12-2013.xml`, and esmis's `download_release_file` takes the first file of a
-  format, so `get_release("2013-08")` reads the original (esmis row 193 asks for a name
-  selector); 2013-07 (95622) lists `R1` and `ORIG` PDF and XLS files beside one XML
-  without a prefix. `get_release(month)` takes the month's
-  latest release that carries an XML file (Johannes, 2026-10-28, G5 inside PR 3): in
+  `wasde-08-12-2013.xml`, and esmis's `download_release_file`, given a format alone, takes
+  the first file of that format, so `get_release("2013-08")` reads the original
+  (https://github.com/xippios/sdk-usda-wasde/issues/20 asks for the revision);
+  2013-07 (95622) lists `R1` and `ORIG` PDF and XLS files beside one XML without a
+  prefix. `get_release(month)` takes the month's latest release that carries an XML
+  file (https://github.com/xippios/sdk-usda-wasde/pull/3): in
   2010-12 and 2014-01 a later release carries a TXT or an ASC only and the month answers
   the earlier one's XML; a month whose releases carry none (every month before 2010-07)
   is refused, naming their formats and the first release with one (2010-07-09, release
@@ -243,7 +244,8 @@ semantics or the shape of the public API.
   other raises `ValidationError` naming the page, element and attribute. A field is the
   attribute's name with the matrix index removed (`m1_commodity1` is `commodity`;
   page 11's class columns `attribute_group2` give `attribute_group`), labels as printed,
-  with three exceptions (gap, row 195): the page's and the table's names are kept on the
+  with three exceptions (https://github.com/xippios/sdk-usda-wasde/pull/3): the page's and the table's
+  names are kept on the
   record under names of their own, as conventions §3 keeps sheet and table names
   (`report` holds `Name`, `table` the `sub_report_title`, `sub_report_title2` or
   `sub_report_title3`, `matrix` the report item's element name); a dimension the pages
@@ -259,8 +261,8 @@ semantics or the shape of the public API.
   attribute without the table index). The U.S. pages print a commodity heading over each
   matrix that the file does not hold (`FEED GRAINS`, `CORN` on page 12): `matrix` tells
   them apart, and `list_commodities` names them from the XLS.
-- **Units.** `unit` carries only what the file states for the row or the page (Johannes,
-  2026-10-28, G5 inside PR 3). On the reliability pages `average`, `smallest` and
+- **Units.** `unit` carries only what the file states for the row or the page
+  (https://github.com/xippios/sdk-usda-wasde/pull/3). On the reliability pages `average`, `smallest` and
   `largest` take the nearest `commodity_label` of their table at or before them, as the
   page reads; the other four statistics stay `None`. On a page whose XML holds no unit
   attribute (pages 8 to 10, 18 to 30) a table value takes its table's
@@ -269,14 +271,14 @@ semantics or the shape of the public API.
   group of a matrix, each with its text, and keeps no trace of which the page prints,
   and a unit on a value's path is its column's share of a unit printed across columns;
   the XLS and the TXT print the unit rows in place.
-- **The slices** (Johannes, 2026-10-28, G5). `get_table(table, month)` answers the
+- **The slices** (https://github.com/xippios/sdk-usda-wasde/pull/5). `get_table(table, month)` answers the
   values of one page, `get_balance_sheet(commodity, region, month)` those of one
   commodity's supply-and-use matrix; both read the month's XML through `get_release`'s
   lookup and read (`_releases`, `_read_xml`), one download per call and nothing kept,
   and answer its `meta` with the arguments given. Their records are `WasdeTableValue`,
   `WasdeXmlCell` projected with `UpstreamModel.project` without the page's labels,
-  `page_title`, `sub_report_subtitle`, `sub_report_footer` and `report_month`
-  (Johannes, 2026-10-28, G5 inside PR 5): `list_tables` states the page's titles,
+  `page_title`, `sub_report_subtitle`, `sub_report_footer` and `report_month`:
+  `list_tables` states the page's titles,
   subtitles and footnotes once, to which a marker in a label (`Trade 2/`) refers, and
   the month is `meta.vintage`; `get_release` keeps the full record. The page, the commodity and the
   region are checked against the packaged lists before anything is sent, case kept; a
@@ -289,8 +291,8 @@ semantics or the shape of the public API.
   the world table's U.S. rows for Coarse Grain, Corn, Rice, Soybean, Soybean Meal and
   Soybean Oil, which have no U.S. matrix under that name. A record is kept where its
   page, matrix and title are a packaged matrix's: a month's file that holds none raises
-  `NotFoundError`. The MCP caps (`MCP_CAPS`; sdk-core ADR-0038; Johannes, 2026-10-28, G5
-  inside PR 5): `get_table` 400 rows or 128 KB, its note naming `get_balance_sheet` for
+  `NotFoundError`. The MCP caps (`MCP_CAPS`; sdk-core ADR-0038; the same pull request):
+  `get_table` 400 rows or 128 KB, its note naming `get_balance_sheet` for
   one matrix or region and Python for the whole page; `get_balance_sheet` 300 rows or 128
   KB, its note naming a region on the world pages and Python for the whole matrix;
   every other tool the default, whose note's narrowing only `list_releases` (`since`,
@@ -298,19 +300,18 @@ semantics or the shape of the public API.
   October 2026 fits whole: the largest page, sr28, 364 values and 129,899 bytes, 1,173
   under the bound; the largest balance sheet, Meats, 280 values and 90,850 bytes; the
   measured sizes are in the comment above `MCP_CAPS`.
-- **The narrative** (Johannes, 2026-10-28, G5). `read_report_text(month)` reads the
+- **The narrative** (https://github.com/xippios/sdk-usda-wasde/pull/5). `read_report_text(month)` reads the
   release's XLS, sheet `WASDE Text` (`parse/wasde_xls.py`): one string per row with
   text, verbatim (25 for October 2026, the first `WASDE - 676\r`), `meta.vintage` the
   month cell (0, 0) of the first `Page N` sheet prints (`October 2026`). A release
   without an XLS, or whose XLS has no such sheet or no text in it while it has a PDF,
-  is read from the PDF (`parse/wasde_pdf.py`, pypdf; the fallback kept by Johannes,
-  2026-10-28, G5 inside PR 5): one string per page from page 1
+  is read from the PDF (`parse/wasde_pdf.py`, pypdf): one string per page from page 1
   up to the first page that prints `Interagency Commodity Estimates Committees` on a
   line of its own, after its running header (`WASDE-484-6`, `WASDE-676-6`): pages 1 to
   5 in July 2010 and October 2026; no later page is read, no figure comes from a PDF
   (sdk-core ADR-0020 decision 4), and `meta.vintage` is the ESMIS release id as esmis
-  prints it (`"95659"`), since the narrative prints a date, not a month label (the
-  session, 2026-10-28, rule 7; sdk-core ADR-0020 decision 5; gap, row 202). The release is the month's latest that carries an XLS or a
+  prints it (`"95659"`), since the narrative prints a date, not a month label
+  (sdk-core ADR-0020 decision 5). The release is the month's latest that carries an XLS or a
   PDF; a month whose releases carry neither is refused naming their formats. ESMIS
   lists revision workbooks as the XLS of some releases of 2001 to 2008, and which older
   report workbooks hold the sheet is unknown: hence the fallback.
@@ -328,14 +329,15 @@ semantics or the shape of the public API.
   2026-11-18, point a; sdk-core ADR-0042, decision 4), and `wasde-07-09-2010_pdf.json`
   with the whole PDF (base64); the secret scan skips their `sha256` lines and reads the
   two base64 bodies, the XLS's and the PDF's, as secrets, which `.secrets.baseline`
-  holds audited, `is_secret: false` (gap, row 124). Release
+  holds audited, `is_secret: false`: no line rule tells a base64 body from a token
+  (https://github.com/xippios/sdk-usda-wasde/pull/5). Release
   95659 carries an XLS too, so the PDF path replays it with its XLS left out. `.gitattributes` marks
-  `tests/fixtures/files/**` `-text`, so no checkout converts the samples' CRLF (gap,
-  row 189). The catalog fixtures are esmis's
+  `tests/fixtures/files/**` `-text`, so no checkout converts the samples' CRLF
+  (https://github.com/xippios/sdk-usda-wasde/pull/3). The catalog fixtures are esmis's
   answers recorded here through core's recorder with esmis's client (sdk-core ADR-0021).
-- **The packaged lists** (decided by Johannes on 2026-10-28, G5). `reference/table.json`
-  (30 pages with their titles, subtitles and footnotes, stated once for the page:
-  Johannes, 2026-10-28, G5 inside PR 5), `commodity.json` (43 matrices), `region.json`
+- **The packaged lists** (https://github.com/xippios/sdk-usda-wasde/pull/4). `reference/table.json`
+  (30 pages with their titles, subtitles and footnotes, stated once for the page),
+  `commodity.json` (43 matrices), `region.json`
   (70 texts) and
   `attribute.json` (451 row labels) are `PackagedList` files, written by
   `scripts/refresh_reference.py` from the latest release's XML and XLS with
@@ -349,7 +351,7 @@ semantics or the shape of the public API.
   core's `matches`, the default MCP cap (the largest answer 29,639 bytes); the attribute
   list has no task in 0.1.1 and is kept for the tasks that name a table's rows. The
   commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
-  32 and 33 (pages 32 and 33 by the session, 2026-10-28, rule 7); the XML names none
+  32 and 33; the XML names none
   of their commodities as a whole: only page 32's records carry a `commodity`, one per
   row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`), while the list names
   its matrix `Meats`, so `list_commodities(search="beef")` answers nothing. On pages 12
@@ -359,7 +361,7 @@ semantics or the shape of the public API.
   elsewhere it is the title's words between its region and `Supply and Use`; `region`
   is `United States` for a `U.S.` title, `Mexico` and `World` as printed. Region texts
   stay as printed, with indents and footnote markers; `get_balance_sheet` matches a
-  region against the text stripped of both (gap row 195). The rules are
+  region against the text stripped of both. The rules are
   `_vocabulary.py`'s docstring. Nothing is generated into `enums.py` (no value list) and
   `params.PACKAGED_LISTS` names the four files, as the template's
   `/refresh-reference-data` expects; the script replaces the template's `LISTS`,
@@ -373,15 +375,17 @@ semantics or the shape of the public API.
   refresh of 2026-10-28 reproduced. `--keep DIR` keeps the downloaded files with what
   the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
-  (decided by Johannes on 2026-10-28): one session fixture runs `get_release()` and
+  (https://github.com/xippios/sdk-usda-wasde/pull/3 and https://github.com/xippios/sdk-usda-wasde/pull/5): one session
+  fixture runs `get_release()` and
   keeps the XML for the live parser test, then downloads the release's XLS and PDF once
   each, for the block titles and the narrative parsers' live tests; the live tests of
   the three list tasks build the lists from those files and compare them with the
   packaged ones, every field but `report_month`, with the month word of the reliability
   titles masked (`Reliability of <Month> Projections`, pages 35 to 37: every release
-  names its own month; gap row 195) and each table footer, `sub_report_footer` to
+  names its own month; https://github.com/xippios/sdk-usda-wasde/pull/4) and each table footer,
+  `sub_report_footer` to
   `sub_report_footer3`, compared only for whether it is set on both sides, never its
-  text, which changes every release (the session, 2026-10-28, rule 7; gap row 195), a
+  text, which changes every release (the same pull request), a
   difference naming the rows. `get_table`,
   `get_balance_sheet` and `read_report_text` run live through the fixture `served`,
   their lookups live, core's `AsyncClient.download` copying the session's file. Sixteen

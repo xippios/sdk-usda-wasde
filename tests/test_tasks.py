@@ -299,7 +299,7 @@ SLICE_FIELDS = [
     "cell_value",
     "value",
 ]
-"""The fields a slice's record keeps (Johannes, 2026-10-28, G5 inside PR 5)."""
+"""The fields a slice's record keeps (https://github.com/xippios/sdk-usda-wasde/pull/5)."""
 
 
 def values(records: list[WasdeXmlCell]) -> list[WasdeTableValue]:
@@ -733,7 +733,7 @@ def test_a_month_without_an_xls_or_a_pdf_is_refused_naming_its_formats() -> None
 
 
 def test_the_slices_have_caps_of_their_own() -> None:
-    """Each note says how to see the rest (Johannes, 2026-10-28, G5 inside PR 5).
+    """Each note says how to see the rest (https://github.com/xippios/sdk-usda-wasde/pull/5).
 
     Every other tool keeps the default; none of them is cut but ``list_releases`` called
     without ``since``, whose filters the default note's narrowing names.
