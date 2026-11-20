@@ -21,6 +21,7 @@ the MCP server; the bulk task is neither a tool nor a route.
 """
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -1049,12 +1050,20 @@ def test_build_is_the_tool_set_the_server_serves() -> None:
 
 ENTRY_POINT = Path(sys.executable).parent / "xippios-usda-wasde-mcp"
 """The installed entry point, ``[project.scripts]`` of ``pyproject.toml``."""
+PLAIN = {"PYTHON_COLORS": "0", "COLUMNS": "100"}
+"""The terminal the entry point's text is compared in: no colors, which Python 3.14's
+argparse adds under ``FORCE_COLOR``, and a width that keeps the usage line whole."""
 
 
 def entry_point(*arguments: str) -> subprocess.CompletedProcess[str]:
     """The entry point run with ``arguments``, which stop it before it serves."""
     return subprocess.run(
-        [str(ENTRY_POINT), *arguments], capture_output=True, text=True, timeout=120, check=False
+        [str(ENTRY_POINT), *arguments],
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+        env={**os.environ, **PLAIN},
     )
 
 
