@@ -1,4 +1,4 @@
-"""Parser tests on the XML samples of ``tests/fixtures/files/wasde_xml/`` (ADR-0020).
+"""Parser tests on the XML samples of ``tests/fixtures/files/wasde_xml/`` (sdk-core ADR-0020).
 
 Each sample is a verbatim cut of the October 2026 release's file that keeps whole pages
 (``tests/fixtures/files/README.md``). The tests assert the parser's shape and the labels

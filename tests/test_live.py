@@ -6,7 +6,7 @@ The nightly run fetches the latest release only, each file kind once, through on
 session-scoped fixture, ``latest`` (decided by Johannes on 2026-10-28): it runs
 ``get_release()`` once, which downloads the latest XML through xippios-usda-esmis, and
 keeps a copy of the file in a temporary directory for the live parser test, which
-checks shape, page names and fields, never values (ADR-0020 decision 6); then it
+checks shape, page names and fields, never values (sdk-core ADR-0020 decision 6); then it
 downloads the release's XLS and its PDF once each through esmis's
 ``download_release_file``, for the block titles of the commodity list and the live
 parser tests of the narrative. ``get_table``, ``get_balance_sheet`` and
@@ -18,7 +18,7 @@ list tasks send nothing: their live tests build the lists from the latest files 
 the refresh script's rules (``_vocabulary``) and compare them with the packaged ones,
 every field but ``report_month``, the month word of the reliability titles masked
 (``Reliability of <Month> Projections``, pages 35 to 37), since every release names its
-own month there and the lists carry the release they came from (ADR-0022 decision 1;
+own month there and the lists carry the release they came from (sdk-core ADR-0041 decision 1;
 gap row 195); each footer of a table, ``sub_report_footer`` to ``sub_report_footer3``,
 is compared only for whether it is set on both sides, never its text, which changes
 every release (the projection month on page 35, the months of the estimates on pages

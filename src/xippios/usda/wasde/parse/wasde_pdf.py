@@ -1,4 +1,4 @@
-"""Parse the narrative pages of a WASDE release's PDF file, text only (ADR-0020 decision 4).
+"""Parse the narrative pages of a WASDE release's PDF, text only (sdk-core ADR-0020 decision 4).
 
 The PDF is the whole report (``docs/upstream/layout.md``): the narrative on its first
 pages, then a page that lists the Interagency Commodity Estimates Committees, the

@@ -4,7 +4,7 @@ Four lists ship here as packaged lists, versioned with the package, each read fr
 latest WASDE release's files by `scripts/refresh_reference.py` (`/refresh-reference-data`)
 and written with core's `PackagedList.write`, never by hand, in the file shape of
 `PackagedList` (`param`, `endpoint`, `fetched`, `note`, `records`; conventions §3,
-ADR-0022; decided by Johannes on 2026-10-28, G5). Each file is named after its `param`,
+sdk-core ADR-0041; decided by Johannes on 2026-10-28, G5). Each file is named after its `param`,
 the parameter the list serves:
 
 - `table.json`: one record per page of the XML, `sr08` to `sr37` (`models.Table`): its
@@ -45,7 +45,7 @@ commodity is the title's words between its region and `Supply and Use`, as print
 
 **When they are refreshed.** Before each release, in the release train's refresh PR of
 its own (conventions §12): a release ships the lists of the latest WASDE, whose
-`Report_Month` is their vintage (ADR-0022 decision 1). Between releases the nightly live
+`Report_Month` is their vintage (sdk-core ADR-0041 decision 1). Between releases the nightly live
 tests compare the packaged tables, commodities and regions with the latest release's,
 every field but `report_month`, with the month word of the reliability titles masked
 (`Reliability of <Month> Projections`, pages 35 to 37), since every release names its

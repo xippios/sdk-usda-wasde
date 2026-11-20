@@ -3,7 +3,7 @@
 ``/add-endpoint`` and ``/record-fixture`` add them.
 
 The tasks send through xippios-usda-esmis's tasks, so the fixtures are esmis's answers,
-recorded here on 2026-10-28 under esmis's wrapper names (ADR-0021 decision 4): WASDE's
+recorded here on 2026-10-28 under esmis's wrapper names (sdk-core ADR-0021 decision 4): WASDE's
 release page 0 (``release_find_by_identifier/wasde_page0.json``), release 796099
 (``release_find_by_id/796099.json``) and the downloads of its XML and its XLS: two
 fixtures of the XML (``download_release_file/wasde1026_xml.json`` and
@@ -96,7 +96,7 @@ JULY_2010_PRINTED = datetime(2010, 7, 9, 12, 0)
 PACKAGED_FETCHED = datetime(2026, 10, 28, 16, 26, 51, tzinfo=UTC)
 """The packaged lists' ``fetched``, when the refresh script's XML download was complete."""
 FILE_KEYS = {"param", "endpoint", "fetched", "note", "records"}
-"""The keys a packaged file may hold (ADR-0022, amendment point 8)."""
+"""The keys a packaged file may hold (sdk-core ADR-0041, decision 5)."""
 OUT_OF_DATE = "If upstream added it since, the packaged list is out of date."
 """How core's ``UnknownCode`` ends from core 0.4.0, a sentence an agent can act on."""
 

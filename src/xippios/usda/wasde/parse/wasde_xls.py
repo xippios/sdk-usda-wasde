@@ -1,4 +1,4 @@
-r"""Parse the narrative of a WASDE release's XLS file into one record per paragraph (ADR-0020).
+r"""Parse the narrative of a WASDE release's XLS into one record per paragraph (sdk-core ADR-0020).
 
 The workbook is Excel 97-2003 (BIFF8), read with xlrd (``docs/upstream/layout.md``). Its
 sheet ``WASDE Text`` holds the report's narrative in one column, one paragraph a row, as

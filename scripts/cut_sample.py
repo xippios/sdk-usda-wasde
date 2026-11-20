@@ -1,8 +1,8 @@
 r"""Cut samples from one WASDE release's file and record its download fixture.
 
 The parser tests read samples of a release's files under
-``tests/fixtures/files/<file_kind>/<case>.<ext>``, each under 256 KiB (ADR-0019 decision
-5, ADR-0020 decision 6). One run reads one file of one release, ``--format``:
+``tests/fixtures/files/<file_kind>/<case>.<ext>``, each under 256 KiB (sdk-core ADR-0040 decision
+5, sdk-core ADR-0020 decision 6). One run reads one file of one release, ``--format``:
 
 - ``xml`` (the default): ``wasde_xml/<case>.xml``, a verbatim cut of the file, byte for
   byte, that keeps whole pages. A cut is the file's leading bytes up to and including the
@@ -30,7 +30,7 @@ One run downloads the file once, through xippios-usda-esmis: the release's catal
 with its ``list_release_files`` task (one request), then the first of its files in the
 format, the one esmis's ``download_release_file`` picks, with one GET through esmis's
 configured client, retried never, as core's recorder sends it (one request, the whole
-file); a recording script may use esmis's client, the package never does (ADR-0021).
+file); a recording script may use esmis's client, the package never does (sdk-core ADR-0021).
 
 ``--fixture <case>`` also writes the download's replay fixture,
 ``tests/fixtures/download_release_file/<file>_<ext>.json`` (``wasde1026_xml.json``), or the
@@ -92,7 +92,7 @@ FIXTURE_DIRECTORY = "download_release_file"
 KINDS = {"xml": "wasde_xml", "xls": "wasde_xls", "pdf": "wasde_pdf"}
 """Each format's file kind, the directory of its samples under ``tests/fixtures/files/``."""
 CAP = 256 * 1024
-"""The size every sample and fixture file stays under (ADR-0019)."""
+"""The size every sample and fixture file stays under (sdk-core ADR-0040)."""
 OPENING = b'<Report Name="wasde">'
 PAGE = re.compile(rb"<(sr\d+)>.*?</\1>", re.DOTALL)
 COPIED = {xlrd.XL_CELL_TEXT, xlrd.XL_CELL_NUMBER, xlrd.XL_CELL_BOOLEAN}
