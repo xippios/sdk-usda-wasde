@@ -11,7 +11,7 @@ follows, sdk-core's conventions among them, are listed under
 | | |
 | --- | --- |
 | Upstream | USDA WAOB World Agricultural Supply and Demand Estimates, https://www.usda.gov/oce/commodity/wasde |
-| API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.1.1 |
+| API base URL | `https://esmis.nal.usda.gov`, ESMIS, which catalogs WASDE's releases and serves their files; this package reaches it only through `xippios-usda-esmis`'s tasks, and its own client sends nothing in 0.2.0 |
 | Documentation | https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates and WAOB's pages under https://www.usda.gov/oce/commodity/wasde, snapshotted in `docs/upstream/` by `scripts/refresh_upstream.py` (`/refresh-upstream`); a page www.usda.gov refuses to automated requests is kept from USDA's CDN origin, usda.azureedge.us; no page names an OpenAPI or Swagger document, so `SPEC_URL` is `None`; the file layouts, as observed, in `docs/upstream/OBSERVED.md`, each note with the release file or sample it was read from |
 | Credentials | none; the API is open |
 | Rate limit | 30 requests per minute, burst 1, esmis's self-imposed pace (upstream documents no limit; sdk-core ADR-0033), kept by `xippios-usda-esmis`'s client, through which every request goes; `_client.py` configures the same pace for a client that sends nothing; no hourly or daily quota documented |
@@ -88,8 +88,8 @@ tests/
                    on the packaged files
   test_reference.py  the packaged lists against the samples, the list rules and refusals
   test_cut_sample.py  cut_sample.py's download fixture, its sample marked, written offline
-  test_refresh_upstream.py  FETCHED.md as the capture script renders it, offline, with the
-                   row of OBSERVED.md, which a snapshot leaves as written
+  test_refresh_upstream.py  FETCHED.md as the capture script renders it, offline: the row of
+                   OBSERVED.md, the table Not fetched, each linked page fetched or a row
   test_observed.py docs/upstream/OBSERVED.md as committed: the release files it was
                    written from, each note's date and file, every cited file present
   test_live.py     @pytest.mark.live smoke tests, one per task, the live parser tests on the
@@ -351,7 +351,7 @@ semantics or the shape of the public API.
   answer from them without a request, `meta` from `PackagedList.meta`, `search` through
   core's `matches`, the default MCP cap (the largest answer 28,604 bytes, `list_tables`
   on the November 2026 lists); the attribute
-  list has no task in 0.1.1 and is kept for the tasks that name a table's rows. The
+  list has no task in 0.2.0 and is kept for the tasks that name a table's rows. The
   commodity list holds one record per report item of the supply-and-use pages, 11 to 30,
   32 and 33; the XML names none
   of their commodities as a whole: only page 32's records carry a `commodity`, one per
@@ -374,12 +374,12 @@ semantics or the shape of the public API.
   before each release, in the release train's refresh PR (conventions §12), so each
   release ships the lists of the latest WASDE, its month
   their vintage (sdk-core ADR-0041 decision 1); a refresh that reproduces them record for
-  record needs no PR: 0.1.1 ships those of ESMIS release 796099 (October 2026), which the
-  refresh of 2026-10-28 reproduced, and 0.2.0 those of release 796142 (November 2026),
-  read on 2026-11-20. The samples stay October 2026's, so the offline tests hold them to
-  the lists by `_vocabulary.differences`, as the live tests hold the latest release's
-  files. `--keep DIR` keeps the downloaded files with what
-  the run learnt of them, `--from DIR` rebuilds from them without a request.
+  record needs no PR. 0.1.1 ships those of ESMIS release 796099 (October 2026), which the
+  refresh of 2026-10-28 reproduced. 0.2.0 ships those of release 796142 (November 2026),
+  whose refresh of 2026-11-20 changed records and had a PR of its own. The samples stay
+  October 2026's, so the offline tests hold them to the lists by `_vocabulary.differences`,
+  as the live tests hold the latest release's files. `--keep DIR` keeps the downloaded files
+  with what the run learnt of them, `--from DIR` rebuilds from them without a request.
 - **Live budget.** The nightly run fetches the latest release only, each file kind once
   (https://github.com/xippios/sdk-usda-wasde/pull/3 and https://github.com/xippios/sdk-usda-wasde/pull/5): one session
   fixture runs `get_release()` and
@@ -395,4 +395,4 @@ semantics or the shape of the public API.
   difference naming the rows. `get_table`,
   `get_balance_sheet` and `read_report_text` run live through the fixture `served`,
   their lookups live, core's `AsyncClient.download` copying the session's file. Sixteen
-  keyless requests, three of them downloads, about 4.7 MB.
+  keyless requests, three of them downloads, about 3.3 MB for the November 2026 release.
