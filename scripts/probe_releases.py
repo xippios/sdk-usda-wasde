@@ -60,10 +60,10 @@ class Probe:
 PROBES = (
     Probe(95659, "2010-07", "xml", None, "the first XML"),
     Probe(95659, "2010-07", "xls", None, "the first XML's workbook"),
-    Probe(95646, "2011-07", "xml", None, "a year the sampling did not read"),
+    Probe(95646, "2011-07", "xml", None, "one more year"),
     Probe(95621, "2013-08", "xml", "ORIGwasde-08-12-2013.xml", "the original of a revised month"),
-    Probe(95607, "2014-10", "xml", None, "a year the sampling did not read"),
-    Probe(95533, "2020-10", "xml", None, "a latest.* name, a year the sampling did not read"),
+    Probe(95607, "2014-10", "xml", None, "one more year"),
+    Probe(95533, "2020-10", "xml", None, "a latest.* name"),
     Probe(95483, "2024-12", "xml", None, "the first reposted month, v2"),
     Probe(96165, "2025-05", "xml", None, "a reposted month, v2"),
 )
