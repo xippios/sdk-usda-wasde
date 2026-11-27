@@ -273,8 +273,7 @@ async def get_data_async(
     with its number, and its footnotes' texts, each label beside its ``_label``. On pages
     12 to 15 the commodity is the block title of the release's XLS, else the report's
     layout (``commodity_source``). The filters keep the records whose ``_label`` equals
-    them; a filter nothing matches answers the empty list. Requests, each tried up to 4
-    times: the pages of ESMIS's list from the newest back to the month, 25 releases a
+    them, else answer the empty list. Requests, each tried up to 4 times: the pages of ESMIS's list from the newest back to the month, 25 releases a
     page (1 for the last two years), the release and the XML, 2, and where a record of
     pages 12 to 15 is kept the release and the XLS, 2 more. A month before July 2010
     raises ``InvalidRequestError`` before anything is sent; a month without a release
@@ -439,8 +438,8 @@ async def list_releases_async(
     """WASDE's releases in ESMIS, newest first, each with its id, release time and files.
 
     Read through xippios-usda-esmis's ``list_releases`` for ``"wasde"``
-    (``esmis_api_release_findByIdentifier``), one request per page of 25 releases, each
-    tried up to 4 times. ``since`` and ``until`` keep the releases whose printed release
+    (``esmis_api_release_findByIdentifier``). Requests, each tried up to 4 times: one per
+    page of 25 releases. ``since`` and ``until`` keep the releases whose printed release
     date lies between them, both included, and ``since`` ends the walk of the pages.
     Without ``since`` every page is walked, 29 requests for the 704 releases of
     2026-11-27, about a minute: bound the call with ``since``. A file name ending in
