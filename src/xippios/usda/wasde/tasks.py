@@ -27,7 +27,7 @@ What every task follows:
   ADR-0060, decision 8), ``meta.published_at`` the release time as ESMIS prints it with
   its ``+0000`` dropped, flagged ``published_at_naive`` (sdk-core ADR-0041), and
   ``meta.request`` the arguments given, none left ``None``, with the release id and the
-  file's URL, and ``xls_url`` where the XLS was read.
+  file's URL, and ``xls_url`` where a record reads its commodity from the XLS.
 - A month in which ESMIS lists no WASDE raises ``NotFoundError`` naming the latest
   release, the first row of ESMIS's first page of WASDE's releases.
 - ``list_releases`` keeps esmis's ``meta.endpoint`` (``esmis_api_release_findByIdentifier``)
@@ -209,8 +209,10 @@ async def _read(
     temporary directory and parsed, its records of pages 12 to 15 taking their commodity from
     the fixed table of the layout; where ``needs_xls`` asks it of those records and the
     release has an XLS, the XLS is downloaded and the XML read again with its block titles.
-    An XLS that cannot be read, its download refused or its workbook one xlrd cannot read,
-    leaves the layout's, and the answer names no ``xls_url``. The directory is removed.
+    An XLS that cannot be read, its download refused, its workbook one xlrd cannot read or
+    its sheets giving no page as many titles as tables, leaves the layout's. The answer names
+    ``xls_url`` where a record reads its commodity from the XLS, and else none. The directory
+    is removed.
     """
     bounds = _with_tables(year, month)
     release = _carrying(
@@ -235,10 +237,10 @@ async def _read(
                 titles = read_block_titles(xls)
             except XippiosError:
                 titles = {}
-            else:
-                xls_url = str(workbook.meta.request["url"])
             if titles:
                 records = parse_wasde_xml(xml, block_titles=titles)
+                if any(record.commodity_source == "xls" for record in records):
+                    xls_url = str(workbook.meta.request["url"])
     meta = _meta(downloaded, release, request)
     if xls_url is not None:
         meta.request["xls_url"] = xls_url
@@ -281,7 +283,14 @@ async def get_data_async(
 
     Args:
         year: The report's year, e.g. ``2026``.
-        month: The report's month, 1 to 12, e.g. ``10``; from July 2010 on.
+        month: The report's month, 1 to 12, e.g. ``10``. The XML files of 2020-10, 2024-12
+            and 2025-05 read whole, as October 2026's samples do; July 2010's raises
+            ``ValidationError`` at its root, and those of 2011-07, 2013-08 and 2014-10 at
+            pages 35 to 37, each after its download
+            (https://github.com/xippios/sdk-usda-wasde/issues/19). With xippios-usda-esmis
+            0.3.0, whose walk of ESMIS's list ends early, a month from 1995-02 to 2018-11
+            raises ``NotFoundError`` as one without a release, until this package takes
+            that package's 0.4.0. A month before July 2010 raises ``InvalidRequestError``.
         commodity: Keep the records whose ``commodity_label`` is this, e.g. ``"CORN"``
             (page 12, U.S.), ``"Corn"`` (world pages), ``"Total Grains"``;
             ``list_commodities`` lists them.
@@ -327,7 +336,14 @@ async def list_tables_async(
 
     Args:
         year: The report's year, e.g. ``2026``.
-        month: The report's month, 1 to 12, e.g. ``10``; from July 2010 on.
+        month: The report's month, 1 to 12, e.g. ``10``. The XML files of 2020-10, 2024-12
+            and 2025-05 read whole, as October 2026's samples do; July 2010's raises
+            ``ValidationError`` at its root, and those of 2011-07, 2013-08 and 2014-10 at
+            pages 35 to 37, each after its download
+            (https://github.com/xippios/sdk-usda-wasde/issues/19). With xippios-usda-esmis
+            0.3.0, whose walk of ESMIS's list ends early, a month from 1995-02 to 2018-11
+            raises ``NotFoundError`` as one without a release, until this package takes
+            that package's 0.4.0. A month before July 2010 raises ``InvalidRequestError``.
         search: Keep the rows where this text occurs, ignoring case, in the title as
             printed or as read, e.g. ``"wheat"``, ``"reliability"``; ``None`` (the
             default) keeps every row.
@@ -364,7 +380,14 @@ async def list_commodities_async(
 
     Args:
         year: The report's year, e.g. ``2026``.
-        month: The report's month, 1 to 12, e.g. ``10``; from July 2010 on.
+        month: The report's month, 1 to 12, e.g. ``10``. The XML files of 2020-10, 2024-12
+            and 2025-05 read whole, as October 2026's samples do; July 2010's raises
+            ``ValidationError`` at its root, and those of 2011-07, 2013-08 and 2014-10 at
+            pages 35 to 37, each after its download
+            (https://github.com/xippios/sdk-usda-wasde/issues/19). With xippios-usda-esmis
+            0.3.0, whose walk of ESMIS's list ends early, a month from 1995-02 to 2018-11
+            raises ``NotFoundError`` as one without a release, until this package takes
+            that package's 0.4.0. A month before July 2010 raises ``InvalidRequestError``.
         search: Keep the rows where this text occurs, ignoring case, in the commodity as
             printed or as read or in one of its tables, e.g. ``"rice"``, ``"soybean"``;
             ``None`` (the default) keeps every row.
@@ -410,7 +433,14 @@ async def list_regions_async(
 
     Args:
         year: The report's year, e.g. ``2026``.
-        month: The report's month, 1 to 12, e.g. ``10``; from July 2010 on.
+        month: The report's month, 1 to 12, e.g. ``10``. The XML files of 2020-10, 2024-12
+            and 2025-05 read whole, as October 2026's samples do; July 2010's raises
+            ``ValidationError`` at its root, and those of 2011-07, 2013-08 and 2014-10 at
+            pages 35 to 37, each after its download
+            (https://github.com/xippios/sdk-usda-wasde/issues/19). With xippios-usda-esmis
+            0.3.0, whose walk of ESMIS's list ends early, a month from 1995-02 to 2018-11
+            raises ``NotFoundError`` as one without a release, until this package takes
+            that package's 0.4.0. A month before July 2010 raises ``InvalidRequestError``.
         search: Keep the rows where this text occurs, ignoring case, in the region as
             printed or as read or in one of its tables, e.g. ``"china"``, ``"european
             union"``; ``None`` (the default) keeps every row.
@@ -509,16 +539,18 @@ async def get_report_text_async(year: int, month: int) -> Result[list[str]]:
     A release without an XLS, or whose XLS holds no such sheet while it has a PDF, is read
     from its PDF: one string per page before the one headed Interagency Commodity
     Estimates Committees, as pypdf extracts it; no figure ever comes from a PDF. The
-    release is the month's latest that carries an XLS or a PDF, a month before July 2010
-    among them. Requests, each tried up to 4 times: the pages of ESMIS's list from the
-    newest back to the month, 25 releases a page (1 for the last two years), then the
-    release and the file, 2, and 2 more where the PDF is read after an XLS without the
-    sheet. A month without a release, or whose releases carry neither file, raises
-    ``NotFoundError``.
+    release is the month's latest that carries an XLS or a PDF. Requests, each tried up to
+    4 times: the pages of ESMIS's list from the newest back to the month, 25 releases a page
+    (1 for the last two years), then the release and the file, 2, and 2 more where the PDF
+    is read after an XLS without the sheet. A month without a release, or whose releases
+    carry neither file, raises ``NotFoundError``.
 
     Args:
-        year: The report's year, e.g. ``2026``, ``2010``.
-        month: The report's month, 1 to 12, e.g. ``10``.
+        year: The report's year, e.g. ``2026``.
+        month: The report's month, 1 to 12, e.g. ``10``. With xippios-usda-esmis 0.3.0,
+            whose walk of ESMIS's list ends early, a month from 1995-02 to 2018-11 raises
+            ``NotFoundError`` as one without a release, until this package takes that
+            package's 0.4.0.
     """
     bounds = _month(year, month)
     release = _carrying(

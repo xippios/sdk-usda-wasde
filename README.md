@@ -64,10 +64,18 @@ since the XML does not say which of its repeated unit rows the page shows.
 
 `list_tables`, `list_commodities` and `list_regions` answer the distinct labels of the
 month's own records, read from its file, so every label and footnote is the month's.
-`get_data` and the three lists read July 2010 and later, the months whose WASDE has an
-XML file, and refuse an earlier month before anything is sent: the TXT tables before it
-are https://github.com/xippios/sdk-usda-wasde/issues/31. Each call downloads the month's
-file and keeps nothing. `get_report_text` answers the narrative as text, from the XLS's
+`get_data` and the three lists refuse a month before July 2010, the first whose WASDE has
+an XML file, before anything is sent: the TXT tables before it are
+https://github.com/xippios/sdk-usda-wasde/issues/31. Of the later XML files, those of
+2020-10, 2024-12 and 2025-05 read whole, as the October 2026 samples do, while July 2010's
+raises `ValidationError` at its root and those of 2011-07, 2013-08 and 2014-10 at pages 35
+to 37, each after its download (`docs/upstream/OBSERVED.md`, "Older and revised files";
+https://github.com/xippios/sdk-usda-wasde/issues/19). With xippios-usda-esmis 0.3.0, whose
+walk of ESMIS's list of releases ends early (`docs/upstream/OBSERVED.md`, "The order of the
+pages"), a month from 1995-02 to 2018-11 raises `NotFoundError` as one without a release,
+the same for `get_report_text`, until the package takes xippios-usda-esmis 0.4.0, which
+mends the walk (https://github.com/xippios/sdk-usda-esmis/pull/71). Each call downloads the
+month's file and keeps nothing. `get_report_text` answers the narrative as text, from the XLS's
 sheet `WASDE Text`, or from the PDF's narrative pages for a release without an XLS or
 whose XLS has no such sheet; no figure is ever read from a PDF. `meta.vintage` of every
 task that reads a file is the ESMIS release id. Task functions are listed in the status
