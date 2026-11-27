@@ -1,0 +1,1 @@
+- `get_data` and the three lists refuse a month before July 2010, the first with an XML file, with `InvalidRequestError` before anything is sent, naming the TXT tables' issue; a month outside 1 to 12 is refused likewise. (https://github.com/xippios/sdk-usda-wasde/issues/31)

@@ -1,0 +1,1 @@
+- `read_report_text(month=None)` is now `get_report_text(year, month)`, with its tool `usda_wasde_get_report_text`; the year and the month are required, and `meta.vintage` is the ESMIS release id for the XLS as for the PDF. (https://github.com/xippios/sdk-usda-esr/issues/60)

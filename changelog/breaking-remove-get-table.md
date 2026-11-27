@@ -1,0 +1,1 @@
+- `get_table` and its tool leave, with `WasdeTableValue`: a table is `get_data(year, month, table=...)`, the title as `list_tables` reads it. (ADR-0060, https://github.com/xippios/sdk-usda-wasde/issues/57)

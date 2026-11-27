@@ -1,0 +1,1 @@
+- `get_latest_release` and its tool leave, since a task that picks the latest release leaves the source package: the latest release is the first row of `list_releases(since=...)`. (ADR-0060, https://github.com/xippios/sdk-usda-wasde/issues/57)

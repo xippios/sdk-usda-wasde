@@ -25,68 +25,53 @@ No API key is needed.
 from datetime import date
 
 from xippios.usda.wasde import (
-    get_balance_sheet,
-    get_latest_release,
-    get_release,
+    get_data,
+    get_report_text,
     list_commodities,
     list_releases,
-    read_report_text,
 )
 
-latest = get_latest_release()  # the newest WASDE release in ESMIS
-latest.data.id, latest.data.month  # "796142", "2026-11"
-latest.meta.published_at  # 2026-11-10 12:00:00: ESMIS's printed time, no zone (sdk-core ADR-0041)
-
 releases = list_releases(since=date(2026, 1, 1))  # bound it: without since, 29 requests
-[release.month for release in releases.data if release.revision]  # ["2026-06", "2026-05"]
+releases.data[0].id, releases.data[0].release_datetime  # "796142", 2026-11-10 12:00:00+00:00
 
-page_12 = list_commodities(search="sr12")  # packaged with the package: no request
-[row.commodity for row in page_12.data]  # ["FEED GRAINS", "CORN"]: matrix1 and matrix2
+corn = get_data(2026, 10, commodity="CORN")  # page 12's U.S. corn, from the XML and the XLS
+corn.meta.endpoint, corn.meta.vintage  # "wasde1026.xml", "796099": the ESMIS release id
+row = corn.data[0]
+row.table_label, row.commodity_source  # "U.S. Feed Grain and Corn Supply and Use", "xls"
+row.attribute_label, row.market_year_label, row.value  # "Area Planted", "2024/25", "90.9"
+[note.text for note in row.footnotes]  # the table's note and its 1/, as printed
 
-corn = get_balance_sheet("CORN")  # page 12's U.S. corn matrix, read from the latest XML
-corn.meta.endpoint, corn.meta.vintage, len(corn.data)  # "wasde1126.xml", "November 2026", 60
-corn.data[0].attribute, corn.data[0].cell_value  # "Area Planted", "90.9" (2024/25)
-# its subtitle and footnotes are page 12's in list_tables(search="sr12"), stated once
-
-october = get_release("2026-10")  # Python only: every value, 6543 records, one download
-narrative = read_report_text("2026-10")  # the XLS's sheet WASDE Text, one string a paragraph
+list_commodities(2026, 10, search="rice")  # the month's own commodities: "TOTAL RICE", "Rice"
+narrative = get_report_text(2026, 10)  # the XLS's sheet WASDE Text, one string a paragraph
 narrative.data[1][:6]  # "WHEAT:"
 ```
 
-Each record of `get_release` is one value of the release's tables with the labels its
-page prints, as printed (`WasdeXmlCell`): 6543 for October 2026, pages 8 to 37. `unit`
-is what the file states: the subtitle of the world and summary pages (8 to 10, 18 to 30),
-the label of a reliability table for its average, smallest and largest; on the U.S.
-pages it is `None`, since the XML does not say which of its repeated unit rows the page
-shows (the XLS and the TXT print them in place). `list_tables`, `list_commodities` and
-`list_regions` answer from lists packaged with the package, read from the November 2026
-release's files (ESMIS release 796142) by `scripts/refresh_reference.py`
-(`reference/README.md`) and refreshed before each release: its 30 table pages with
-their titles, subtitles and footnotes, the
-43 supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, and its
-70 region texts, as printed. The XML names none of these matrices' commodities as a
-whole: on pages 12 to 15 they are the XLS's block titles; only page 32's records carry a
-`commodity`, one per row (e.g. `Beef`, `Pork`, `Broiler`, `Turkey`, `Red Meat & Poultry`),
-while the list names its matrix `Meats`, so `list_commodities(search="beef")` answers
-nothing.
+`get_data` answers one record per value of a month's tables, pages 8 to 37 of the
+release's XML, complete in itself (`WasdeRecord`; sdk-core ADR-0060, decision 7): the
+report's number and month, the table's title, the commodity, the region, the market year
+with its status, the forecast month, the row label with its class and statistic, the
+unit, `value` as printed (`"10.45 *"`) with `value_number` beside it (`10.45`), and the
+footnotes with their texts. Each label stands as printed and beside it its `_label`, the
+text with its line breaks, runs of spaces and footnote marks left out, which the
+filters `commodity`, `region` and `table` compare. Where the XML names the commodity or
+the region only in the table's title, the record reads it there; on pages 12 to 15, whose
+XML names no table's commodity, it reads the block title of the same release's XLS, or
+where the XLS cannot be read a fixed table of the report's layout, and
+`commodity_source` says which: `title`, `xls` or `layout`. `unit` is what the file
+states: the subtitle of the world and summary pages (8 to 10, 18 to 30), the label of a
+reliability table for its average, smallest and largest; on the U.S. pages it is `None`,
+since the XML does not say which of its repeated unit rows the page shows.
 
-`get_table` and `get_balance_sheet` answer a slice of `get_release`'s records, a page or
-one commodity's matrix, the world pages' rows of one region, named as the packaged lists
-name them (`"CORN"` is page 12's U.S. corn, `"Corn"` the world corn pages; `"Argentina"`
-matches `"        Argentina"`). Their records (`WasdeTableValue`) leave out the page's
-own labels: its subtitle and footnotes, to which a marker such as `Trade 2/` refers, are
-`list_tables`'s, stated once per page with its titles, the page's number line
-(` WASDE - 676 - 12`) is left out, and the report month is `meta.vintage`. So every page
-and balance sheet of October 2026 fits its tool's cap (`get_table` 400 rows or 128 KB,
-`get_balance_sheet` 300 rows or 128 KB), each with a note that says how to see the rest
-should one not. Each call downloads the month's XML and keeps nothing, so a Python
-caller wanting several slices of one month calls `get_release` once.
-
-`read_report_text` answers the narrative as text, from the XLS's sheet `WASDE Text`, or
-from the PDF's narrative pages for a release without an XLS or whose XLS has no such
-sheet; no figure is ever read from a PDF. `meta.vintage` is the month the XLS prints, or
-for a PDF, which prints a date, the ESMIS release id. Task functions are listed in the
-status table below.
+`list_tables`, `list_commodities` and `list_regions` answer the distinct labels of the
+month's own records, read from its file, so every label and footnote is the month's.
+`get_data` and the three lists read July 2010 and later, the months whose WASDE has an
+XML file, and refuse an earlier month before anything is sent: the TXT tables before it
+are https://github.com/xippios/sdk-usda-wasde/issues/31. Each call downloads the month's
+file and keeps nothing. `get_report_text` answers the narrative as text, from the XLS's
+sheet `WASDE Text`, or from the PDF's narrative pages for a release without an XLS or
+whose XLS has no such sheet; no figure is ever read from a PDF. `meta.vintage` of every
+task that reads a file is the ESMIS release id. Task functions are listed in the status
+table below.
 
 ## MCP
 
@@ -115,15 +100,12 @@ exactly tasks.__all__, and tasks_write.__all__ where the package has write tasks
 
 | Upstream operation | Task function | MCP tool | Status |
 | --- | --- | --- | --- |
-| ESMIS `esmis_api_release_findByIdentifier` for `wasde`, through xippios-usda-esmis's `list_releases`, pages walked newest first | `list_releases(since=None, until=None)` | `usda_wasde_list_releases` | alpha |
-| ESMIS `esmis_api_release_findByIdentifier` for `wasde`, page 0, through xippios-usda-esmis's `get_latest_release` | `get_latest_release()` | `usda_wasde_get_latest_release` | alpha |
-| the release's XML file, downloaded through xippios-usda-esmis's `download_release_file`, parsed by `parse_wasde_xml` | `get_release(month=None)`, a bulk task | none, Python only | alpha |
-| the XML's pages, their titles, subtitles, footnotes and matrices, packaged from the latest release (`reference/table.json`), no request | `list_tables(search=None)` | `usda_wasde_list_tables` | alpha |
-| the XML's supply-and-use matrices of pages 11 to 30, 32 and 33 with their commodities, on pages 12 to 15 the XLS's block titles, packaged (`reference/commodity.json`), no request | `list_commodities(search=None)` | `usda_wasde_list_commodities` | alpha |
-| the XML's region texts with their pages, packaged (`reference/region.json`), no request | `list_regions(search=None)` | `usda_wasde_list_regions` | alpha |
-| one page of the release's XML, as `get_release` reads it, its values without the page's labels (`list_tables` states them), one download per call | `get_table(table, month=None)` | `usda_wasde_get_table` | alpha |
-| one commodity's supply-and-use matrix of the release's XML, a U.S. or Mexico page or the world pages' rows of one region, matrices from `reference/commodity.json`, its values without the page's labels, one download per call | `get_balance_sheet(commodity, region="United States", month=None)` | `usda_wasde_get_balance_sheet` | alpha |
-| the release's narrative: its XLS's sheet `WASDE Text` read with xlrd, else its PDF's narrative pages read with pypdf, text only | `read_report_text(month=None)` | `usda_wasde_read_report_text` | alpha |
+| ESMIS `esmis_api_release_findByIdentifier` for `wasde`, through xippios-usda-esmis's `list_releases`, pages walked newest first | `list_releases(*, since=None, until=None)` | `usda_wasde_list_releases` | alpha |
+| the month's XML, downloaded through xippios-usda-esmis's `download_release_file`, parsed by `parse_wasde_xml`, and for pages 12 to 15 the block titles of its XLS | `get_data(year, month, *, commodity=None, region=None, table=None)` | `usda_wasde_get_data` | alpha |
+| the month's XML, its tables' titles | `list_tables(year, month, *, search=None)` | `usda_wasde_list_tables` | alpha |
+| the month's XML and XLS, its records' commodities | `list_commodities(year, month, *, search=None)` | `usda_wasde_list_commodities` | alpha |
+| the month's XML, its records' regions | `list_regions(year, month, *, search=None)` | `usda_wasde_list_regions` | alpha |
+| the month's narrative: its XLS's sheet `WASDE Text` read with xlrd, else its PDF's narrative pages read with pypdf, text only | `get_report_text(year, month)` | `usda_wasde_get_report_text` | alpha |
 
 ## Upstream terms and attribution
 

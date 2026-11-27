@@ -1,0 +1,1 @@
+- `get_balance_sheet` and its tool leave: a balance sheet is `get_data(year, month, commodity=..., region=...)`, the commodity and the region as the month's records read them. (ADR-0060, https://github.com/xippios/sdk-usda-wasde/issues/57)

@@ -1,0 +1,1 @@
+- A value printed with a mark, as page 17's `"10.45 *"`, keeps its number in `value_number` and its mark in `value`, with the footnote that explains it; a mark printed in place of a value, `"3/"`, has no number. (https://github.com/xippios/sdk-usda-wasde/issues/22)
