@@ -3,23 +3,21 @@
 ``/add-endpoint`` and ``/record-fixture`` add them.
 
 The tasks send through xippios-usda-esmis's tasks, so the fixtures are esmis's answers,
-recorded here on 2026-10-28 under esmis's wrapper names (sdk-core ADR-0021 decision 4): WASDE's
-release page 0 (``release_find_by_identifier/wasde_page0.json``), release 796099
-(``release_find_by_id/796099.json``) and the downloads of its XML and its XLS: two
-fixtures of the XML (``download_release_file/wasde1026_xml.json`` and
-``wasde1026_xml_sr11_sr24.json``), whose bodies are the samples
-``files/wasde_xml/sr08_sr35_sr36.xml`` and ``sr11_sr24.xml``, so ``get_release``,
-``get_table`` and ``get_balance_sheet`` replay as the parser reads those samples, and one
-of the XLS (``wasde1026_xls.json``), whose body is ``files/wasde_xls/wasde_text_page_8.xls``.
-The PDF path of ``read_report_text`` replays release 95659 of 2010-07
-(``release_find_by_id/95659.json``) and the download of its PDF, whole
-(``download_release_file/wasde-07-09-2010_pdf.json``): that release carries an XLS too, so
-the test reads it as one without, its XLS left out of the recorded release, as the tests of
-``get_release``'s refusals leave out an XML file. The three list tasks answer from the
-packaged lists in ``reference/`` and send nothing. Every tool is called end to end through
-the MCP server; the bulk task is neither a tool nor a route.
+recorded here under esmis's wrapper names (sdk-core ADR-0021 decision 4): WASDE's release
+page 0 (``release_find_by_identifier/wasde_page0.json``, 2026-10-28), release 796099
+(``release_find_by_id/796099.json``) and the downloads of its XML and its XLS. Three
+fixtures of the XML, whose bodies are samples of whole pages
+(``download_release_file/wasde1026_xml.json``, ``files/wasde_xml/sr08_sr35_sr36.xml``;
+``wasde1026_xml_sr11_sr24.json``, ``sr11_sr24.xml``; ``wasde1026_xml_sr14.json``,
+``sr14.xml``, cut on 2026-11-27), so a task replays as the parser reads that sample, and
+one of the XLS (``wasde1026_xls.json``), whose body is the six-sheet sample
+``files/wasde_xls/wasde_text_page_8_page_12_page_13_page_14_page_15.xls``. The PDF path of
+``get_report_text`` replays release 95659 of 2010-07 (``release_find_by_id/95659.json``)
+and the download of its PDF, whole (``download_release_file/wasde-07-09-2010_pdf.json``).
+Every tool is called end to end through the MCP server.
 """
 
+import inspect
 import json
 import os
 import subprocess
@@ -27,27 +25,16 @@ import sys
 import tempfile
 from collections.abc import Callable
 from datetime import UTC, date, datetime
-from importlib import resources
 from pathlib import Path
 from typing import Any
 
+import httpx
 import pytest
 import respx
 from fastapi import FastAPI
-from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
-from mcp.client import Client
-from mcp.types import TextContent
 from pydantic import TypeAdapter
-from xippios.core import (
-    InvalidRequestError,
-    NotFoundError,
-    PackagedList,
-    ResultCap,
-    UnknownCode,
-    UpstreamModel,
-)
-from xippios.core.mcp import tool_name
+from xippios.core import InvalidRequestError, NotFoundError
 from xippios.core.testing import (
     ReplayFixture,
     assert_projection,
@@ -61,28 +48,25 @@ from xippios.usda.esmis.models import Release as EsmisRelease
 from xippios.usda.esmis.models import ReleaseFile, ReleaseResults
 
 from xippios.usda.wasde import _client, tasks
-from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde import mcp as wasde_mcp
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.http import router
 from xippios.usda.wasde.mcp import server
-from xippios.usda.wasde.models import (
-    Attribute,
-    Commodity,
-    Region,
-    Release,
-    Table,
-    WasdeTableValue,
-    WasdeXmlCell,
+from xippios.usda.wasde.models import Release, WasdeCommodity, WasdeRegion, WasdeTable
+from xippios.usda.wasde.parse import (
+    parse_wasde_pdf,
+    parse_wasde_xls,
+    parse_wasde_xml,
+    read_block_titles,
 )
-from xippios.usda.wasde.params import PACKAGE, PACKAGED_LISTS
-from xippios.usda.wasde.parse import parse_wasde_pdf, parse_wasde_xls, parse_wasde_xml
 
 FIXTURES = Path(__file__).parent / "fixtures"
-SAMPLE = FIXTURES / "files" / "wasde_xml" / "sr08_sr35_sr36.xml"
-SR11_SR24 = FIXTURES / "files" / "wasde_xml" / "sr11_sr24.xml"
-XLS_SAMPLE = FIXTURES / "files" / "wasde_xls" / "wasde_text_page_8.xls"
-PDF_SAMPLE = FIXTURES / "files" / "wasde_pdf" / "wasde-07-09-2010.pdf"
+FILES = FIXTURES / "files"
+SAMPLE = FILES / "wasde_xml" / "sr08_sr35_sr36.xml"
+SR11_SR24 = FILES / "wasde_xml" / "sr11_sr24.xml"
+SR14 = FILES / "wasde_xml" / "sr14.xml"
+XLS_SAMPLE = FILES / "wasde_xls" / "wasde_text_page_8_page_12_page_13_page_14_page_15.xls"
+PDF_SAMPLE = FILES / "wasde_pdf" / "wasde-07-09-2010.pdf"
 ESMIS = "https://esmis.nal.usda.gov"
 PAGE_0 = f"{ESMIS}/api/v1/release/findByIdentifier/wasde?page=0"
 RELEASE = f"{ESMIS}/api/v1/release/findById/796099"
@@ -97,17 +81,7 @@ OCTOBER_PRINTED = datetime(2026, 10, 9, 12, 0)
 """The October 2026 release's ``release_datetime`` as printed, its ``+0000`` dropped."""
 JULY_2010_PRINTED = datetime(2010, 7, 9, 12, 0)
 """The July 2010 release's ``release_datetime`` as printed, its ``+0000`` dropped."""
-PACKAGED_FETCHED = datetime(2026, 11, 20, 18, 3, 38, tzinfo=UTC)
-"""The packaged lists' ``fetched``, when the refresh script's XML download was complete."""
-FILE_KEYS = {"param", "endpoint", "fetched", "note", "records"}
-"""The keys a packaged file may hold (sdk-core ADR-0041, decision 5)."""
-OUT_OF_DATE = "If upstream added it since, the packaged list is out of date."
-"""How core's ``UnknownCode`` ends from core 0.4.0, a sentence an agent can act on."""
-
-
-def task_and_tool(task: str) -> str:
-    """A task named in a refusal with its MCP tool, as conventions §8 asks."""
-    return f"{task} (over MCP, the tool {tool_name(SOURCE, getattr(tasks, task))})"
+RICE = "U.S. Rice Supply and Use"
 
 
 def page_0() -> list[EsmisRelease]:
@@ -117,20 +91,56 @@ def page_0() -> list[EsmisRelease]:
     return TypeAdapter(ReleaseResults).validate_python(body).results
 
 
-def test_list_releases_re_shapes_esmis_releases(replay_fixture: ReplayFixture) -> None:
+def replay_october(replay_fixture: ReplayFixture, *downloads: str) -> list[respx.Route]:
+    """Page 0, release 796099 and the downloads named, each at its recorded URL."""
+    return [
+        replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"]),
+        replay_fixture("release_find_by_id", "796099"),
+        *(replay_fixture("download_release_file", download) for download in downloads),
+    ]
+
+
+def test_the_package_answers_six_tasks_and_no_bulk_one() -> None:
+    assert tasks.__all__ == [
+        "get_data",
+        "get_report_text",
+        "list_commodities",
+        "list_regions",
+        "list_releases",
+        "list_tables",
+    ]
+    assert not tasks.BULK_TASKS
+    assert dict(tasks.MCP_CAPS) == {}
+
+
+def test_the_tasks_take_year_and_month_first_and_the_rest_by_keyword() -> None:
+    """https://github.com/xippios/sdk-usda-esr/issues/60, part 1."""
+
+    def arguments(name: str) -> str:
+        signature = inspect.signature(getattr(tasks, name))
+        return str(signature.replace(return_annotation=inspect.Signature.empty))
+
+    lists = "(year: int, month: int, *, search: str | None = None)"
+    assert {name: arguments(name) for name in tasks.__all__} == {
+        "get_data": "(year: int, month: int, *, commodity: str | None = None, "
+        "region: str | None = None, table: str | None = None)",
+        "get_report_text": "(year: int, month: int)",
+        "list_commodities": lists,
+        "list_regions": lists,
+        "list_releases": "(*, since: datetime.date | None = None, "
+        "until: datetime.date | None = None)",
+        "list_tables": lists,
+    }
+
+
+def test_list_releases_projects_esmis_releases(replay_fixture: ReplayFixture) -> None:
     route = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
     since = date(2026, 1, 1)
     before = datetime.now(UTC)
     result = tasks.list_releases(since=since)
     after = datetime.now(UTC)
-    assert [release.month for release in result.data] == [
-        f"2026-{month:02d}" for month in range(10, 0, -1)
-    ]
+    assert [release.release_datetime.month for release in result.data] == list(range(10, 0, -1))
     assert [release.id for release in result.data][:2] == ["796099", "796054"]
-    assert {release.month: release.revision for release in result.data if release.revision} == {
-        "2026-06": "v2",
-        "2026-05": "v2",
-    }
     october = result.data[0]
     assert october.release_datetime == datetime(2026, 10, 9, 12, 0, tzinfo=UTC)
     assert october.files == [
@@ -141,503 +151,235 @@ def test_list_releases_re_shapes_esmis_releases(replay_fixture: ReplayFixture) -
         )
         for kind in ("pdf", "txt", "xls", "xml")
     ]
+    assert list(Release.model_fields) == ["id", "release_datetime", "files"]
     assert result.meta.source == SOURCE
     assert result.meta.endpoint == RELEASES
     assert result.meta.total == 703, "ESMIS's count before the date filter"
     assert result.meta.request == {"since": since}, "until left None is omitted"
     assert (result.meta.vintage, result.meta.published_at) == (None, None)
     assert_time_between(result.meta.retrieved_at, before, after)
-    # Page 0's oldest release (2024-09-12) is before since: one request.
     assert sent_urls(route) == [PAGE_0]
 
 
 def test_a_release_is_a_projection_of_esmis_release() -> None:
-    """Every release of page 0: id and time copied, files, revision and month parsed."""
+    """Every release of page 0: id and time copied, files as esmis reads them."""
     for upstream in page_0():
         release = tasks._release(upstream)
-        assert_projection(
-            release,
-            upstream,
-            files=upstream.release_files(),
-            revision=release.revision,
-            month=upstream.release_datetime.strftime("%Y-%m"),
-        )
+        assert_projection(release, upstream, files=upstream.release_files())
         assert [file.url for file in release.files] == upstream.files
 
 
-@pytest.mark.parametrize(
-    ("since", "until", "revision"),
-    [
-        (date(2024, 12, 1), date(2024, 12, 31), "v2"),  # wasde1224v2.*
-        (date(2024, 11, 1), date(2024, 11, 30), None),  # wasde1124.xml beside latest.pdf
-        (date(2025, 4, 1), date(2025, 5, 31), "v2"),  # 2025-05 and 2025-04
-        (date(2026, 10, 1), date(2026, 10, 31), None),
-    ],
-)
-def test_revision_is_the_suffix_every_file_carries(
-    replay_fixture: ReplayFixture, since: date, until: date, revision: str | None
+def test_release_keeps_the_time_as_printed() -> None:
+    """``release_datetime`` stays aware at ``+00:00``, as ESMIS prints it; never converted."""
+    release = tasks._release(page_0()[0])
+    assert release.release_datetime.utcoffset() is not None
+    assert release.model_dump(mode="json")["release_datetime"] == "2026-10-09T12:00:00Z"
+
+
+def test_get_data_reads_the_month_s_xml(
+    replay_fixture: ReplayFixture, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
-    result = tasks.list_releases(since=since, until=until)
-    assert result.data
-    assert {release.revision for release in result.data} == {revision}
-    assert result.meta.request == {"since": since, "until": until}
-
-
-def test_get_latest_release(replay_fixture: ReplayFixture) -> None:
-    route = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
-    result = tasks.get_latest_release()
-    assert (result.data.id, result.data.month, result.data.revision) == ("796099", "2026-10", None)
-    assert result.meta.source == SOURCE
-    assert result.meta.endpoint == RELEASES
-    assert result.meta.vintage == "796099"
-    assert (result.meta.published_at, result.meta.published_at_naive) == (OCTOBER_PRINTED, True)
-    assert result.meta.request == {}
-    assert result.meta.total is None
-    assert sent_urls(route) == [PAGE_0]
-
-
-@pytest.mark.parametrize(("month", "catalog"), [(None, PAGE_0), ("2026-10", PAGE_0)])
-def test_get_release_reads_the_xml(
-    replay_fixture: ReplayFixture,
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    month: str | None,
-    catalog: str,
-) -> None:
+    """Pages 8, 35 and 36: no record of pages 12 to 15, so no XLS is read."""
     monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
-    listed = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
-    release = replay_fixture("release_find_by_id", "796099")
-    download = replay_fixture("download_release_file", "wasde1026_xml")
+    listed, release, download = replay_october(replay_fixture, "wasde1026_xml")
+    xls = replay_fixture("download_release_file", "wasde1026_xls")
     before = datetime.now(UTC)
-    result = tasks.get_release(month)
+    result = tasks.get_data(2026, 10)
     after = datetime.now(UTC)
     assert result.data == parse_wasde_xml(SAMPLE), "the records of the replayed body"
-    assert {record.report for record in result.data} == {"sr08", "sr35", "sr36"}
     assert result.meta.source == SOURCE
     assert result.meta.endpoint == "wasde1026.xml", "the file's name as catalogued"
-    assert result.meta.vintage == "October 2026", "the file's Report_Month as printed"
+    assert result.meta.vintage == "796099", "the ESMIS release id (sdk-core ADR-0060, decision 8)"
     assert (result.meta.published_at, result.meta.published_at_naive) == (OCTOBER_PRINTED, True)
-    expected = {"release_id": 796099, "url": XML} | ({"month": month} if month else {})
-    assert result.meta.request == expected
+    assert result.meta.request == {"year": 2026, "month": 10, "release_id": 796099, "url": XML}
     assert result.meta.total is None
     assert_time_between(result.meta.retrieved_at, before, after)
-    assert sent_urls(listed) == [catalog]
-    assert sent_urls(release) == [RELEASE]
-    assert sent_urls(download) == [XML]
+    assert (sent_urls(listed), sent_urls(release), sent_urls(download)) == (
+        [PAGE_0],
+        [RELEASE],
+        [XML],
+    )
+    assert sent_urls(xls) == []
     assert list(tmp_path.iterdir()) == [], "the temporary directory is removed"
 
 
-def test_get_release_of_a_month_without_one_names_the_latest(
-    replay_fixture: ReplayFixture,
+def test_get_data_names_pages_12_to_15_from_the_xls(replay_fixture: ReplayFixture) -> None:
+    """Page 14's record says ``xls`` where the replay serves the XLS sample."""
+    _, release, download, xls = replay_october(
+        replay_fixture, "wasde1026_xml_sr14", "wasde1026_xls"
+    )
+    result = tasks.get_data(2026, 10)
+    titles = read_block_titles(XLS_SAMPLE)
+    assert result.data == parse_wasde_xml(SR14, block_titles=titles)
+    assert list(dict.fromkeys((r.commodity, r.commodity_source) for r in result.data)) == [
+        ("TOTAL RICE", "xls"),
+        ("LONG-GRAIN RICE", "xls"),
+        ("MEDIUM & SHORT-GRAIN RICE", "xls"),
+    ]
+    assert result.meta.endpoint == "wasde1026.xml"
+    assert result.meta.request["xls_url"] == XLS
+    assert sent_urls(release) == [RELEASE, RELEASE], "one per download"
+    assert (sent_urls(download), sent_urls(xls)) == ([XML], [XLS])
+
+
+def without_xls(respx_mock: respx.MockRouter) -> respx.Route:
+    """NOT RECORDED: release 796099's recorded answer with its XLS file left out
+    (conventions §10, kind 4), as a release whose workbook ESMIS does not list."""
+    fixture = load_fixture(FIXTURES / "release_find_by_id" / "796099.json")
+    body = json.loads(fixture.response.content)
+    body["results"][0]["files"] = [
+        url for url in body["results"][0]["files"] if not url.endswith(".xls")
+    ]
+    return respx_mock.get(RELEASE).mock(return_value=httpx.Response(200, json=body))
+
+
+def test_get_data_names_pages_12_to_15_from_the_layout_without_an_xls(
+    replay_fixture: ReplayFixture, respx_mock: respx.MockRouter
 ) -> None:
-    """October 2025 has no WASDE (OBSERVED.md): the month's list is empty, then the latest."""
+    """Page 14's record says ``layout`` where the replay serves no XLS.
+
+    Page 0 lists the release's XLS, the release's own entry, at the download, no more.
+    """
+    replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
+    release = without_xls(respx_mock)
+    download = replay_fixture("download_release_file", "wasde1026_xml_sr14")
+    result = tasks.get_data(2026, 10)
+    assert {record.commodity_source for record in result.data} == {"layout"}
+    assert "xls_url" not in result.meta.request
+    assert sent_urls(release) == [RELEASE, RELEASE], "the XML's, then the XLS's, which lacks it"
+    assert sent_urls(download) == [XML]
+
+
+@pytest.mark.parametrize(
+    ("filters", "count", "xls_read"),
+    [
+        ({"table": RICE}, 148, True),
+        ({"commodity": "LONG-GRAIN RICE"}, 40, True),
+        ({"region": "U.S."}, 148, True),
+        ({"table": "World Wheat Supply and Use"}, 0, False),
+        ({"commodity": "Long-Grain Rice"}, 0, True),
+    ],
+)
+def test_get_data_s_filters_compare_the_labels(
+    replay_fixture: ReplayFixture, filters: dict[str, str], count: int, xls_read: bool
+) -> None:
+    """Equality with the record's ``_label``, after the fetch; a filter nothing matches is []."""
+    *_, xls = replay_october(replay_fixture, "wasde1026_xml_sr14", "wasde1026_xls")
+    result = tasks.get_data(2026, 10, **filters)
+    assert len(result.data) == count
+    assert result.meta.request == {
+        "year": 2026,
+        "month": 10,
+        **filters,
+        "release_id": 796099,
+        "url": XML,
+        **({"xls_url": XLS} if xls_read else {}),
+    }
+    assert sent_urls(xls) == ([XLS] if xls_read else [])
+
+
+@pytest.mark.parametrize(
+    "task", [tasks.get_data, tasks.list_tables, tasks.list_commodities, tasks.list_regions]
+)
+def test_a_month_before_july_2010_is_refused_before_anything_is_sent(
+    respx_mock: respx.MockRouter, task: Callable[..., Any]
+) -> None:
+    """The maintainer's decision of 2026-11-27: the TXT tables are #31's."""
+    with pytest.raises(InvalidRequestError) as caught:
+        task(2010, 6)
+    assert str(caught.value) == (
+        "2010-06 is before July 2010, the first month whose WASDE has an XML file, from which "
+        "this package reads the tables; the releases before it carry them as TXT files, which "
+        "it does not read (https://github.com/xippios/sdk-usda-wasde/issues/31). Nothing was "
+        "sent."
+    )
+    assert respx_mock.calls.call_count == 0
+
+
+@pytest.mark.parametrize("month", [0, 13, -1])
+def test_a_month_outside_1_to_12_is_refused_before_anything_is_sent(
+    respx_mock: respx.MockRouter, month: int
+) -> None:
+    for task in (tasks.get_data, tasks.get_report_text):
+        with pytest.raises(InvalidRequestError, match=r"month must be 1 to 12.*Nothing was sent"):
+            task(2026, month)
+    assert respx_mock.calls.call_count == 0
+
+
+def test_a_month_without_a_wasde_names_the_latest(replay_fixture: ReplayFixture) -> None:
+    """October 2025 has no WASDE (OBSERVED.md): the month's pages, then page 0 for the latest.
+
+    As v0.2.0 answers it; the empty list with a note waits for the adoption of
+    xippios-core 0.5.0.
+    """
     listed = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
-    download = replay_fixture("download_release_file", "wasde1026_xml")
     with pytest.raises(NotFoundError) as caught:
-        tasks.get_release("2025-10")
+        tasks.get_data(2025, 10)
     assert str(caught.value) == (
         "ESMIS lists no WASDE release in 2025-10; the latest is that of 2026-10 "
         "(release 796099, 2026-10-09)"
     )
     assert sent_urls(listed) == [PAGE_0, PAGE_0]
-    assert sent_urls(download) == []
 
 
-@pytest.mark.parametrize("month", ["2026-13", "2026-1", "Oct 2026", "2026-10-01", "202610"])
-def test_get_release_refuses_a_month_not_written_yyyy_mm(
-    replay_fixture: ReplayFixture, month: str
-) -> None:
-    listed = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
-    with pytest.raises(InvalidRequestError, match="month must be 'YYYY-MM'"):
-        tasks.get_release(month)
-    assert sent_urls(listed) == [], "refused before anything is sent"
-
-
-def without_xml(release: EsmisRelease) -> EsmisRelease:
-    """A recorded release with its PDF and TXT only, as the releases before 2010-07 are."""
-    return release.model_copy(update={"files": release.files[:2]})
-
-
-def test_a_month_without_an_xml_file_is_refused_naming_its_formats() -> None:
-    """Every month before 2010-07 has none (OBSERVED.md); built from page 0's releases."""
-    october = tasks._release(without_xml(page_0()[0]))
-    with pytest.raises(NotFoundError) as caught:
-        tasks._with_xml([october], "no WASDE release of 2026-10 has an XML file")
-    assert str(caught.value) == (
-        "no WASDE release of 2026-10 has an XML file: release 796099 (2026-10-09) has pdf, "
-        "txt. Of the WASDE releases ESMIS lists, the first with an XML file is that of "
-        "2010-07-09 (release 95659)."
-    )
-
-
-def test_a_month_answers_its_latest_release_with_an_xml_file() -> None:
-    """As 2014-01 does, whose later release carries an ASC file only (OBSERVED.md).
-
-    Built from page 0's releases, no recording: ESMIS's page 0 lists one release a month.
-    """
-    september, october = page_0()[1], page_0()[0]
-    later_without = [tasks._release(without_xml(october)), tasks._release(september)]
-    assert tasks._with_xml(later_without, "no XML in 2026-10").id == "796054"
-    both = [tasks._release(october), tasks._release(september)]
-    assert tasks._with_xml(both, "no XML in 2026-10").id == "796099", "the latest release time"
-
-
-SLICE_FIELDS = [
-    "report",
-    "table",
-    "matrix",
-    "commodity_header",
-    "region_header",
-    "commodity",
-    "region",
-    "market_year",
-    "forecast_month",
-    "attribute",
-    "attribute_group",
-    "statistic",
-    "unit",
-    "cell_value",
-    "value",
-]
-"""The fields a slice's record keeps (https://github.com/xippios/sdk-usda-wasde/pull/5)."""
-
-
-def values(records: list[WasdeXmlCell]) -> list[WasdeTableValue]:
-    """The records as the slices answer them, without their page's labels."""
-    return [WasdeTableValue.project(record) for record in records]
-
-
-def test_a_slice_record_is_the_xml_record_without_its_pages_labels() -> None:
-    """Every field copied unchanged; the page's title, subtitle, footer and month left out."""
-    assert list(WasdeTableValue.model_fields) == SLICE_FIELDS
-    dropped = set(WasdeXmlCell.model_fields) - set(SLICE_FIELDS)
-    assert dropped == {"page_title", "sub_report_subtitle", "sub_report_footer", "report_month"}
-    assert [name for name in WasdeXmlCell.model_fields if name in SLICE_FIELDS] == SLICE_FIELDS
-    for record in parse_wasde_xml(SR11_SR24):
-        assert_projection(WasdeTableValue.project(record), record)
-
-
-def test_the_pages_labels_are_list_tables_s() -> None:
-    """What a slice leaves out is stated once per page, as the page's records carry it.
-
-    The replayed records are October 2026's and the packaged list the latest release's, so
-    they are held together in what no release changes, as ``_vocabulary.differences``
-    compares two releases: the month left out, the reliability titles' month masked, a
-    footer compared for being set (https://github.com/xippios/sdk-usda-wasde/pull/4).
-    """
-    tables = {
-        table.report: vocabulary.footers_set(vocabulary.month_masked(table))
-        for table in tasks.list_tables().data
-    }
-    for record in parse_wasde_xml(SR11_SR24):
-        table = tables[record.report]
-        assert record.table in {table.sub_report_title, table.sub_report_title2}
-        assert record.sub_report_subtitle in {table.sub_report_subtitle, None}
-        footers = {getattr(table, name) for name in vocabulary.FOOTERS}
-        assert ("<set>" if record.sub_report_footer is not None else None) in footers
-
-
-def replay_october(replay_fixture: ReplayFixture, download: str) -> list[respx.Route]:
-    """Page 0, release 796099 and one of its downloads: the routes, in that order."""
-    return [
-        replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"]),
-        replay_fixture("release_find_by_id", "796099"),
-        replay_fixture("download_release_file", download),
+def test_list_tables_answers_the_month_s_titles(replay_fixture: ReplayFixture) -> None:
+    *_, xls = replay_october(replay_fixture, "wasde1026_xml_sr11_sr24", "wasde1026_xls")
+    result = tasks.list_tables(2026, 10)
+    assert result.data == [
+        WasdeTable(table="U.S. Wheat Supply and Use  1/", table_label="U.S. Wheat Supply and Use"),
+        WasdeTable(
+            table="U.S. Wheat by Class: Supply and Use",
+            table_label="U.S. Wheat by Class: Supply and Use",
+        ),
+        WasdeTable(
+            table="World Rice Supply and Use  (Milled Basis)  1/",
+            table_label="World Rice Supply and Use (Milled Basis)",
+        ),
+    ]
+    assert result.meta.vintage == "796099"
+    assert result.meta.request == {"year": 2026, "month": 10, "release_id": 796099, "url": XML}
+    assert sent_urls(xls) == [], "no commodity is answered, so no XLS is read"
+    assert [row.table for row in tasks.list_tables(2026, 10, search="class").data] == [
+        "U.S. Wheat by Class: Supply and Use"
     ]
 
 
-@pytest.mark.parametrize("month", [None, "2026-10"])
-def test_get_table_answers_one_page(
-    replay_fixture: ReplayFixture,
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    month: str | None,
-) -> None:
-    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
-    listed, release, download = replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
-    before = datetime.now(UTC)
-    result = tasks.get_table("sr24", month)
-    after = datetime.now(UTC)
-    page = [record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr24"]
-    assert result.data == values(page), "the page's values of the replayed body, in file order"
-    assert result.meta.endpoint == "wasde1026.xml"
-    assert result.meta.vintage == "October 2026"
-    assert (result.meta.published_at, result.meta.published_at_naive) == (OCTOBER_PRINTED, True)
-    expected = {"table": "sr24", "release_id": 796099, "url": XML}
-    assert result.meta.request == expected | ({"month": month} if month else {})
-    assert_time_between(result.meta.retrieved_at, before, after)
-    assert (sent_urls(listed), sent_urls(release), sent_urls(download)) == (
-        [PAGE_0],
-        [RELEASE],
-        [XML],
-    )
-    assert list(tmp_path.iterdir()) == [], "the temporary directory is removed"
+def test_list_commodities_answers_the_month_s_commodities(replay_fixture: ReplayFixture) -> None:
+    *_, xls = replay_october(replay_fixture, "wasde1026_xml_sr14", "wasde1026_xls")
+    result = tasks.list_commodities(2026, 10)
+    assert result.data == [
+        WasdeCommodity(commodity=name, commodity_label=name, commodity_source="xls", tables=[RICE])
+        for name in ("TOTAL RICE", "LONG-GRAIN RICE", "MEDIUM & SHORT-GRAIN RICE")
+    ]
+    assert result.meta.request["xls_url"] == XLS
+    assert sent_urls(xls) == [XLS]
 
 
-@pytest.mark.parametrize(
-    ("table", "first"),
-    [
-        ("SR12", "sr12 (page 12: U.S. Feed Grain and Corn Supply and Use  1/)"),
-        ("12", "sr12 (page 12: U.S. Feed Grain and Corn Supply and Use  1/)?"),
-        ("sr7", "sr37 (page 37: Reliability of United States November Projections  1/)"),
-    ],
-)
-def test_get_table_refuses_a_page_list_tables_lacks(
-    respx_mock: respx.MockRouter, table: str, first: str
-) -> None:
-    with pytest.raises(UnknownCode) as caught:
-        tasks.get_table(table)
-    message = str(caught.value)
-    assert message.startswith(
-        f"{table!r} is not a table in the packaged table list (fetched 2026-11-20). "
-        f"Did you mean {first}"
-    )
-    assert "'sr' and its two-digit printed number: page 12 is 'sr12'" in message
-    assert f"{task_and_tool('list_tables')} lists the pages." in message
-    assert message.endswith(OUT_OF_DATE)
-    assert isinstance(caught.value, InvalidRequestError)
-    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
-
-
-def test_get_table_of_a_page_the_file_lacks(replay_fixture: ReplayFixture) -> None:
-    """The replayed body holds pages 11 and 24 only, as a month without a page would."""
+def test_list_regions_answers_the_month_s_regions(replay_fixture: ReplayFixture) -> None:
     replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
-    with pytest.raises(NotFoundError) as caught:
-        tasks.get_table("sr12")
-    assert str(caught.value) == (
-        "wasde1026.xml of release 796099 holds no page sr12; its pages: sr11, sr24"
-    )
-
-
-BALANCE_SHEETS: list[tuple[str, str, list[tuple[str, str]], bool]] = [
-    ("Wheat", "United States", [("sr11", "matrix1")], False),
-    ("Wheat", "Argentina", [("sr18", "matrix1"), ("sr18", "matrix2"), ("sr19", "matrix1")], True),
-    ("Wheat", "World", [("sr18", "matrix1"), ("sr18", "matrix2"), ("sr19", "matrix1")], True),
-    ("CORN", "United States", [("sr12", "matrix2")], False),
-    (
-        "Corn",
-        "United States",
-        [("sr22", "matrix1"), ("sr22", "matrix2"), ("sr23", "matrix1")],
-        True,
-    ),
-    ("Cotton", "United States", [("sr17", "matrix1")], False),
-    ("Cotton", "India", [("sr26", "matrix3"), ("sr26", "matrix4"), ("sr27", "matrix2")], True),
-    ("Sugar", "United States", [("sr16", "matrix1")], False),
-    ("Sugar", "Mexico", [("sr16", "matrix2")], False),
-    ("Soybean", "Paraguay", [("sr28", "matrix4"), ("sr28", "matrix5"), ("sr28", "matrix3")], True),
-    ("Meats", "United States", [("sr32", "matrix1")], False),
-    ("Milk", "United States", [("sr33", "matrix2")], False),
-]
-
-
-@pytest.mark.parametrize(("commodity", "region", "matrices", "sliced"), BALANCE_SHEETS)
-def test_a_balance_sheet_is_the_packaged_matrices_of_its_commodity_and_region(
-    respx_mock: respx.MockRouter,
-    commodity: str,
-    region: str,
-    matrices: list[tuple[str, str]],
-    sliced: bool,
-) -> None:
-    """A U.S. or Mexico matrix where the list has one, else the world pages by region."""
-    found, slices = tasks._balance_sheet(commodity, region)
-    assert [(row.report, row.matrix) for row in found] == matrices
-    assert slices is sliced
-    assert all(tasks.BY_CLASS not in row.table for row in found), "page 11's by-class table"
-    assert respx_mock.calls.call_count == 0
-
-
-def test_the_us_rows_of_a_world_table_answer_the_commodities_without_a_us_matrix() -> None:
-    """As the docstring names them: no U.S. matrix carries their name as printed."""
-    rows = tasks.list_commodities().data
-    world = {row.commodity for row in rows if row.region == "World"}
-    national = {row.commodity for row in rows if row.region == "United States"}
-    assert sorted(world - national) == [
-        "Coarse Grain",
-        "Corn",
-        "Rice",
-        "Soybean",
-        "Soybean Meal",
-        "Soybean Oil",
+    result = tasks.list_regions(2026, 10, search="china")
+    rice = ["World Rice Supply and Use (Milled Basis)"]
+    assert result.data == [
+        WasdeRegion(region="    World Less China", region_label="World Less China", tables=rice),
+        WasdeRegion(region="        China", region_label="China", tables=rice),
     ]
-    assert sorted(world & national) == ["Cotton", "Wheat"]
+    assert result.meta.request["search"] == "china"
 
 
-def test_get_balance_sheet_of_a_us_commodity(
+def test_get_report_text_reads_the_xls_sheet(
     replay_fixture: ReplayFixture, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Page 11's first matrix; its by-class table, the page's second matrix, is left out."""
-    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
-    listed, release, download = replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
-    result = tasks.get_balance_sheet("Wheat")
-    matrix = [
-        record
-        for record in parse_wasde_xml(SR11_SR24)
-        if (record.report, record.matrix) == ("sr11", "matrix1")
-    ]
-    assert result.data == values(matrix)
-    assert {record.table for record in result.data} == {"U.S. Wheat Supply and Use  1/"}
-    assert result.meta.endpoint == "wasde1026.xml"
-    assert result.meta.vintage == "October 2026"
-    assert result.meta.request == {
-        "commodity": "Wheat",
-        "region": "United States",
-        "release_id": 796099,
-        "url": XML,
-    }
-    assert (sent_urls(listed), sent_urls(release), sent_urls(download)) == (
-        [PAGE_0],
-        [RELEASE],
-        [XML],
-    )
-    assert list(tmp_path.iterdir()) == []
-
-
-@pytest.mark.parametrize(
-    ("region", "printed"),
-    [
-        ("Thailand", {"        Thailand"}),
-        ("World", {"World  3/"}),
-        ("United States", {"United States"}),
-        ("European Union", {"        European Union  6/"}),
-        ("World Less China", {"    World Less China"}),
-    ],
-)
-def test_get_balance_sheet_of_a_world_commodity_by_region(
-    replay_fixture: ReplayFixture, region: str, printed: set[str]
-) -> None:
-    """The world rice rows of the region; the replayed body holds page 24, not page 25."""
-    replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
-    result = tasks.get_balance_sheet("Rice", region, "2026-10")
-    rows = [
-        record
-        for record in parse_wasde_xml(SR11_SR24)
-        if record.report == "sr24" and tasks._bare(record.region) == region
-    ]
-    assert result.data == values(rows)
-    assert {record.region for record in result.data} == printed, "the region as printed"
-    assert result.meta.request == {
-        "commodity": "Rice",
-        "region": region,
-        "month": "2026-10",
-        "release_id": 796099,
-        "url": XML,
-    }
-
-
-@pytest.mark.parametrize(
-    ("printed", "bare"),
-    [
-        ("        European Union  5/", "European Union"),
-        ("World  3/", "World"),
-        ("    World Less China", "World Less China"),
-        ("        Southeast Asia 5/", "Southeast Asia"),
-        ("        N. Afr & Mideast  7/", "N. Afr & Mideast"),
-        ("U.S.", "U.S."),
-        (None, None),
-    ],
-)
-def test_a_region_is_matched_without_its_indent_and_footnote_marker(
-    printed: str | None, bare: str | None
-) -> None:
-    assert tasks._bare(printed) == bare
-
-
-@pytest.mark.parametrize(
-    ("commodity", "region", "message"),
-    [
-        (
-            "corn",
-            "United States",
-            "'corn' is not a commodity in the packaged commodity list (fetched 2026-11-20). "
-            "Did you mean CORN (United States sr12), Corn (World sr22, World sr23), ",
-        ),
-        (
-            "Wheat",
-            "argentina",
-            "'argentina' is not a region in the packaged region list (fetched 2026-11-20). "
-            "Did you mean Argentina (rows of sr18, sr19)?",
-        ),
-        (
-            "CORN",
-            "World",
-            "'World' is not a region in the packaged region list (fetched 2026-11-20). "
-            "'CORN' is printed for United States.",
-        ),
-        (
-            "Wheat",
-            "united states",
-            "'united states' is not a region in the packaged region list (fetched 2026-11-20). "
-            "Did you mean United States (sr11 matrix1)? A region of 'Wheat' is 'United "
-            "States' or 'Mexico' where it has a U.S. or Mexico matrix, else one its world "
-            "pages print",
-        ),
-        (
-            "Sugar",
-            "Mexco",
-            "'Mexco' is not a region in the packaged region list (fetched 2026-11-20). "
-            "Did you mean Mexico (sr16 matrix2)?",
-        ),
-    ],
-)
-def test_get_balance_sheet_refuses_a_near_miss_naming_the_closest(
-    respx_mock: respx.MockRouter, commodity: str, region: str, message: str
-) -> None:
-    with pytest.raises(UnknownCode) as caught:
-        tasks.get_balance_sheet(commodity, region)
-    assert str(caught.value).startswith(message)
-    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
-
-
-@pytest.mark.parametrize(
-    ("commodity", "region", "task"),
-    [("corn", "United States", "list_commodities"), ("Wheat", "argentina", "list_regions")],
-)
-def test_a_balance_sheet_refusal_names_the_list_task_with_its_tool(
-    respx_mock: respx.MockRouter, commodity: str, region: str, task: str
-) -> None:
-    """The list task that names the known values is named with its tool (conventions §8)."""
-    with pytest.raises(UnknownCode) as caught:
-        tasks.get_balance_sheet(commodity, region)
-    message = str(caught.value)
-    assert task_and_tool(task) in message
-    assert message.endswith(OUT_OF_DATE)
-    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
-
-
-def test_a_balance_sheet_the_file_lacks_is_not_found(replay_fixture: ReplayFixture) -> None:
-    """The replayed body holds pages 11 and 24, not the world corn pages 22 and 23."""
-    replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
-    with pytest.raises(NotFoundError) as caught:
-        tasks.get_balance_sheet("Corn", "Argentina")
-    assert str(caught.value) == (
-        "wasde1026.xml of release 796099 holds no record of 'Corn' for 'Argentina' in sr22 "
-        "matrix1 'World Corn Supply and Use  1/'; sr22 matrix2 'World Corn Supply and Use  "
-        "1/'; sr23 matrix1 \"World Corn Supply and Use  1/  (Cont'd.)\", as the packaged list "
-        "read them from November 2026; get_table (over MCP, the tool usda_wasde_get_table) "
-        "answers a page as that month prints it"
-    )
-
-
-@pytest.mark.parametrize("month", [None, "2026-10"])
-def test_read_report_text_reads_the_xls_sheet(
-    replay_fixture: ReplayFixture,
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-    month: str | None,
 ) -> None:
     monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
     listed, release, download = replay_october(replay_fixture, "wasde1026_xls")
     before = datetime.now(UTC)
-    result = tasks.read_report_text(month)
+    result = tasks.get_report_text(2026, 10)
     after = datetime.now(UTC)
     assert result.data == [row.text for row in parse_wasde_xls(XLS_SAMPLE)]
     assert result.data[0] == "WASDE - 676\r"
     assert result.meta.endpoint == "wasde1026.xls", "the file read"
-    assert result.meta.vintage == "October 2026", "the month Page 8 prints"
+    assert result.meta.vintage == "796099", "the ESMIS release id"
     assert (result.meta.published_at, result.meta.published_at_naive) == (OCTOBER_PRINTED, True)
-    expected = {"release_id": 796099, "url": XLS} | ({"month": month} if month else {})
-    assert result.meta.request == expected
+    assert result.meta.request == {"year": 2026, "month": 10, "release_id": 796099, "url": XLS}
     assert_time_between(result.meta.retrieved_at, before, after)
     assert (sent_urls(listed), sent_urls(release), sent_urls(download)) == (
         [PAGE_0],
@@ -656,7 +398,8 @@ def july_2010() -> EsmisRelease:
 
 
 def leaving_out(release: EsmisRelease, format: str) -> Release:
-    """The recorded release with its files of ``format`` left out, re-shaped."""
+    """NOT RECORDED: the recorded release with its files of ``format`` left out
+    (conventions §10, kind 4), projected, as a release without that file."""
     files = [url for url in release.files if not url.endswith(f".{format}")]
     return tasks._release(release.model_copy(update={"files": files}))
 
@@ -665,19 +408,19 @@ def leaving_out(release: EsmisRelease, format: str) -> Release:
 async def test_a_release_without_an_xls_is_read_from_its_pdf(
     replay_fixture: ReplayFixture, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Every release before 2010-07 carries none; release 95659 read as one of them."""
+    """Release 95659 read as one without an XLS: its PDF's narrative, pages 1 to 5."""
     monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
     release = replay_fixture("release_find_by_id", "95659")
     download = replay_fixture("download_release_file", "wasde-07-09-2010_pdf")
     july = leaving_out(july_2010(), "xls")
     assert tasks._carrying([july], ("xls", "pdf"), "no XLS or PDF").id == "95659"
-    result = await tasks._narrative(july, {"month": "2010-07"})
+    result = await tasks._narrative(july, {"year": 2010, "month": 7})
     assert result.data == [page.text for page in parse_wasde_pdf(PDF_SAMPLE)]
-    assert len(result.data) == 5, "pages 1 to 5, the narrative of July 2010"
+    assert len(result.data) == 5
     assert result.meta.endpoint == "wasde-07-09-2010.pdf"
-    assert result.meta.vintage == "95659", "the PDF prints a date: the ESMIS release id"
+    assert result.meta.vintage == "95659", "the ESMIS release id"
     assert (result.meta.published_at, result.meta.published_at_naive) == (JULY_2010_PRINTED, True)
-    assert result.meta.request == {"month": "2010-07", "release_id": 95659, "url": PDF_2010}
+    assert result.meta.request == {"year": 2010, "month": 7, "release_id": 95659, "url": PDF_2010}
     assert (sent_urls(release), sent_urls(download)) == ([RELEASE_2010], [PDF_2010])
     assert list(tmp_path.iterdir()) == []
 
@@ -695,7 +438,8 @@ def no_narrative(path: Path) -> list[Any]:
 async def test_an_xls_without_the_narrative_gives_way_to_the_pdf(
     replay_fixture: ReplayFixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The XLS is downloaded and read first; the recorded XLS answer is served at its URL."""
+    """The recorded XLS answer served at 2010's URL (conventions §10, kind 3); the test
+    asserts what was sent and what the PDF gives."""
     monkeypatch.setattr(tasks, "parse_wasde_xls", no_narrative)
     release = replay_fixture("release_find_by_id", "95659")
     xls = replay_fixture("download_release_file", "wasde1026_xls", url=XLS_2010)
@@ -711,6 +455,7 @@ async def test_an_xls_without_the_narrative_gives_way_to_the_pdf(
 async def test_an_xls_without_the_narrative_and_no_pdf_is_not_found(
     replay_fixture: ReplayFixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    """The recorded XLS answer served at 2010's URL (conventions §10, kind 3)."""
     monkeypatch.setattr(tasks, "parse_wasde_xls", no_narrative)
     replay_fixture("release_find_by_id", "95659")
     replay_fixture("download_release_file", "wasde1026_xls", url=XLS_2010)
@@ -726,180 +471,85 @@ async def test_an_xls_without_the_narrative_and_no_pdf_is_not_found(
 
 
 def test_a_month_without_an_xls_or_a_pdf_is_refused_naming_its_formats() -> None:
-    """As 1995 to 1997 are, TXT only (OBSERVED.md); built from page 0's releases."""
+    """As 1995 to 1997 are, TXT only (OBSERVED.md).
+
+    NOT RECORDED: page 0's first release with its TXT file alone (conventions §10, kind 4).
+    """
     october = page_0()[0]
     txt = october.model_copy(
         update={"files": [url for url in october.files if url.endswith(".txt")]}
     )
     with pytest.raises(NotFoundError) as caught:
         tasks._carrying(
-            [tasks._release(txt)], ("xls", "pdf"), tasks._lacking("1996-05", "XLS or PDF file")
+            [tasks._release(txt)],
+            ("xls", "pdf"),
+            "no WASDE release of 1996-05 has an XLS or PDF file",
         )
     assert str(caught.value) == (
         "no WASDE release of 1996-05 has an XLS or PDF file: release 796099 (2026-10-09) has txt."
     )
-    assert tasks._lacking(None, "XML file") == "the latest WASDE release has no XML file"
 
 
-def test_the_slices_have_caps_of_their_own() -> None:
-    """Each note says how to see the rest (https://github.com/xippios/sdk-usda-wasde/pull/5).
-
-    Every other tool keeps the default; none of them is cut but ``list_releases`` called
-    without ``since``, whose filters the default note's narrowing names.
-    """
-    assert dict(tasks.MCP_CAPS) == {
-        "get_table": ResultCap(
-            max_rows=400,
-            max_bytes=131_072,
-            note="call get_balance_sheet for one commodity's matrix, or one region's rows of a "
-            "world page (list_commodities, list_regions); Python callers get the whole page",
-        ),
-        "get_balance_sheet": ResultCap(
-            max_rows=300,
-            max_bytes=131_072,
-            note="on the world pages a region gives one region's rows (list_regions); Python "
-            "callers get the whole matrix",
-        ),
-    }
-
-
-@pytest.mark.anyio
-async def test_the_bulk_task_is_no_tool_and_no_route() -> None:
-    bulk = tasks.BULK_TASKS
-    assert bulk == {"get_release"}
-    tools = {tool.name for tool in await server.list_tools()}
-    routes = {route.path for route in router.routes if isinstance(route, APIRoute)}
-    for name in tasks.__all__:
-        served = name not in bulk
-        assert (tool_name(SOURCE, getattr(tasks, name)) in tools) is served, name
-        assert (f"/{SOURCE}/{name}" in routes) is served, name
-    assert tools == {
-        "usda_wasde_list_releases",
-        "usda_wasde_get_latest_release",
-        "usda_wasde_list_tables",
-        "usda_wasde_list_commodities",
-        "usda_wasde_list_regions",
-        "usda_wasde_get_table",
-        "usda_wasde_get_balance_sheet",
-        "usda_wasde_read_report_text",
-    }
-    assert len(routes) == 8
-
-
-type McpCase = tuple[str, dict[str, Any], list[str], list[str], Callable[..., bool]]
-"""A tool's task name, its arguments, the download fixture it replays beside page 0 and
-release 796099 (none, or one), the URLs it sends to page 0, a check of its answer."""
-
-SR24 = values([record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr24"])
-"""Page 24's values in the replayed body, world rice."""
-SR11 = values([record for record in parse_wasde_xml(SR11_SR24) if record.report == "sr11"])
-"""Page 11's values in the replayed body, U.S. wheat and wheat by class."""
+type McpCase = tuple[str, dict[str, Any], list[str], Callable[[Any], bool]]
+"""A tool's task name, its arguments, the downloads it replays beside page 0 and release
+796099, and a check of its answer."""
 
 MCP_CASES: list[McpCase] = [
     (
         "list_releases",
         {"since": "2026-01-01"},
         [],
-        [PAGE_0],
         lambda payload: (
-            [release["month"] for release in payload["data"]][:2] == ["2026-10", "2026-09"]
-            and len(payload["data"]) == 10
+            len(payload["data"]) == 10
+            and payload["data"][0]["id"] == "796099"
             and payload["meta"]["total"] == 703
             and payload["meta"]["request"] == {"since": "2026-01-01"}
         ),
     ),
     (
-        "get_latest_release",
-        {},
-        [],
-        [PAGE_0],
+        "get_data",
+        {"year": 2026, "month": 10, "commodity": "TOTAL RICE"},
+        ["wasde1026_xml_sr14", "wasde1026_xls"],
         lambda payload: (
-            payload["data"]["id"] == payload["meta"]["vintage"] == "796099"
-            and payload["data"]["files"][3]["name"] == "wasde1026.xml"
+            len(payload["data"]) == 60
+            and payload["data"][0]["commodity_source"] == "xls"
+            and payload["data"][0]["value_number"] == 2.92
+            and payload["meta"]["vintage"] == "796099"
             and payload["meta"]["published_at"] == "2026-10-09T12:00:00"
-            and payload["meta"]["published_at_naive"] is True
         ),
     ),
     (
         "list_tables",
-        {"search": "wheat"},
-        [],
-        [],
+        {"year": 2026, "month": 10, "search": "wheat"},
+        ["wasde1026_xml_sr11_sr24"],
         lambda payload: (
-            [table["report"] for table in payload["data"]] == ["sr11", "sr18", "sr19"]
-            and payload["meta"]["vintage"] == "November 2026"
-            and payload["meta"]["endpoint"] == "wasde1126.xml"
-            and payload["meta"]["retrieved_at"] == "2026-11-20T18:03:38Z"
-            and payload["meta"]["request"] == {"search": "wheat"}
+            [row["table_label"] for row in payload["data"]]
+            == ["U.S. Wheat Supply and Use", "U.S. Wheat by Class: Supply and Use"]
         ),
     ),
     (
         "list_commodities",
-        {"search": "sr12"},
-        [],
-        [],
+        {"year": 2026, "month": 10},
+        ["wasde1026_xml_sr14", "wasde1026_xls"],
         lambda payload: (
-            [row["commodity"] for row in payload["data"]] == ["FEED GRAINS", "CORN"]
-            and [row["matrix"] for row in payload["data"]] == ["matrix1", "matrix2"]
-            and payload["meta"]["vintage"] == "November 2026"
+            [row["commodity"] for row in payload["data"]]
+            == ["TOTAL RICE", "LONG-GRAIN RICE", "MEDIUM & SHORT-GRAIN RICE"]
         ),
     ),
     (
         "list_regions",
-        {},
-        [],
-        [],
-        lambda payload: (
-            len(payload["data"]) == 70
-            and payload["data"][0]
-            == {
-                "region": "World",
-                "reports": ["sr09", "sr26", "sr27", "sr35", "sr36"],
-                "report_month": "November 2026",
-            }
-            and "note" not in payload
-        ),
-    ),
-    (
-        "get_table",
-        {"table": "sr24"},
+        {"year": 2026, "month": 10, "search": "thailand"},
         ["wasde1026_xml_sr11_sr24"],
-        [PAGE_0],
-        lambda payload: (
-            payload["data"] == [record.model_dump(mode="json") for record in SR24]
-            and list(payload["data"][0]) == SLICE_FIELDS
-            and "note" not in payload
-            and payload["meta"]["vintage"] == "October 2026"
-            and payload["meta"]["request"] == {"table": "sr24", "release_id": 796099, "url": XML}
-        ),
+        lambda payload: {row["region_label"] for row in payload["data"]} == {"Thailand"},
     ),
     (
-        "get_balance_sheet",
-        {"commodity": "Rice", "region": "Thailand"},
-        ["wasde1026_xml_sr11_sr24"],
-        [PAGE_0],
-        lambda payload: (
-            {row["region"] for row in payload["data"]} == {"        Thailand"}
-            and {row["report"] for row in payload["data"]} == {"sr24"}
-            and list(payload["data"][0]) == SLICE_FIELDS
-            and "note" not in payload
-            and payload["meta"]["endpoint"] == "wasde1026.xml"
-            and payload["meta"]["request"]
-            == {"commodity": "Rice", "region": "Thailand", "release_id": 796099, "url": XML}
-        ),
-    ),
-    (
-        "read_report_text",
-        {},
+        "get_report_text",
+        {"year": 2026, "month": 10},
         ["wasde1026_xls"],
-        [PAGE_0],
         lambda payload: (
             payload["data"] == [row.text for row in parse_wasde_xls(XLS_SAMPLE)]
-            and payload["data"][0] == "WASDE - 676\r"
-            and "note" not in payload
             and payload["meta"]["endpoint"] == "wasde1026.xls"
-            and payload["meta"]["vintage"] == "October 2026"
-            and payload["meta"]["published_at"] == "2026-10-09T12:00:00"
+            and payload["meta"]["vintage"] == "796099"
         ),
     ),
 ]
@@ -907,154 +557,54 @@ MCP_CASES: list[McpCase] = [
 
 @pytest.mark.anyio
 @pytest.mark.parametrize(
-    ("task", "arguments", "downloads", "urls", "check"),
-    MCP_CASES,
-    ids=[case[0] for case in MCP_CASES],
+    ("task", "arguments", "downloads", "check"), MCP_CASES, ids=[case[0] for case in MCP_CASES]
 )
 async def test_every_tool_end_to_end(
     replay_fixture: ReplayFixture,
     task: str,
     arguments: dict[str, Any],
     downloads: list[str],
-    urls: list[str],
     check: Callable[[Any], bool],
 ) -> None:
-    route = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
-    for download in downloads:
-        replay_fixture("release_find_by_id", "796099")
-        replay_fixture("download_release_file", download)
+    route, *_ = replay_october(replay_fixture, *downloads)
     payload = await mcp_call(server, f"usda_wasde_{task}", arguments)
     assert payload["meta"]["source"] == SOURCE
     assert check(payload), payload["meta"]
-    assert sent_urls(route) == urls
+    assert sent_urls(route) == [PAGE_0]
 
 
-@pytest.mark.anyio
-async def test_get_table_answers_a_page_within_its_cap_whole(
-    replay_fixture: ReplayFixture,
-) -> None:
-    """Page 11, U.S. wheat and wheat by class, fits 400 rows and 128 KB."""
-    replay_october(replay_fixture, "wasde1026_xml_sr11_sr24")
-    payload = await mcp_call(server, "usda_wasde_get_table", {"table": "sr11"})
-    assert "note" not in payload
-    assert payload["data"] == [record.model_dump(mode="json") for record in SR11]
+def test_every_task_is_tested_through_the_mcp_server() -> None:
+    assert {case[0] for case in MCP_CASES} == set(tasks.__all__)
 
 
 @pytest.mark.anyio
 async def test_a_refusal_reaches_the_agent_as_text(respx_mock: respx.MockRouter) -> None:
-    text = await mcp_call_text(server, "usda_wasde_get_balance_sheet", {"commodity": "corn"})
-    assert text.startswith("error: UnknownCode: 'corn' is not a commodity")
+    text = await mcp_call_text(server, "usda_wasde_get_data", {"year": 2009, "month": 5})
+    assert text.startswith("error: InvalidRequestError: 2009-05 is before July 2010")
     assert respx_mock.calls.call_count == 0
 
 
-async def tool_result(name: str, arguments: dict[str, Any]) -> tuple[bool, str]:
-    """A tool's answer through an in-process client: its ``isError`` flag and its text."""
-    async with Client(server) as client:
-        result = await client.call_tool(name, arguments)
-    content = result.content[0]
-    assert isinstance(content, TextContent), result.content
-    return result.is_error, content.text
-
-
-@pytest.mark.anyio
-@pytest.mark.parametrize(
-    ("arguments", "text"),
-    [
-        ({"commodity": "corn"}, "error: UnknownCode: 'corn' is not a commodity"),
-        ({}, "error: InvalidRequestError: commodity: Field required"),
-    ],
-    ids=["a-refusal-of-the-task", "a-refusal-of-the-schema"],
-)
-async def test_an_error_answer_sets_is_error(
-    respx_mock: respx.MockRouter, arguments: dict[str, Any], text: str
-) -> None:
-    """A client tells a refusal from data by the flag, not only by the text (core 0.4.0)."""
-    flagged, answer = await tool_result("usda_wasde_get_balance_sheet", arguments)
-    assert flagged
-    assert answer.startswith(text)
-    assert respx_mock.calls.call_count == 0
-
-
-@pytest.mark.anyio
-async def test_an_answer_with_data_is_no_error() -> None:
-    flagged, answer = await tool_result("usda_wasde_list_tables", {"search": "sr12"})
-    assert not flagged
-    assert json.loads(answer)["data"][0]["report"] == "sr12"
-
-
-@pytest.mark.anyio
-@pytest.mark.parametrize(
-    ("name", "arguments", "text"),
-    [
-        (
-            "usda_wasde_get_table",
-            {"table": "sr12", "year": 2026},
-            "error: InvalidRequestError: year: Not an argument of this tool; it takes table, month",
-        ),
-        (
-            "usda_wasde_list_tables",
-            {"serch": "wheat"},
-            "error: InvalidRequestError: serch: Not an argument of this tool; it takes search",
-        ),
-    ],
-    ids=["get_table", "list_tables"],
-)
-async def test_a_tool_refuses_an_argument_it_does_not_declare(
-    respx_mock: respx.MockRouter, name: str, arguments: dict[str, Any], text: str
-) -> None:
-    """Refused before the tool runs, where 0.1 dropped the argument and ran without it."""
-    flagged, answer = await tool_result(name, arguments)
-    assert flagged
-    assert answer == text
-    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
-
-
-@pytest.mark.parametrize(
-    ("path", "detail"),
-    [
-        ("/usda-wasde/get_table", "table: Field required"),
-        ("/usda-wasde/get_balance_sheet?region=Mexico", "commodity: Field required"),
-        (
-            "/usda-wasde/list_releases?since=2026-13-01",
-            "since: Input should be a valid date or datetime, month value is outside expected "
-            "range of 1-12",
-        ),
-    ],
-    ids=["get_table", "get_balance_sheet", "list_releases"],
-)
-def test_a_route_refuses_an_argument_its_schema_refuses_as_problem_details(
-    respx_mock: respx.MockRouter, path: str, detail: str
-) -> None:
-    """HTTP 422 as problem details before the task runs, the input never echoed."""
+def test_a_route_refuses_a_missing_month_as_problem_details(respx_mock: respx.MockRouter) -> None:
+    """HTTP 422 as problem details before the task runs."""
     app = FastAPI()
     app.include_router(router)
     with TestClient(app) as http:
-        answer = http.get(path)
+        answer = http.get("/usda-wasde/get_data?year=2026")
     assert answer.status_code == 422
-    assert answer.headers["content-type"] == "application/problem+json"
-    problem = answer.json()
-    assert (problem["title"], problem["detail"], problem["source"]) == (
-        "InvalidRequestError",
-        detail,
-        SOURCE,
-    )
-    assert respx_mock.calls.call_count == 0, "refused before anything is sent"
+    assert answer.json()["detail"] == "month: Field required"
+    assert respx_mock.calls.call_count == 0
 
 
 def test_the_package_reads_no_variable() -> None:
     """``ENV_VARS``, the list a host reads beside ``SOURCE``, is empty: the API is keyless."""
     assert _client.ENV_VARS == ()
-    assert "ENV_VARS" in _client.__all__
     assert wasde_mcp.ENV_VARS is _client.ENV_VARS
 
 
 def test_build_is_the_tool_set_the_server_serves() -> None:
-    """A host serves ``build()`` as the entry point does: every task but the bulk one."""
     tools = wasde_mcp.build()
-    served = [name for name in tasks.__all__ if name not in tasks.BULK_TASKS]
-    assert [task.__name__ for task in tools.tasks] == served
+    assert [task.__name__ for task in tools.tasks] == tasks.__all__
     assert tools.source == SOURCE
-    assert dict(tools.caps or {}) == dict(tasks.MCP_CAPS)
 
 
 ENTRY_POINT = Path(sys.executable).parent / "xippios-usda-wasde-mcp"
@@ -1064,21 +614,15 @@ PLAIN = {"PYTHON_COLORS": "0", "COLUMNS": "100"}
 argparse adds under ``FORCE_COLOR``, and a width that keeps the usage line whole."""
 
 
-def entry_point(*arguments: str) -> subprocess.CompletedProcess[str]:
-    """The entry point run with ``arguments``, which stop it before it serves."""
-    return subprocess.run(
-        [str(ENTRY_POINT), *arguments],
+def test_the_entry_point_names_itself_in_its_usage_and_errors() -> None:
+    run = subprocess.run(
+        [str(ENTRY_POINT), "--bogus"],
         capture_output=True,
         text=True,
         timeout=120,
         check=False,
         env={**os.environ, **PLAIN},
     )
-
-
-def test_the_entry_point_names_itself_in_its_usage_and_errors() -> None:
-    """Core 0.4.0 names the entry point that runs, where 0.1 named the server's slug."""
-    run = entry_point("--bogus")
     assert run.returncode == 2
     assert run.stderr.startswith("usage: xippios-usda-wasde-mcp [-h]")
     assert run.stderr.splitlines()[-1] == (
@@ -1086,17 +630,10 @@ def test_the_entry_point_names_itself_in_its_usage_and_errors() -> None:
     )
 
 
-def test_allow_remote_changes_nothing_on_this_read_server() -> None:
-    run = entry_point("--help")
-    assert run.returncode == 0
-    assert "--allow-remote changes nothing: this read server is not held to loopback" in (
-        " ".join(run.stdout.split())
-    )
-
-
 SAMPLED = [
     ("wasde1026_xml", SAMPLE),
     ("wasde1026_xml_sr11_sr24", SR11_SR24),
+    ("wasde1026_xml_sr14", SR14),
     ("wasde1026_xls", XLS_SAMPLE),
 ]
 """The download fixtures whose body is a sample of the file, with that sample."""
@@ -1104,11 +641,7 @@ SAMPLED = [
 
 @pytest.mark.parametrize(("case", "sample"), SAMPLED, ids=[case for case, _ in SAMPLED])
 def test_a_download_fixture_carries_its_sample_marked_sample(case: str, sample: Path) -> None:
-    """The body is the sample the parser tests read, marked ``sample``, never ``truncated``.
-
-    ``truncated`` is the recorder's cut; a sample the source cut is marked ``sample`` with
-    the whole file's size and sha256 (sdk-core ADR-0020, amendment 2026-11-18, point a).
-    """
+    """The body is the sample the parser tests read, marked ``sample``, never ``truncated``."""
     response = load_fixture(FIXTURES / "download_release_file" / f"{case}.json").response
     assert (response.sample, response.truncated) == (True, False)
     assert response.content == sample.read_bytes()
@@ -1124,131 +657,8 @@ def test_the_pdf_download_fixture_is_the_whole_file() -> None:
     assert response.content == PDF_SAMPLE.read_bytes()
 
 
-def test_every_task_is_tested_through_the_mcp_server_or_is_bulk() -> None:
-    assert {case[0] for case in MCP_CASES} | tasks.BULK_TASKS == set(tasks.__all__)
-
-
 def test_the_package_re_exports_the_tasks() -> None:
     import xippios.usda.wasde as package
 
     for name in tasks.__all__:
         assert getattr(package, name) is getattr(tasks, name)
-
-
-def test_release_keeps_the_time_as_printed() -> None:
-    """``release_datetime`` stays aware at ``+00:00``, as ESMIS prints it; never converted."""
-    release = tasks._release(page_0()[0])
-    assert isinstance(release, Release)
-    assert release.release_datetime.utcoffset() is not None
-    assert release.model_dump(mode="json")["release_datetime"] == "2026-10-09T12:00:00Z"
-
-
-type Packaged = tuple[str, Callable[..., Any], type[UpstreamModel], int]
-"""A list task, the packaged list it answers from, its record model and its row count."""
-
-PACKAGED: list[Packaged] = [
-    ("table", tasks.list_tables, Table, 30),
-    ("commodity", tasks.list_commodities, Commodity, 43),
-    ("region", tasks.list_regions, Region, 70),
-]
-
-
-def packaged_file(name: str) -> dict[str, Any]:
-    """``reference/<name>.json`` as written, read as JSON, not through ``PackagedList``."""
-    text = resources.files(PACKAGE).joinpath("reference", f"{name}.json").read_text("utf-8")
-    payload: dict[str, Any] = json.loads(text)
-    return payload
-
-
-@pytest.mark.parametrize(("name", "task", "model", "rows"), PACKAGED, ids=[p[0] for p in PACKAGED])
-def test_a_list_task_answers_its_packaged_list_without_a_request(
-    respx_mock: respx.MockRouter,
-    name: str,
-    task: Callable[..., Any],
-    model: type[UpstreamModel],
-    rows: int,
-) -> None:
-    packaged = PackagedList.load(PACKAGE, name)
-    result = task()
-    assert len(result.data) == len(packaged.records) == rows, "the counts the docstring names"
-    assert result.data == packaged.parse(model, source=SOURCE), "the file's order"
-    assert result.meta.source == SOURCE
-    assert result.meta.endpoint == "wasde1126.xml", "the file the list came from"
-    assert result.meta.retrieved_at == packaged.fetched == PACKAGED_FETCHED
-    assert result.meta.vintage == "November 2026", "the release's Report_Month"
-    assert result.meta.request == {}, "search left None is omitted"
-    assert (result.meta.published_at, result.meta.total) == (None, None)
-    assert not result.meta.published_at_naive
-    assert respx_mock.calls.call_count == 0
-
-
-def key(row: Any) -> str:
-    """What names a row in the search cases: a table's report, a commodity, a region text."""
-    if isinstance(row, Table):
-        return row.report
-    if isinstance(row, Commodity):
-        return row.commodity
-    assert isinstance(row, Region)
-    return row.region
-
-
-SEARCHES: list[tuple[Callable[..., Any], str, list[str]]] = [
-    (tasks.list_tables, "wheat", ["sr11", "sr18", "sr19"]),
-    (tasks.list_tables, "RELIABILITY", ["sr35", "sr36", "sr37"]),
-    (tasks.list_tables, "matrix6", ["sr29", "sr30"]),
-    (tasks.list_tables, "Million 480-lb", ["sr09"]),
-    (tasks.list_commodities, "sr13", ["SORGHUM", "BARLEY", "OATS"]),
-    (tasks.list_commodities, "mexico", ["Sugar"]),
-    (tasks.list_commodities, "sr33", ["Egg", "Milk"]),
-    (tasks.list_commodities, "grain rice", ["LONG-GRAIN RICE", "MEDIUM & SHORT-GRAIN RICE"]),
-    (
-        tasks.list_regions,
-        "china",
-        ["    World Less China", "        China", "       China", "    China"],
-    ),
-    (tasks.list_regions, "u.s.", ["U.S."]),
-]
-
-
-@pytest.mark.parametrize(("task", "search", "keys"), SEARCHES)
-def test_search_keeps_the_rows_where_the_text_occurs_in_a_field(
-    respx_mock: respx.MockRouter, task: Callable[..., Any], search: str, keys: list[str]
-) -> None:
-    result = task(search=search)
-    assert [key(row) for row in result.data] == keys
-    assert result.meta.request == {"search": search}
-    assert result.meta.vintage == "November 2026"
-    assert respx_mock.calls.call_count == 0
-
-
-def test_search_matches_each_field_on_its_own() -> None:
-    """A text spanning two fields matches neither (core's ``matches``)."""
-    assert tasks.list_commodities(search="CORN United States").data == []
-    assert len(tasks.list_regions(search="sr24").data) == 23, "a page among the reports"
-    assert tasks.list_tables(search="12").data[0].report == "sr12", "the page number as text"
-
-
-def test_the_packaged_files_hold_the_four_keys_and_a_note() -> None:
-    reference = Path(tasks.__file__).parent / "reference"
-    assert sorted(path.stem for path in reference.glob("*.json")) == sorted(PACKAGED_LISTS)
-    models: dict[str, type[UpstreamModel]] = {
-        "table": Table,
-        "commodity": Commodity,
-        "region": Region,
-        "attribute": Attribute,
-    }
-    for name in PACKAGED_LISTS:
-        raw = packaged_file(name)
-        assert set(raw) == FILE_KEYS, name
-        packaged = PackagedList.load(PACKAGE, name)
-        assert (packaged.param, packaged.endpoint) == (name, "wasde1126.xml"), "named by param"
-        assert packaged.fetched == PACKAGED_FETCHED
-        assert packaged.note is not None
-        assert "ESMIS release 796142" in packaged.note
-        assert "Report_Month 'November 2026'" in packaged.note
-        model = models[name]
-        for row, record in zip(packaged.parse(model, source=SOURCE), raw["records"], strict=True):
-            assert list(record) == list(model.model_fields), "every field, null included"
-            assert row.dump_upstream() == record
-        assert {record["report_month"] for record in raw["records"]} == {"November 2026"}
-    assert "wasde1126.xls" in (PackagedList.load(PACKAGE, "commodity").note or "")

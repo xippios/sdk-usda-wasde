@@ -23,7 +23,13 @@ from xippios.usda.wasde.models import WasdeXlsText
 from xippios.usda.wasde.parse import parse_wasde_xls
 from xippios.usda.wasde.parse.wasde_xls import TEXT_SHEET
 
-SAMPLE = Path(__file__).parent / "fixtures" / "files" / "wasde_xls" / "wasde_text_page_8.xls"
+SAMPLE = (
+    Path(__file__).parent
+    / "fixtures"
+    / "files"
+    / "wasde_xls"
+    / "wasde_text_page_8_page_12_page_13_page_14_page_15.xls"
+)
 
 
 def sheet_rows(path: Path) -> list[tuple[int, str]]:

@@ -14,8 +14,9 @@ xippios-usda-esmis, which prints its row below; Kept says what of the file it ho
   `</srNN>`, each with the line break and indent before it), the root's closing tag, all
   as the file has them; a sample is named after the pages it keeps. Each parses to the
   same records as those pages of the whole file.
-- `wasde_xls/` holds the October 2026 release's XLS cut to two sheets, `WASDE Text` (the
-  narrative) and `Page 8` (whose first cell prints the report month): a binary workbook
+- `wasde_xls/` holds the October 2026 release's XLS cut to six sheets, `WASDE Text` (the
+  narrative), `Page 8` (whose first cell prints the report month) and `Page 12` to
+  `Page 15` (whose block titles name the tables' commodities): a binary workbook
   cannot be cut by bytes, so the script copies every cell that holds a value, at its row
   and column, with its type and value as xlrd reads them, into a workbook written with
   xlwt, and reads the copy back to compare it with the original, cell for cell. No
@@ -27,8 +28,10 @@ xippios-usda-esmis, which prints its row below; Kept says what of the file it ho
 
 The download's replay fixtures under `../download_release_file/` are the recorded GET
 exchanges of the files: `wasde1026_xml.json` carries `wasde_xml/sr08_sr35_sr36.xml` as its
-body, `wasde1026_xml_sr11_sr24.json` `wasde_xml/sr11_sr24.xml` and `wasde1026_xls.json`
-`wasde_xls/wasde_text_page_8.xls` (base64), each marked `sample` with the whole file's
+body, `wasde1026_xml_sr11_sr24.json` `wasde_xml/sr11_sr24.xml`, `wasde1026_xml_sr14.json`
+`wasde_xml/sr14.xml` and `wasde1026_xls.json`
+`wasde_xls/wasde_text_page_8_page_12_page_13_page_14_page_15.xls` (base64), each marked
+`sample` with the whole file's
 bytes and sha256 (sdk-core ADR-0020, amendment 2026-11-18, point a);
 `wasde-07-09-2010_pdf.json` carries the whole PDF (base64), unmarked.
 
@@ -40,5 +43,8 @@ bytes and sha256 (sdk-core ADR-0020, amendment 2026-11-18, point a);
 | `wasde_xml/sr12_sr37.xml` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xml | 3569419 | 85e67ec8e8ec8eb98462596a4e784c170534630108cd51f4f42037756a9e50b9 | sr12, sr37 | 2026-10-28T15:06:18Z |
 | `wasde_xml/sr13_sr34.xml` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xml | 3569419 | 85e67ec8e8ec8eb98462596a4e784c170534630108cd51f4f42037756a9e50b9 | sr13, sr34 | 2026-10-28T15:06:18Z |
 | `wasde_xml/sr31_sr32.xml` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xml | 3569419 | 85e67ec8e8ec8eb98462596a4e784c170534630108cd51f4f42037756a9e50b9 | sr31, sr32 | 2026-10-28T15:06:18Z |
-| `wasde_xls/wasde_text_page_8.xls` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xls | 354304 | 5beb5732b587807d10a12fddf58c1c1120a08891bef4f361a346ab68a7906025 | sheets WASDE Text, Page 8, copied cell by cell (values and types, no formatting) into a workbook written with xlwt | 2026-10-28T19:30:54Z |
+| `wasde_xml/sr14.xml` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xml | 3569419 | 85e67ec8e8ec8eb98462596a4e784c170534630108cd51f4f42037756a9e50b9 | sr14 | 2026-11-27T07:44:38Z |
+| `wasde_xml/sr15.xml` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xml | 3569419 | 85e67ec8e8ec8eb98462596a4e784c170534630108cd51f4f42037756a9e50b9 | sr15 | 2026-11-27T07:44:38Z |
+| `wasde_xml/sr17.xml` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xml | 3569419 | 85e67ec8e8ec8eb98462596a4e784c170534630108cd51f4f42037756a9e50b9 | sr17 | 2026-11-27T07:44:38Z |
+| `wasde_xls/wasde_text_page_8_page_12_page_13_page_14_page_15.xls` | 796099 | https://esmis.nal.usda.gov/sites/default/release-files/796099/wasde1026.xls | 354304 | 5beb5732b587807d10a12fddf58c1c1120a08891bef4f361a346ab68a7906025 | sheets WASDE Text, Page 8, Page 12, Page 13, Page 14, Page 15, copied cell by cell (values and types, no formatting) into a workbook written with xlwt | 2026-11-27T07:44:26Z |
 | `wasde_pdf/wasde-07-09-2010.pdf` | 95659 | https://esmis.nal.usda.gov/sites/default/release-files/3t945q76s/3n203z415/8c97kq758/wasde-07-09-2010.pdf | 152211 | 8a4f13b3cd90e2ba92ddf368d6966691f9bcde94ae6705282f2cdac6161ce18e | the whole file | 2026-10-28T19:29:27Z |
