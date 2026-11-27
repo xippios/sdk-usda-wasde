@@ -133,6 +133,14 @@ def test_the_tasks_take_year_and_month_first_and_the_rest_by_keyword() -> None:
     }
 
 
+@pytest.mark.parametrize("name", tasks.__all__)
+def test_a_tool_s_description_stays_under_1000_characters(name: str) -> None:
+    """The docstring before ``Args:`` (https://github.com/xippios/sdk-core/issues/485)."""
+    description = (inspect.getdoc(getattr(tasks, name)) or "").split("Args:")[0].strip()
+    assert len(description) < 1000
+    assert "Requests" in description, "each states the most requests one call spends"
+
+
 def test_list_releases_projects_esmis_releases(replay_fixture: ReplayFixture) -> None:
     route = replay_fixture("release_find_by_identifier", "wasde_page0", match_params=["page"])
     since = date(2026, 1, 1)
