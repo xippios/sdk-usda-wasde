@@ -17,6 +17,13 @@ tables, of which this parser reads one cell, the report month.
   none (``Page 9`` prints the month a row lower, so the rule reads the first page sheet
   only).
 
+- **The block titles** (``read_block_titles``). Sheets ``Page 12`` to ``Page 15`` print a
+  title over each of the page's tables (``FEED GRAINS``, ``CORN``), which the XML does not
+  hold: the text of a block's header row, the row whose later cells hold the market years
+  (``2024/25``, ``2025/26 Est.``), in the first of columns 0 to 4 that holds text, since
+  the oldest workbooks print it in columns 1 to 4 and those since 2015 in column 0
+  (``docs/upstream/OBSERVED.md``). A title is that cell's text verbatim.
+
 A file xlrd cannot open as an XLS raises ``ValidationError``, as does a cell of
 ``WASDE Text`` that holds anything but text, or text in a column after the first: a
 layout the parser does not know. A workbook without the sheet, or whose sheet holds no
@@ -38,7 +45,7 @@ from xippios.core import NotFoundError, ValidationError, XippiosError
 from xippios.usda.wasde._client import SOURCE
 from xippios.usda.wasde.models import WasdeXlsText
 
-__all__ = ["MONTH_NAMES", "TEXT_SHEET", "parse_wasde_xls"]
+__all__ = ["BLOCK_PAGES", "MONTH_NAMES", "TEXT_SHEET", "parse_wasde_xls", "read_block_titles"]
 
 FILE_KIND = "wasde.xls"
 """The file kind, as messages name it."""
@@ -62,6 +69,11 @@ MONTH_NAMES = (
 """The month names WASDE prints, in English, written out so that no locale changes them."""
 _MONTH = re.compile(rf"(?:{'|'.join(MONTH_NAMES)}) \d{{4}}")
 _EMPTY = (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK)
+BLOCK_PAGES = (12, 13, 14, 15)
+"""The printed pages whose sheets print a block title over each table, which the XML lacks."""
+_TITLE_COLUMNS = 5
+"""Columns 0 to 4, where a block's header row prints its title."""
+_MARKET_YEAR = re.compile(r"\d{4}/\d{2}")
 
 
 def _refuse(message: str, raw: object) -> NoReturn:
@@ -140,6 +152,65 @@ def parse_wasde_xls(path: str | PathLike[str]) -> list[WasdeXlsText]:
     """
     try:
         return _rows(Path(path))
+    except (XippiosError, OSError):
+        raise
+    except Exception as error:  # xlrd raises more than its own errors on a corrupt file
+        _refuse(f"not a workbook xlrd reads: {type(error).__name__}: {error}", str(path))
+
+
+def _titles(sheet: xlrd.sheet.Sheet) -> list[str]:
+    """The block titles of one page sheet, in sheet order."""
+    found: list[str] = []
+    for row in range(sheet.nrows):
+        cells = sheet.row(row)
+        texts = [
+            (column, str(cell.value))
+            for column, cell in enumerate(cells[:_TITLE_COLUMNS])
+            if cell.ctype == xlrd.XL_CELL_TEXT and str(cell.value).strip()
+        ]
+        if not texts:
+            continue
+        column, text = texts[0]
+        if _MARKET_YEAR.search(text):
+            continue
+        if any(
+            cell.ctype == xlrd.XL_CELL_TEXT and _MARKET_YEAR.search(str(cell.value))
+            for cell in cells[column + 1 :]
+        ):
+            found.append(text)
+    return found
+
+
+def _block_titles(path: Path) -> dict[int, list[str]]:
+    """The block titles of the workbook at ``path``; ``read_block_titles`` is its door."""
+    with xlrd.open_workbook(str(path), logfile=io.StringIO(), on_demand=True) as book:
+        sheets = book.sheet_names()
+        return {
+            page: _titles(book.sheet_by_name(f"Page {page}"))
+            for page in BLOCK_PAGES
+            if f"Page {page}" in sheets
+        }
+
+
+def read_block_titles(path: str | PathLike[str]) -> dict[int, list[str]]:
+    """The block titles of pages 12 to 15 in a WASDE release's XLS, by printed page number.
+
+    The text of each block's header row in the first of its columns 0 to 4 that holds
+    text, verbatim, in sheet order, e.g. ``{12: ["FEED GRAINS", "CORN"], 13: ["SORGHUM",
+    "BARLEY", "OATS"], ...}``; a page whose sheet the workbook lacks has no entry. The
+    rules are this module's docstring; ``parse.wasde_xml.parse_wasde_xml`` takes the
+    answer as its ``block_titles``.
+
+    Args:
+        path: The XLS file as ESMIS serves it, e.g. ``"wasde1026.xls"``.
+
+    Raises:
+        ValidationError: The file is no workbook xlrd reads (any error xlrd raises on it,
+            its class and text named). An ``OSError``, a file that cannot be opened,
+            passes as raised.
+    """
+    try:
+        return _block_titles(Path(path))
     except (XippiosError, OSError):
         raise
     except Exception as error:  # xlrd raises more than its own errors on a corrupt file
