@@ -1,0 +1,1 @@
+- `meta.vintage` of every task that reads a file is the ESMIS release id, e.g. `"796099"`, where the XML's and the XLS's tasks gave the printed `Report_Month`. The record carries the report's month itself. (ADR-0060, https://github.com/xippios/sdk-usda-wasde/issues/57)

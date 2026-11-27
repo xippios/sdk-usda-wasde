@@ -139,8 +139,9 @@ on pages 26 and 27, 24 cells hold a footnote marker instead of a value (`3/`). A
 be split over several unit cells where the page prints it on two lines
 (`Million 480 ` and ` Pound Bales`).
 
-Observed: 2026-10-28, in `wasde1026.xml`, every value cell counted; no sample holds
-pages 17, 26 or 27.
+Observed: 2026-10-28, in `wasde1026.xml`, every value cell counted; on 2026-11-27 in the
+sample `tests/fixtures/files/wasde_xml/sr17.xml`, page 17 whole, its six marked values and
+the footnotes of its asterisks. No sample holds pages 26 or 27.
 
 ### Units on elements
 
@@ -263,6 +264,37 @@ Observed: 2026-10-28, in `wasde1026.xml`, every page; the six samples under
 `tests/fixtures/files/wasde_xml/` hold pages 8, 9, 11, 12, 13, 16, 24, 31, 32 and 34 to
 37 whole.
 
+### Older and revised files
+
+A probe of 2026-11-27 (`scripts/probe_releases.py`) read eight files of seven releases
+with the package's readers, two keyless requests a file, each sent once:
+
+| Month | Release | File | Bytes | sha256 | Read |
+| --- | --- | --- | --- | --- | --- |
+| 2010-07 | 95659 | wasde-07-09-2010.xml | 3719364 | e32c2378a008cf9fe5f6ba2861863c0cd78f5e89587a2abb56caa57c577908ed | refused: the root is `<{wasde}Report>` with `name` and `xsi:schemaLocation`, not `<Report Name="wasde">` |
+| 2010-07 | 95659 | wasde-07-09-2010.xls | 304128 | baddad70943d2e72f3ad2c0178de13bccea903685b57ad0e6ed756581b538fd5 | the eleven block titles of pages 12 to 15 (XLS, below) |
+| 2011-07 | 95646 | wasde-07-12-2011.xml | 2121380 | 10c2bf1fcad64b3677a2d664d6fdbab6558f3d176b95e976adc76292522b0404 | refused: `sr35`'s `<Report>` lacks `Report_Month` and `page_title` |
+| 2013-08 | 95621 | ORIGwasde-08-12-2013.xml | 2129780 | 072337623d4242742abb994af4abfe73021089ee0bfa7de0f883f3ebae90cd15 | refused: as 2011-07 |
+| 2014-10 | 95607 | wasde-10-10-2014.xml | 2082761 | db9cea77ef6a98b434bb6a09ee71698a24b68b66af28bf27787f622c51308e68 | refused: as 2011-07 |
+| 2020-10 | 95533 | latest.xml | 2033128 | 91b6ad1ff5c86636523e8cb7dcf646e88f9288da08e82b42e03c11baab2d6195 | 6473 records |
+| 2024-12 | 95483 | wasde1224v2.xml | 2052263 | 71bc46339a77ceca168ee97b0d37db5d1411ab8b2387b7aecfe7f991d324977c | 6543 records |
+| 2025-05 | 96165 | wasde0525v2.xml | 2024450 | b7a133dabca19e9f85dc4c1323c3dd0d0c89b62c85542d9943e04ebda644ab2b | 6477 records |
+
+The first XML, July 2010's, writes its elements in a namespace and names its pages with
+`name`, not `Name`, so the reader refuses it at its root. In 2011-07, 2013-08 and 2014-10
+the reader refuses the reliability pages 35 to 37 only: their `<Report>` holds its name
+and no `Report_Month`, `page_title` or `sub_report_title`; read page by page, the other
+27 pages of each give 5653, 5681 and 5660 records. The three files of 2020-10 to 2025-05,
+among them two reposted months whose names carry `v2` and one `latest.xml`, read whole,
+their pages 12 to 15 under the same four titles as in October 2026. 2013-08's file was
+read by its name, `ORIGwasde-08-12-2013.xml`, the original, which the release lists before
+the revision. The months read stand for no month between them: the parser of each older
+layout is https://github.com/xippios/sdk-usda-wasde/issues/19.
+
+Observed: 2026-11-27, in the files above, downloaded through ESMIS's `findById` and file
+URLs; recording `tests/fixtures/release_find_by_id/95659.json`, July 2010's release and
+its files.
+
 ## XLS
 
 ### Sheets
@@ -271,9 +303,9 @@ The workbook has 31 sheets: `WASDE Text`, then `Page 8` to `Page 37`, one per pr
 table page, named after it. Strings are stored as UTF-16 (codepage 1200 in the file).
 
 Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd; the sample
-`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls` holds two of its sheets, copied
-cell by cell into a workbook written with xlwt, so it keeps neither the other sheets nor
-the codepage.
+`tests/fixtures/files/wasde_xls/wasde_text_page_8_page_12_page_13_page_14_page_15.xls`, cut on 2026-11-27, holds six of
+its sheets, `WASDE Text`, `Page 8` and `Page 12` to `Page 15`, copied cell by cell into a
+workbook written with xlwt, so it keeps neither the other sheets nor the codepage.
 
 ### The narrative sheet
 
@@ -283,7 +315,7 @@ row, as the PDF prints it on pages 1 to 5 (`WHEAT: The outlook for 2026/27 U.S. 
 to the cotton paragraphs).
 
 Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd; sample
-`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls`, its sheet `WASDE Text`.
+`tests/fixtures/files/wasde_xls/wasde_text_page_8_page_12_page_13_page_14_page_15.xls`, its sheet `WASDE Text`.
 
 ### Page sheets
 
@@ -312,7 +344,8 @@ out as the page prints it, which differs from sheet to sheet:
 - the footnotes in the last row, in column 0.
 
 Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd; sample
-`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls`, its sheet `Page 8`.
+`tests/fixtures/files/wasde_xls/wasde_text_page_8_page_12_page_13_page_14_page_15.xls`, its sheet `Page 8`, and on
+2026-11-27 its sheets `Page 12` to `Page 15`, the block titles.
 
 ### Columns with numbers
 
@@ -354,7 +387,19 @@ numbers (counted from 0):
 | Page 37 | 50 × 8 | 1, 2, 3, 4, 5, 6, 7 |
 
 Observed: 2026-10-28, in `wasde1026.xls`, read with xlrd, every sheet; sample
-`tests/fixtures/files/wasde_xls/wasde_text_page_8.xls`, its sheet `Page 8`.
+`tests/fixtures/files/wasde_xls/wasde_text_page_8_page_12_page_13_page_14_page_15.xls`, its sheet `Page 8`.
+
+### Block titles in older workbooks
+
+July 2010's workbook prints the block titles of pages 12 to 15 where the market years
+start further right, in column 2 of `Page 12` and `Page 15`, column 1 of `Page 13` and
+columns 3 and 4 of `Page 14`, where October 2026's prints them in column 0: the eleven
+titles, `FEED GRAINS` to `SOYBEAN MEAL`, read the same characters in both. Its sheet
+`WASDE Text` holds one row, `This is worksheet is a placeholder for the textual portion of
+the WASDE Report`, and no narrative, and the first cell of `Page 8` holds no month.
+
+Observed: 2026-11-27, in release 95659's workbook, wasde-07-09-2010.xls (Older and revised files,
+above), read with xlrd; recording `tests/fixtures/release_find_by_id/95659.json`.
 
 ## TXT
 
@@ -473,6 +518,26 @@ XLSX is that of 2010-08-12, the one ZIP (`95501.zip`, with a `readme.txt`) that 
 Observed: 2026-10-28, in the 703 releases of `list_releases("wasde")`, every page of
 the list; recording `tests/fixtures/release_find_by_identifier/wasde_page0.json`, the
 releases of 2024-09-12 to 2026-10-09.
+
+### The order of the pages
+
+ESMIS's list of WASDE's releases, read whole on 2026-11-27, holds 704 releases on 29 pages,
+25 a page and 4 on the last. Pages 0 to 2 and 5 to 28 are in date order, newest first;
+pages 3 and 4 are not: 21 older releases stand there out of place, 3 on page 3 (of
+1995-01-31, 2004-11-12 and 2004-09-10) and 18 on page 4 (of 2002-03-08 to 2006-05-12),
+missing where their dates would put them, on pages 10 to 16. Each page's newest release
+is dated before the newest of the page before it, on all 29 pages. So a walk that ends at
+the first page whose oldest release is dated before `since`, as xippios-usda-esmis 0.3.0's
+`list_releases` walks, ends at page 3 for any `since` after 1995-01-31 and misses the
+months from 1995-02 to 2018-11, while a walk that ends at the first page whose newest
+release is dated before `since` misses none. The mended walk is
+https://github.com/xippios/sdk-usda-esmis/pull/71.
+
+Observed: 2026-11-27, the 29 pages of `esmis_api_release_findByIdentifier` for `wasde`,
+29 keyless requests, as the comment of that date on
+https://github.com/xippios/sdk-usda-esmis/issues/67 gives them; recording
+`tests/fixtures/release_find_by_identifier/wasde_page0.json`, page 0 of 2026-10-28, in
+date order.
 
 ### Months without a release
 

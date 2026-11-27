@@ -1,0 +1,2149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report Name="wasde">
+  <sr17>
+    <Report Name="sr17" Report_Month="October 2026" page_title=" WASDE - 676 - 17" sub_report_title="U.S. Cotton Supply and Use  1/" sub_report_footer3="Note: Reliability calculations at end of report. 1/ Upland and extra-long staple; marketing year beginning August 1. Totals may not add due to rounding. 2/ Reflects the difference between the previous season's supply less total use and ending stocks. 3/ Cents per pound for upland cotton. *September planted area, harvested, yield, and production as reported in the September 11, 2026 Crop Production report. **October planted area, harvested, yield, and production as reported in the October 9, 2026 Crop Production report. ">
+      <matrix1>
+        <m1_attribute_group_Collection>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="  Planted">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="11.18" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="9.28" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="10.45 *" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="10.45 **" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="  Harvested">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="7.76" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="7.83" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="8.16 *" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="8.16 **" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Yield per Harvested Acre">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="892" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="852" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="776 *" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="790 **" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Beginning Stocks">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="3.15" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="4.00" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="4.15" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="4.15" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Production">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="14.41" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="13.90" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="13.20" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="13.44" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Imports">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="0.00" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="0.00" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="0.01" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="0.01" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="  Supply, Total">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="17.56" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="17.90" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="17.36" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="17.60" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Domestic Use">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="1.70" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="1.50" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="1.50" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="1.50" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Exports, Total">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="11.90" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="12.30" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="12.30" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="12.30" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="  Use, Total">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="13.60" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="13.80" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="13.80" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="13.80" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Unaccounted 2/">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="-0.04" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="-0.05" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="-0.04" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="0.00" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Ending Stocks">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="4.00" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="4.15" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="3.60" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="3.80" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+          <m1_attribute_group>
+            <m1_filler1 m1_filler1="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_filler2="Filler" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler1>
+            <FormatFiller3>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr1="Million Acres" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr1="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller3>
+            <attribute4 attribute4="Avg. Farm Price 3/">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="63.2" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell cell_value4="62.2" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell cell_value4="78.0" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell cell_value4="77.0" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </attribute4>
+            <m1_filler3 m1_filler3="Filler">
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr2="Pounds" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr2="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </m1_filler3>
+            <FormatFiller5>
+              <m1_year_group_Collection>
+                <m1_year_group market_year4="2024/25">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2025/26 Est.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="">
+                      <Cell m1_unit_descr3="Million 480 " />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Sep">
+                      <Cell m1_unit_descr3=" Pound Bales" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+                <m1_year_group market_year4="2026/27 Proj.">
+                  <m1_month_group_Collection>
+                    <m1_month_group forecast_month4="Oct">
+                      <Cell m1_unit_descr3="" />
+                    </m1_month_group>
+                  </m1_month_group_Collection>
+                </m1_year_group>
+              </m1_year_group_Collection>
+            </FormatFiller5>
+          </m1_attribute_group>
+        </m1_attribute_group_Collection>
+        <FormatFiller6>
+          <m1_year_group_Collection>
+            <m1_year_group market_year4="2024/25">
+              <m1_month_group_Collection>
+                <m1_month_group forecast_month4="">
+                  <Cell />
+                </m1_month_group>
+              </m1_month_group_Collection>
+            </m1_year_group>
+            <m1_year_group market_year4="2025/26 Est.">
+              <m1_month_group_Collection>
+                <m1_month_group forecast_month4="">
+                  <Cell />
+                </m1_month_group>
+              </m1_month_group_Collection>
+            </m1_year_group>
+            <m1_year_group market_year4="2026/27 Proj.">
+              <m1_month_group_Collection>
+                <m1_month_group forecast_month4="Sep">
+                  <Cell />
+                </m1_month_group>
+              </m1_month_group_Collection>
+            </m1_year_group>
+            <m1_year_group market_year4="2026/27 Proj.">
+              <m1_month_group_Collection>
+                <m1_month_group forecast_month4="Oct">
+                  <Cell />
+                </m1_month_group>
+              </m1_month_group_Collection>
+            </m1_year_group>
+          </m1_year_group_Collection>
+        </FormatFiller6>
+      </matrix1>
+    </Report>
+  </sr17>
+</Report>

@@ -1,0 +1,1 @@
+- The four packaged lists under `reference/`, `params.py`, `enums.py` and the models `Table`, `Commodity`, `Region` and `Attribute` leave, with the script that built them: a package builds no list of its own, and the lists named every month by the labels of one. (ADR-0060, https://github.com/xippios/sdk-usda-wasde/issues/21)

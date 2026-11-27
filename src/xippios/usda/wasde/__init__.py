@@ -6,26 +6,20 @@ this package finds and downloads through ``xippios-usda-esmis`` (sdk-core ADR-00
 
 from xippios.usda.wasde._version import __version__
 from xippios.usda.wasde.tasks import (
-    get_balance_sheet,
-    get_latest_release,
-    get_release,
-    get_table,
+    get_data,
+    get_report_text,
     list_commodities,
     list_regions,
     list_releases,
     list_tables,
-    read_report_text,
 )
 
 __all__ = [
     "__version__",
-    "get_balance_sheet",
-    "get_latest_release",
-    "get_release",
-    "get_table",
+    "get_data",
+    "get_report_text",
     "list_commodities",
     "list_regions",
     "list_releases",
     "list_tables",
-    "read_report_text",
 ]

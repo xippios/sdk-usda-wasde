@@ -2,44 +2,28 @@
 
 ``/add-endpoint`` adds them.
 
-The nightly run fetches the latest release only, each file kind once, through one
+The nightly run reads the latest release only, each file kind once, through one
 session-scoped fixture, ``latest``, as https://github.com/xippios/sdk-usda-wasde/pull/3
-and https://github.com/xippios/sdk-usda-wasde/pull/5 decided: it runs
-``get_release()`` once, which downloads the latest XML through xippios-usda-esmis, and
-keeps a copy of the file in a temporary directory for the live parser test, which
-checks shape, page names and fields, never values (sdk-core ADR-0020 decision 6); then it
-downloads the release's XLS and its PDF once each through esmis's
-``download_release_file``, for the block titles of the commodity list and the live
-parser tests of the narrative. ``get_table``, ``get_balance_sheet`` and
-``read_report_text`` run live through the fixture ``served``, which hands their
-downloads the session's copy of the file instead of fetching it again: each still asks
-ESMIS for the latest release and for the release, so its lookups are live, and core's
-``AsyncClient.download`` copies the file of the format its URL names. The three
-list tasks send nothing: their live tests build the lists from the latest files with
-the refresh script's rules (``_vocabulary``) and compare them with the packaged ones by
-its ``differences``, every field but ``report_month``, the month word of the reliability
-titles masked (``Reliability of <Month> Projections``, pages 35 to 37), since every
-release names its own month there and the lists carry the release they came from
-(sdk-core ADR-0041 decision 1;
-https://github.com/xippios/sdk-usda-wasde/pull/4); each footer of a table,
-``sub_report_footer`` to ``sub_report_footer3``, is compared only for whether it is set
-on both sides, never its text, which changes every release (the projection month on
-page 35, the months of the estimates on pages 13 and 16; the same pull request). The
-packaged lists are
-refreshed before each release, in the release train's refresh PR (conventions §12), so
-a difference between releases is a change upstream made: it fails, naming the rows, and
-the lists are refreshed
-(``scripts/refresh_reference.py``). Keyless requests, paced by
-esmis's client at 30 a minute: the reachability check 1, ``list_releases`` 1 (page 0),
-``get_latest_release`` 1, the fixture's ``get_release`` 3 (the latest release, the
-release, the file, about 3.4 MB), its XLS 2 and its PDF 2 (the release, the file, about
-346 KB and 917 KB), and ``read_report_text``, ``get_table`` and ``get_balance_sheet``
-2 each (the latest release, the release): sixteen, three of them downloads, about
-4.7 MB. Assertions read shapes, counts and the rows' names, never a raw payload or a
-value, as every live run takes ``--tb=short``.
+and https://github.com/xippios/sdk-usda-wasde/pull/5 decided: it finds the latest
+release's month by ``list_releases``, runs ``get_data`` for it once, which downloads the
+XML and the XLS through xippios-usda-esmis, keeps a copy of both for the live parser
+tests, which check shape, pages and fields, never values (sdk-core ADR-0020 decision 6),
+and downloads the release's PDF once through esmis's ``download_release_file``. The fixed
+table of pages 12 to 15 (``parse.wasde_xml.LAYOUT``) is held against the latest XLS's
+block titles each night (sdk-core ADR-0061, decision 12). The three list tasks and
+``get_report_text`` run live through the fixture ``served``, which hands their downloads
+the session's copy of the file instead of fetching it again: each still asks ESMIS for
+the month's releases and for the release, so its lookups are live, and core's
+``AsyncClient.download`` copies the file of the format its URL names. Keyless requests,
+paced by esmis's client at 30 a minute, counted from this module: the reachability check
+1, ``list_releases`` 1 (page 0), the fixture 8 (page 0 for the month, then ``get_data``'s
+page 0, the release and the XML, the release and the XLS, and the PDF's release and file),
+``list_tables``, ``list_regions`` and ``get_report_text`` 2 each (page 0, the release) and
+``list_commodities`` 3 (page 0, the release for the XML and for the XLS): nineteen, three
+of them downloads, the XML, the XLS and the PDF. Assertions read shapes, counts and the
+rows' names, never a raw payload or a value, as every live run takes ``--tb=short``.
 """
 
-import re
 import shutil
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
@@ -53,19 +37,20 @@ from pypdf import PdfReader
 from xippios.core import AsyncClient, Downloaded, Result
 from xippios.usda.esmis import tasks as esmis
 
-from xippios.usda.wasde import _vocabulary as vocabulary
 from xippios.usda.wasde import tasks
 from xippios.usda.wasde._client import BASE_URL, config
-from xippios.usda.wasde.models import WasdeXmlCell
-from xippios.usda.wasde.parse import parse_wasde_pdf, parse_wasde_xls, parse_wasde_xml
+from xippios.usda.wasde.models import WasdeRecord
+from xippios.usda.wasde.parse import (
+    parse_wasde_pdf,
+    parse_wasde_xls,
+    parse_wasde_xml,
+    read_block_titles,
+)
 from xippios.usda.wasde.parse.wasde_pdf import HEADING
-from xippios.usda.wasde.parse.wasde_xls import MONTH_NAMES
+from xippios.usda.wasde.parse.wasde_xml import LAYOUT
 
 pytestmark = [pytest.mark.live, pytest.mark.anyio]
 
-PAGES = {f"sr{number:02d}" for number in range(8, 38)}
-"""The pages the October 2026 file holds, printed pages 8 to 37 (``docs/upstream/OBSERVED.md``)."""
-RELIABILITY = {"sr35", "sr36", "sr37"}
 STATISTICS = {
     "root_mean_square_error",
     "confidence_interval",
@@ -75,22 +60,24 @@ STATISTICS = {
     "below_final",
     "above_final",
 }
-MONTH = re.compile(r"\d{4}-(0[1-9]|1[0-2])")
-REPORT_MONTH = re.compile(rf"(?:{'|'.join(MONTH_NAMES)}) \d{{4}}")
 
 
 @dataclass(frozen=True)
 class Latest:
-    """The latest release's files, fetched once for the session.
+    """The latest release's month and files, fetched once for the session.
 
     Attributes:
-        release: What ``get_release()`` answered.
+        year: The latest release's year.
+        month: Its month.
+        data: What ``get_data`` answered for it.
         xml: A copy of the XML file it parsed.
-        xls: The same release's XLS file.
+        xls: A copy of the XLS file it read.
         pdf: The same release's PDF file.
     """
 
-    release: Result[list[WasdeXmlCell]]
+    year: int
+    month: int
+    data: Result[list[WasdeRecord]]
     xml: Path
     xls: Path
     pdf: Path
@@ -98,30 +85,32 @@ class Latest:
 
 @pytest.fixture(scope="session")
 def latest(tmp_path_factory: pytest.TempPathFactory) -> Latest:
-    """``get_release()`` once, keeping a copy of the file its parser reads; the XLS, the PDF."""
+    """``get_data`` once for the latest month, keeping its XML and XLS; the PDF."""
     directory = tmp_path_factory.mktemp("latest")
-    kept = directory / "wasde.xml"
+    newest = tasks.list_releases(since=date.today() - timedelta(days=93)).data[0]
+    printed = newest.release_datetime
+    kept = {"xml": directory / "wasde.xml", "xls": directory / "wasde.xls"}
 
-    def keep_and_parse(path: Path) -> list[WasdeXmlCell]:
-        shutil.copyfile(path, kept)
-        return parse_wasde_xml(path)
+    def keep_xml(path: Path, **kwargs: Any) -> list[WasdeRecord]:
+        shutil.copyfile(path, kept["xml"])
+        return parse_wasde_xml(path, **kwargs)
+
+    def keep_xls(path: Path) -> dict[int, list[str]]:
+        shutil.copyfile(path, kept["xls"])
+        return read_block_titles(path)
 
     with pytest.MonkeyPatch.context() as patch:
-        patch.setattr("xippios.usda.wasde.tasks.parse_wasde_xml", keep_and_parse)
-        release = tasks.get_release()
-    files = {format: directory / f"wasde.{format}" for format in ("xls", "pdf")}
-    for format, path in files.items():
-        esmis.download_release_file(release.meta.request["release_id"], format, path)
-    return Latest(release=release, xml=kept, xls=files["xls"], pdf=files["pdf"])
+        patch.setattr("xippios.usda.wasde.tasks.parse_wasde_xml", keep_xml)
+        patch.setattr("xippios.usda.wasde.tasks.read_block_titles", keep_xls)
+        data = tasks.get_data(printed.year, printed.month)
+    pdf = directory / "wasde.pdf"
+    esmis.download_release_file(int(newest.id), format="pdf", dest=pdf)
+    return Latest(printed.year, printed.month, data, kept["xml"], kept["xls"], pdf)
 
 
 @pytest.fixture
 def served(latest: Latest, monkeypatch: pytest.MonkeyPatch) -> Latest:
-    """The tasks' downloads served from the session's files; their lookups stay live.
-
-    Core's ``AsyncClient.download`` copies the session's file of the format the URL's
-    extension names, instead of fetching it again, and answers as the download would.
-    """
+    """The tasks' downloads served from the session's files; their lookups stay live."""
     files = {"xml": latest.xml, "xls": latest.xls, "pdf": latest.pdf}
 
     async def copy(self: AsyncClient, url: str, dest: str | PathLike[str], **_: Any) -> Downloaded:
@@ -142,11 +131,7 @@ def served(latest: Latest, monkeypatch: pytest.MonkeyPatch) -> Latest:
 
 
 async def test_upstream_answers() -> None:
-    """The base URL answers without a server error.
-
-    A plain request, not the package's client; any answer below 500 (a 404 at the
-    root, say) shows the host is up.
-    """
+    """The base URL answers without a server error: a plain request, any answer below 500."""
     async with httpx.AsyncClient(
         headers={"User-Agent": config.user_agent},
         timeout=config.timeouts.to_httpx(),
@@ -162,101 +147,64 @@ async def test_list_releases_live() -> None:
     assert result.data
     for release in result.data:
         assert release.id.isdigit()
-        assert MONTH.fullmatch(release.month)
-        assert release.revision in (None, "v2")
         assert release.files
         assert all(file.url.endswith(f"/{file.name}") for file in release.files)
     assert result.meta.endpoint == "esmis_api_release_findByIdentifier"
     assert result.meta.total is not None
-    assert result.meta.total >= len(result.data)
 
 
-async def test_get_latest_release_live() -> None:
-    result = await tasks.get_latest_release_async()
-    assert MONTH.fullmatch(result.data.month)
-    assert result.data.release_datetime.date() <= date.today()
-    assert result.meta.vintage == result.data.id
-    assert result.meta.published_at == result.data.release_datetime.replace(tzinfo=None)
-    assert result.meta.published_at_naive
-    assert "xml" in {file.format for file in result.data.files}
-
-
-def test_get_release_live(latest: Latest) -> None:
-    result = latest.release
+def test_get_data_live(latest: Latest) -> None:
+    """The latest month's records, pages 12 to 15 named from its XLS."""
+    result = latest.data
     assert result.data
     assert result.meta.endpoint.endswith(".xml")
-    assert result.meta.request["url"].endswith(f"/{result.meta.endpoint}")
-    assert isinstance(result.meta.request["release_id"], int)
-    assert "month" not in result.meta.request
-    assert result.meta.vintage == result.data[0].report_month
+    assert result.meta.request["xls_url"].endswith(".xls")
+    assert result.meta.vintage == str(result.meta.request["release_id"])
     assert result.meta.published_at_naive
+    on_layout = [record for record in result.data if record.table_label in LAYOUT]
+    assert on_layout
+    assert {record.commodity_source for record in on_layout} == {"xls"}
 
 
 def test_parse_wasde_xml_live(latest: Latest) -> None:
-    """The current file still reads: every known page has records, every record its fields."""
+    """The current file still reads: every record its fields, the reliability statistics."""
     records = parse_wasde_xml(latest.xml)
-    reports = {record.report for record in records}
-    assert reports >= PAGES, sorted(PAGES - reports)
     assert {record.report_month for record in records} == {records[0].report_month}
-    for record in records:
-        assert record.page_title.strip().startswith("WASDE - ")
-        assert record.table
-        assert record.matrix.startswith("table" if record.report in RELIABILITY else "matrix")
-    on_tables = [record for record in records if record.report not in RELIABILITY]
-    for field in ("commodity", "region", "market_year", "forecast_month", "attribute"):
-        assert any(getattr(record, field) is not None for record in on_tables), field
-    reliability = [record for record in records if record.report in RELIABILITY]
-    assert {record.statistic for record in reliability} == STATISTICS
-    assert {record.statistic for record in on_tables} == {None}
-    numbers = sum(record.value is not None for record in records)
-    assert numbers > 0.9 * len(records), "most values are numbers as printed"
+    assert {record.report_number for record in records} == {records[0].report_number}
+    for field in ("commodity", "region", "market_year", "forecast_month", "attribute", "unit"):
+        assert any(getattr(record, field) is not None for record in records), field
+    assert {record.statistic for record in records} - {None} == STATISTICS
+    assert sum(record.value_number is not None for record in records) > 0.9 * len(records)
+    assert {record.commodity_source for record in records} >= {None, "title", "layout"}
 
 
-def test_block_titles_live(latest: Latest) -> None:
-    """The positional match still holds: each page of 12 to 15 has a title per matrix."""
-    titles = vocabulary.block_titles(latest.xls)
+def test_the_fixed_table_is_the_latest_xls_s_block_titles(latest: Latest) -> None:
+    """sdk-core ADR-0061, decision 12: ``LAYOUT`` held against the latest XLS each night."""
+    titles = read_block_titles(latest.xls)
     records = parse_wasde_xml(latest.xml)
-    packaged = tasks.list_commodities().data
-    for page in vocabulary.BLOCK_PAGES:
-        report = vocabulary.report_name(page)
-        matrices = list(dict.fromkeys(cell.matrix for cell in records if cell.report == report))
-        assert len(titles[report]) == len(matrices), report
-        assert titles[report] == [row.commodity for row in packaged if row.report == report], (
-            f"{report}: the block titles changed; refresh the packaged lists"
-        )
+    by_page = {record.table_label for record in records} & set(LAYOUT)
+    assert by_page == set(LAYOUT), "the four titles of pages 12 to 15"
+    assert sorted(tuple(texts) for texts in titles.values()) == sorted(LAYOUT.values()), (
+        "the block titles changed: update parse.wasde_xml.LAYOUT"
+    )
 
 
-async def test_list_tables_live(latest: Latest) -> None:
-    """The packaged tables are the latest release's, but for the month and the footers' text.
-
-    The reliability titles' month word is masked, and each footer is compared only for
-    whether it is set on both sides, never its text.
-    """
-    result = await tasks.list_tables_async()
-    masked = [vocabulary.month_masked(table) for table in result.data]
-    assert sum(table != month for table, month in zip(result.data, masked, strict=True)) == 3
-    packaged = [vocabulary.footers_set(table) for table in masked]
-    current = [
-        vocabulary.footers_set(vocabulary.month_masked(table))
-        for table in vocabulary.tables(latest.xml)
-    ]
-    assert not vocabulary.differences(packaged, current, vocabulary.by_report)
-    assert result.meta.endpoint.endswith(".xml")
+async def test_list_tables_live(served: Latest) -> None:
+    result = await tasks.list_tables_async(served.year, served.month)
+    assert {row.table_label for row in result.data} >= set(LAYOUT)
+    assert result.meta.vintage == served.data.meta.vintage
 
 
-async def test_list_commodities_live(latest: Latest) -> None:
-    result = await tasks.list_commodities_async()
-    records = parse_wasde_xml(latest.xml)
-    current = vocabulary.commodities(records, vocabulary.block_titles(latest.xls))
-    assert not vocabulary.differences(result.data, current, vocabulary.by_matrix)
-    assert result.meta.vintage
+async def test_list_commodities_live(served: Latest) -> None:
+    result = await tasks.list_commodities_async(served.year, served.month)
+    named = {row.commodity for row in result.data if row.commodity_source == "xls"}
+    assert named == {text for texts in LAYOUT.values() for text in texts}
+    assert result.meta.request["xls_url"].endswith(".xls")
 
 
-async def test_list_regions_live(latest: Latest) -> None:
-    result = await tasks.list_regions_async()
-    current = vocabulary.regions(parse_wasde_xml(latest.xml))
-    assert not vocabulary.differences(result.data, current, vocabulary.by_region)
-    assert result.meta.vintage
+async def test_list_regions_live(served: Latest) -> None:
+    result = await tasks.list_regions_async(served.year, served.month, search="world")
+    assert "World" in {row.region_label for row in result.data}
 
 
 def test_parse_wasde_xls_live(latest: Latest) -> None:
@@ -264,9 +212,8 @@ def test_parse_wasde_xls_live(latest: Latest) -> None:
     rows = parse_wasde_xls(latest.xls)
     assert rows
     assert rows[0].text.startswith("WASDE -")
-    assert [row.row for row in rows] == sorted({row.row for row in rows})
     assert {row.sheet for row in rows} == {"WASDE Text"}
-    assert {row.report_month for row in rows} == {latest.release.data[0].report_month}
+    assert {row.report_month for row in rows} == {latest.data.data[0].report_month}
 
 
 def test_parse_wasde_pdf_live(latest: Latest) -> None:
@@ -280,37 +227,10 @@ def test_parse_wasde_pdf_live(latest: Latest) -> None:
     assert HEADING.casefold() in [line.strip().casefold() for line in after.splitlines()]
 
 
-async def test_read_report_text_live(served: Latest) -> None:
-    result = await tasks.read_report_text_async()
+async def test_get_report_text_live(served: Latest) -> None:
+    result = await tasks.get_report_text_async(served.year, served.month)
     assert result.data
     assert result.data[0].startswith("WASDE -")
     assert result.meta.endpoint.endswith(".xls")
-    assert result.meta.request["url"].endswith(f"/{result.meta.endpoint}")
-    assert result.meta.vintage is not None
-    assert REPORT_MONTH.fullmatch(result.meta.vintage)
-    assert result.meta.vintage == served.release.meta.vintage, "the XML's Report_Month"
+    assert result.meta.vintage == served.data.meta.vintage, "the ESMIS release id"
     assert result.meta.published_at_naive
-
-
-async def test_get_table_live(served: Latest) -> None:
-    result = await tasks.get_table_async("sr12")
-    packaged = {table.report: table for table in tasks.list_tables().data}
-    assert result.data
-    assert {record.report for record in result.data} == {"sr12"}
-    assert list(dict.fromkeys(record.matrix for record in result.data)) == (
-        packaged["sr12"].matrices
-    )
-    for field in ("attribute", "market_year", "forecast_month"):
-        assert any(getattr(record, field) is not None for record in result.data), field
-    assert result.meta.endpoint.endswith(".xml")
-    assert result.meta.request["table"] == "sr12"
-
-
-async def test_get_balance_sheet_live(served: Latest) -> None:
-    result = await tasks.get_balance_sheet_async("CORN")
-    assert result.data
-    assert {(record.report, record.matrix) for record in result.data} == {("sr12", "matrix2")}
-    for field in ("attribute", "market_year", "cell_value"):
-        assert all(getattr(record, field) is not None for record in result.data), field
-    assert result.meta.request["commodity"] == "CORN"
-    assert result.meta.vintage == served.release.meta.vintage

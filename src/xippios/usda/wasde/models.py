@@ -1,62 +1,69 @@
-"""Pydantic models mirroring what this package returns, one ``UpstreamModel`` per record.
+"""Pydantic models of what this package returns, one ``UpstreamModel`` per record.
 
-Conventions §3 and ``/add-endpoint`` give the rules; for a file, fidelity applies to the
-file (sdk-core ADR-0020): labels, units and footnote markers kept as text as printed, nothing
-renamed, converted or joined across files. A ``WasdeXmlCell`` field is named after the
-file's attribute, snake_cased with the matrix index removed (``m1_commodity1`` is
-``commodity``, ``attribute_group2`` is ``attribute_group``), with three exceptions
-(https://github.com/xippios/sdk-usda-wasde/pull/3): the page's and the table's names
-are kept on the record under names of their own, as conventions §3 keeps sheet and
-table names (``report`` holds the page's
-``Name``, ``table`` its ``sub_report_title``, ``sub_report_title2`` or
-``sub_report_title3``, ``matrix`` the report item's element name); a dimension the
-pages spell several ways is folded into one field (``attr_desc`` into ``attribute``,
-``wb_forecast_month_desc`` into ``forecast_month``); and every value goes into
-``cell_value``, ``wb_value`` and the reliability statistics included, the statistic's
-name into ``statistic``.
+Conventions §3 and sdk-core ADR-0060, decision 7, give the rules of the one record this
+package shapes itself, ``WasdeRecord``: one value per record; a field under upstream's
+name holds upstream's text as printed; a reading of that text stands beside it under a
+fixed suffix, ``<stem>_number`` for a number and ``<stem>_label`` for a label; and where
+the file names no value that the record needs, as the XML names no commodity on pages 12
+to 15, the record reads it from the table's title or from the same release's XLS, and
+``commodity_source`` says which (ADR-0060, decision 7; ADR-0020, decision 2, as amended on
+2026-11-24). No record names a page or a matrix of the file.
 
-``Release`` is ESMIS's release of WASDE, re-shaped from ``xippios-usda-esmis``'s model
-(sdk-core ADR-0021); ``WasdeXmlCell`` is one value of a release's XML file, as
-``parse.wasde_xml.parse_wasde_xml`` reads it, and ``WasdeTableValue`` its projection
-without the page's labels, which ``get_table`` and ``get_balance_sheet`` answer;
-``WasdeXlsText`` one paragraph of the
-narrative in its XLS file and ``WasdePdfPage`` one narrative page of its PDF, as
-``parse.wasde_xls.parse_wasde_xls`` and ``parse.wasde_pdf.parse_wasde_pdf`` read them, text
-only (sdk-core ADR-0020 decision 4). ``Table``, ``Commodity``, ``Region`` and
-``Attribute`` are the records of the four packaged lists under ``reference/``, which
-``scripts/refresh_reference.py`` writes from the latest release's files (conventions §3,
-sdk-core ADR-0041): labels as the files print them, each record with the ``report_month`` of the
-release it was read from. No record here carries a documented personal identifier
-(sdk-core ADR-0017).
+``Release`` is ESMIS's release of WASDE, projected from ``xippios-usda-esmis``'s model
+(sdk-core ADR-0021). ``WasdeRecord`` is one value of a release's tables, read from its
+XML by ``parse.wasde_xml.parse_wasde_xml``, with its footnotes as ``WasdeFootnote``.
+``WasdeTable``, ``WasdeCommodity`` and ``WasdeRegion`` are the rows of the three list
+tasks, each the distinct texts of one field of a month's records. ``WasdeXlsText`` is
+one paragraph of the narrative in the XLS and ``WasdePdfPage`` one narrative page of the
+PDF, text only (sdk-core ADR-0020 decision 4). No record here carries a documented
+personal identifier (sdk-core ADR-0017).
 """
 
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import AwareDatetime
 from xippios.core import UpstreamModel
 from xippios.usda.esmis.models import ReleaseFile
 
 __all__ = [
-    "Attribute",
-    "Commodity",
-    "Region",
+    "CommoditySource",
+    "FootnoteOn",
     "Release",
-    "Table",
+    "WasdeCommodity",
+    "WasdeFootnote",
     "WasdePdfPage",
-    "WasdeTableValue",
+    "WasdeRecord",
+    "WasdeRegion",
+    "WasdeTable",
     "WasdeXlsText",
-    "WasdeXmlCell",
 ]
+
+CommoditySource = Literal["title", "xls", "layout"]
+"""Where a record's ``commodity`` was read where its value's path in the XML states none:
+the table's title, the block title of the same release's XLS, or the fixed table of the
+report's layout (``parse.wasde_xml.LAYOUT``)."""
+
+FootnoteOn = Literal[
+    "table",
+    "commodity",
+    "region",
+    "market_year",
+    "attribute",
+    "attribute_group",
+    "unit",
+    "value",
+]
+"""The field of a record whose printed text carries a footnote's mark."""
 
 
 class Release(UpstreamModel):
-    """One WASDE release as ESMIS catalogs it, with its files, revision and month.
+    """One WASDE release as ESMIS catalogs it: its id, its release time and its files.
 
     A projection of ``xippios.usda.esmis.models.Release`` built with
     ``UpstreamModel.project`` (conventions §3): ``id`` and ``release_datetime`` are
-    copied under ESMIS's names; ``files``, ``revision`` and ``month`` are values parsed
-    from ESMIS's own fields (the file URLs, their names, the printed date), the only
-    override the projection rule permits. Nothing is converted: the time stays as ESMIS
+    copied under ESMIS's names, and ``files`` is esmis's reading of the release's file
+    URLs, ``Release.release_files()``. Nothing is converted: the time stays as ESMIS
     prints it.
 
     Attributes:
@@ -67,166 +74,191 @@ class Release(UpstreamModel):
             (``docs/upstream/OBSERVED.md``); the value is upstream's text, never converted.
         files: The release's files in ESMIS's order, each an
             ``xippios.usda.esmis.models.ReleaseFile`` with its ``url``, its ``name`` as the
-            URL prints it (``"wasde1026.xml"``) and its ``format``, the extension
-            lowercased (``"pdf"``, ``"txt"``, ``"xls"``, ``"xml"``), read from the URL as
-            ESMIS's ``list_release_files`` reads it.
-        revision: ``"v2"`` where the release's file names carry that suffix
-            (``wasde0626v2.xml``: a month WAOB reposted, whose catalog entry lists the
-            revised files only), else ``None``; the suffix every file name of the
-            release carries, ``None`` when not all carry the same one.
-        month: The release month, ``"YYYY-MM"``, from the printed date of
-            ``release_datetime``, e.g. ``"2026-10"``: what Python callers pass to
-            ``get_release``.
+            URL prints it (``"wasde1026.xml"``, ``"wasde0626v2.xml"`` where WAOB reposted
+            the month) and its ``format``, the extension lowercased (``"pdf"``, ``"txt"``,
+            ``"xls"``, ``"xml"``).
     """
 
     id: str
     release_datetime: AwareDatetime
     files: list[ReleaseFile]
-    revision: str | None
-    month: str
 
 
-class WasdeXmlCell(UpstreamModel):
-    r"""One value of a WASDE release's XML file, with the labels its page prints for it.
+class WasdeFootnote(UpstreamModel):
+    r"""A footnote of a record: the mark a printed text carries and the footnote's text.
 
-    Named after the file kind it mirrors (``wasde_xml``, the parser's name) and the
-    element that holds most values (``<Cell>``), so the XLS records of a later parser
-    can carry their own name. One record per value: a ``cell_value1``,
-    ``m1_cell_value1`` or ``wb_value`` attribute of a ``<Cell>`` on pages 8 to 34, or one
-    of the seven statistics on a row of the reliability tables of pages 35 to 37.
-    Labels are the attributes of the value's ancestors, read from the page down, as
-    printed: line breaks (``"Total\r\nSupply"``), double spaces, leading and trailing
-    spaces and footnote markers (``"Trade 2/"``) are kept. A field the value's path
-    carries no attribute for is ``None``. ``docs/upstream/OBSERVED.md`` describes the file.
+    The text is read from the footnotes the record's table prints (the page's
+    ``sub_report_footer`` attributes, ``parse_wasde_xml``): the words after the mark up to
+    the next mark, as printed but for the spaces around them. A table's note that no mark
+    refers to, such as ``"Note: Totals may not add due to rounding."``, stands on each of
+    the table's records with ``on`` ``"table"`` and no ``mark``.
 
     Attributes:
-        report: The page's ``Name``, e.g. ``"sr12"`` (printed page 12).
+        on: The field whose printed text carries the mark, e.g. ``"table"`` for the title's
+            ``1/``, ``"region"`` for ``"World  3/"``, ``"value"`` for ``"10.45 *"``.
+        mark: The mark as printed, e.g. ``"1/"``, ``"/2"`` (``"Total /2\r\nDomestic"``),
+            ``"*"``, ``"**"``; ``None`` for a table's note without one.
+        text: The footnote's text, e.g. ``"Aggregate of local marketing years."``; ``None``
+            where the table's footnotes print no such mark.
+    """
+
+    on: FootnoteOn
+    mark: str | None
+    text: str | None
+
+
+class WasdeRecord(UpstreamModel):
+    r"""One value of a WASDE release's tables, complete in itself, read from its XML file.
+
+    One record per value: a ``cell_valueN``, ``mN_cell_valueN`` or ``wb_value`` of pages
+    8 to 34, or one of the seven statistics of a row of the reliability tables of pages 35
+    to 37 (``parse.wasde_xml``). A field under upstream's name holds the text as printed,
+    line breaks (``"Total\r\nSupply"``), runs of spaces, indents and footnote marks
+    (``"Trade 2/"``) kept, and its ``_label`` beside it holds the label as read: the line
+    breaks and runs of spaces collapsed to one space, the outer spaces and the footnote
+    marks (``1/``, ``/2``, ``*``) left out, e.g. ``"Total Supply"``, ``"Trade"``. A label
+    ``None`` beside a text ``None``. ``docs/upstream/OBSERVED.md`` describes the file.
+
+    Attributes:
+        report_number: The report's number, read from the page's ``page_title``
+            (``" WASDE - 676 - 12"`` gives ``676``).
         report_month: The page's ``Report_Month`` as printed, e.g. ``"October 2026"``.
-        page_title: The page's ``page_title`` as printed, with its leading space, e.g.
-            ``" WASDE - 676 - 12"``.
-        table: The title of the table the value belongs to, the page's
-            ``sub_report_title``, ``sub_report_title2`` or ``sub_report_title3`` as
-            printed, e.g. ``"U.S. Feed Grain and Corn Supply and Use  1/"``; on a page
-            with several titles the Nth report item takes the Nth (``parse_wasde_xml``).
-        sub_report_subtitle: The table's subtitle by the same rule, e.g.
-            ``"(Million Metric Tons)"``; ``None`` where the page prints none.
-        sub_report_footer: The table's footnotes by the same rule, e.g. ``"1/ Aggregate
-            of local marketing years. ..."``; ``None`` where the page prints none.
-        matrix: The report item the value sits in, its element name, e.g. ``"matrix1"``;
-            ``"table1"`` to ``"table4"`` on the reliability pages.
-        commodity_header: ``commodity_headerN`` of the item, e.g. ``"World"``.
-        region_header: ``region_headerN`` of the item, e.g. ``"2026/27 Proj."``.
-        commodity: ``commodityN``, ``mN_commodityN`` or ``commodity``, e.g.
-            ``"Wheat"``, ``"Beef"``, ``"WHEAT"``.
-        region: ``regionN`` or ``region``, e.g. ``"World  3/"``, ``"U.S."``.
-        market_year: ``market_yearN`` or ``mN_market_yearN``, e.g. ``"2026/27 Proj."``,
-            ``"2025/26 (Est.) "``, ``"2026"``.
+        table: The title of the value's table as printed, e.g. ``"U.S. Feed Grain and
+            Corn Supply and Use  1/"``: the page's ``sub_report_title``, or on a page of
+            several titles the Nth for its Nth report item (``parse_wasde_xml``).
+        table_label: ``table`` as read, e.g. ``"U.S. Feed Grain and Corn Supply and Use"``.
+        commodity: The commodity as printed. Where the value's path states it
+            (``commodityN``, ``mN_commodityN``: ``"Total Grains 4/"``, ``"Beef"``,
+            ``"WHEAT"``) that text; else the title's words, as ``commodity_source`` says;
+            ``None`` where neither states one (``"U.S. Dairy Prices"``).
+        commodity_label: ``commodity`` as read, e.g. ``"Total Grains"``, ``"CORN"``.
+        commodity_source: ``None`` where the value's path states the commodity, or no
+            commodity is read; ``"title"`` where the table's title names it (``"Wheat"``
+            from ``"U.S. Wheat Supply and Use  1/"``, ``"Cotton"`` from ``"World and U.S.
+            Supply and Use for Cotton  1/"``); on pages 12 to 15, whose title names
+            several, ``"xls"`` for the block title the same release's XLS prints over
+            the table (``"CORN"``) and ``"layout"`` for the fixed table of the report's
+            layout where the XLS was not read (``parse.wasde_xml.LAYOUT``).
+        region: The region as printed: ``regionN`` or ``region`` of the value's path
+            (``"        Argentina"``, ``"World  3/"``), else ``commodity_headerN``, which
+            heads the matrix with its region on pages 8 to 10 (``"World"``, ``"United
+            States"``, ``"Foreign  3/"``), else the region that starts the table's title
+            (``"U.S."``, ``"Mexico"``); ``None`` where none is printed.
+        region_label: ``region`` as read, e.g. ``"Argentina"``, ``"World"``.
+        market_year: The year as printed: ``market_yearN`` or ``mN_market_yearN``
+            (``"2026/27 Proj."``, ``"2025/26 (Est.) "``, ``"2026"``), else
+            ``region_headerN``, which heads the matrix with its year on the world pages
+            18 to 30 (``"2025/26 Est."``); ``None`` on the reliability pages.
+        market_year_label: The year as read, its status left out, e.g. ``"2025/26"``.
+        market_year_status: ``"Est."`` or ``"Proj."`` where the year is printed with that
+            status, with or without parentheses; ``None`` for a year printed without one.
         forecast_month: ``forecast_monthN``, ``mN_forecast_monthN`` or
-            ``wb_forecast_month_desc``, e.g. ``"Oct"``, ``"September"``, ``"IV"``, or
-            ``""`` where the page leaves the column's month empty.
-        attribute: ``attributeN``, ``mN_attributeN``, ``attr_desc`` or ``attribute``,
-            e.g. ``"Ending Stocks"``, ``"Total\r\nSupply"``, ``"Production"``.
-        attribute_group: ``attribute_groupN``, the column of page 11's wheat-by-class
-            table, e.g. ``"Hard Red\r\nWinter"``, ``"Total"``.
-        statistic: On the reliability pages the name of the value's attribute, the
-            table index removed by the naming rule (``average1`` is ``"average"``;
-            https://github.com/xippios/sdk-usda-wasde/pull/3), e.g.
-            ``"root_mean_square_error"``, ``"below_final"``; ``None`` on pages 8 to 34.
-        unit: What the file states for the row or the page
-            (https://github.com/xippios/sdk-usda-wasde/pull/3): on the reliability
-            pages, for ``average``, ``smallest`` and
-            ``largest`` only, the nearest ``commodity_label`` of the table at or before
-            the value, e.g. ``"Million Bushels"``; on pages 8 to 10 and 18 to 30 the
-            table's ``sub_report_subtitle`` as printed, e.g. ``"(Million Metric
-            Tons)"``; ``None`` on pages 11 to 17 and 31 to 34, for which the XML carries
-            no per-row unit (``parse_wasde_xml``), and on the other statistics.
-        cell_value: The value as printed, e.g. ``"2,141"``, ``"-4"``, ``"10.45 *"``,
-            ``"3/"``.
-        value: ``cell_value`` as a number, its thousands separators removed
-            (``Decimal("2141")``); ``None`` where the text is not one, a printed mark
-            such as ``"10.45 *"`` or a footnote marker such as ``"3/"``.
+            ``wb_forecast_month_desc`` as printed, e.g. ``"Oct"``, ``"September"``,
+            ``"IV*"``, ``"Oct Proj."``, or ``""`` where the page leaves the month empty.
+        attribute: The row label as printed: ``attributeN``, ``mN_attributeN``,
+            ``attr_desc`` or ``attribute``, e.g. ``"Ending Stocks"``, ``"Total /2\r\nDomestic"``.
+        attribute_label: ``attribute`` as read, e.g. ``"Total Domestic"``.
+        attribute_group: ``attribute_groupN``, the class column of page 11's
+            wheat-by-class table, e.g. ``"Hard Red\r\nWinter"``; ``None`` elsewhere.
+        attribute_group_label: ``attribute_group`` as read, e.g. ``"Hard Red Winter"``.
+        statistic: On the reliability pages the name of the value's attribute, the table
+            index removed (``average1`` is ``"average"``), e.g.
+            ``"root_mean_square_error"``; ``None`` on pages 8 to 34.
+        unit: What the file states for the row or the page: on pages 8 to 10 and 18 to 30
+            the table's ``sub_report_subtitle`` as printed (``"(Million Metric Tons)"``);
+            on the reliability pages, for ``average``, ``smallest`` and ``largest``, the
+            nearest ``commodity_label`` of the table at or before the value (``"Million
+            Bushels"``); ``None`` on the U.S. pages, whose XML states no unit per row.
+        unit_label: ``unit`` as read, e.g. ``"(Million Metric Tons)"``.
+        value: The value as printed, e.g. ``"2,141"``, ``"-4"``, ``"10.45 *"``, ``"3/"``.
+        value_number: ``value`` as a number, its thousands separators and its marks left
+            out: ``Decimal("2141")``, ``Decimal("10.45")`` for ``"10.45 *"``; ``None``
+            where the text holds no number, as ``"3/"``, a footnote's mark printed in
+            place of a value (https://github.com/xippios/sdk-usda-wasde/issues/22).
+        footnotes: The record's footnotes in the order of its fields: the table's note
+            without a mark, then each mark its texts carry, with the footnote's text.
     """
 
-    report: str
+    report_number: int
     report_month: str
-    page_title: str
     table: str
-    sub_report_subtitle: str | None
-    sub_report_footer: str | None
-    matrix: str
-    commodity_header: str | None
-    region_header: str | None
+    table_label: str
     commodity: str | None
+    commodity_label: str | None
+    commodity_source: CommoditySource | None
     region: str | None
+    region_label: str | None
     market_year: str | None
+    market_year_label: str | None
+    market_year_status: Literal["Est.", "Proj."] | None
     forecast_month: str | None
     attribute: str | None
+    attribute_label: str | None
     attribute_group: str | None
+    attribute_group_label: str | None
     statistic: str | None
     unit: str | None
-    cell_value: str
-    value: Decimal | None
+    unit_label: str | None
+    value: str
+    value_number: Decimal | None
+    footnotes: list[WasdeFootnote]
 
 
-class WasdeTableValue(UpstreamModel):
-    r"""One value of a WASDE table with the labels of its row and column: a slice's record.
+class WasdeTable(UpstreamModel):
+    """One table of a month's WASDE release, as its records name it: a ``list_tables`` row.
 
-    A projection of ``WasdeXmlCell`` built with ``UpstreamModel.project`` (conventions §3;
-    https://github.com/xippios/sdk-usda-wasde/pull/5): the fields that label the value and
-    the value, copied unchanged under their names, in ``WasdeXmlCell``'s order. Left out are the
-    page's own labels, the same on every value of a page: ``page_title``,
-    ``sub_report_subtitle`` and ``sub_report_footer``, which ``list_tables`` states once
-    per page with its titles (``reference/table.json``), and ``report_month``, the
-    answer's ``meta.vintage``. A footnote marker in a label (``"Trade 2/"``, ``"World  3/"``)
-    refers to the page's footnotes, ``list_tables``'s ``sub_report_footer`` to
-    ``sub_report_footer3``. ``get_table`` and ``get_balance_sheet`` answer with it,
-    ``get_release`` with the full ``WasdeXmlCell``. Named after what it holds, one value
-    of a table: not a row, since a printed row holds several values, and not a cell,
-    ``WasdeXmlCell``'s name for the XML's ``<Cell>`` with every label of its page.
+    One row per distinct ``table`` text of the month's records, in the order of the
+    file.
 
     Attributes:
-        report: The page's ``Name``, e.g. ``"sr12"`` (printed page 12): ``list_tables``'s
-            ``report``.
-        table: The title of the value's table as printed, e.g. ``"U.S. Feed Grain and
-            Corn Supply and Use  1/"``.
-        matrix: The report item the value sits in, e.g. ``"matrix2"``.
-        commodity_header: ``commodity_headerN`` of the item, e.g. ``"World"``.
-        region_header: ``region_headerN`` of the item, e.g. ``"2026/27 Proj."``.
-        commodity: The value's commodity label as printed, e.g. ``"Wheat"``, ``"Beef"``.
-        region: The value's region as printed, indent and footnote marker kept, e.g.
-            ``"        Argentina"``, ``"World  3/"``.
-        market_year: The value's year as printed, e.g. ``"2026/27 Proj."``, ``"2025"``.
-        forecast_month: The value's month or quarter as printed, e.g. ``"Oct"``,
-            ``"IV"``, or ``""`` where the page leaves it empty.
-        attribute: The value's row label as printed, e.g. ``"Area Planted"``,
-            ``"Total\r\nSupply"``, ``"Trade 2/"``.
-        attribute_group: The class column of page 11's wheat-by-class table, e.g.
-            ``"Hard Red\r\nWinter"``; ``None`` elsewhere.
-        statistic: On the reliability pages the statistic's name, e.g.
-            ``"root_mean_square_error"``; ``None`` on pages 8 to 34.
-        unit: What the file states for the row or the page, as ``WasdeXmlCell``'s
-            ``unit``: the table's subtitle on pages 8 to 10 and 18 to 30, e.g.
-            ``"(Million Metric Tons)"``; ``None`` on the U.S. pages.
-        cell_value: The value as printed, e.g. ``"2,141"``, ``"10.45 *"``, ``"3/"``.
-        value: ``cell_value`` as a number, e.g. ``Decimal("2141")``; ``None`` where the
-            text is not one.
+        table: The title as printed, e.g. ``"World Wheat Supply and Use  1/"``.
+        table_label: The title as read, e.g. ``"World Wheat Supply and Use"``: what
+            ``get_data``'s ``table`` compares.
     """
 
-    report: str
     table: str
-    matrix: str
-    commodity_header: str | None
-    region_header: str | None
-    commodity: str | None
-    region: str | None
-    market_year: str | None
-    forecast_month: str | None
-    attribute: str | None
-    attribute_group: str | None
-    statistic: str | None
-    unit: str | None
-    cell_value: str
-    value: Decimal | None
+    table_label: str
+
+
+class WasdeCommodity(UpstreamModel):
+    """One commodity of a month's WASDE release, as its records name it: a ``list_commodities`` row.
+
+    One row per distinct ``commodity`` text and source of the month's records, in the
+    order of the file; a record without a commodity gives none.
+
+    Attributes:
+        commodity: The commodity as printed, e.g. ``"Total Grains 4/"``, ``"CORN"``.
+        commodity_label: As read, e.g. ``"Total Grains"``: what ``get_data``'s
+            ``commodity`` compares.
+        commodity_source: ``WasdeRecord.commodity_source``: ``None`` where the value's
+            path states it, else ``"title"``, ``"xls"`` or ``"layout"``.
+        tables: The labels of the tables whose records carry it, in the order of the
+            file, e.g. ``["U.S. Feed Grain and Corn Supply and Use"]``.
+    """
+
+    commodity: str
+    commodity_label: str
+    commodity_source: CommoditySource | None
+    tables: list[str]
+
+
+class WasdeRegion(UpstreamModel):
+    """One region of a month's WASDE release, as its records name it: a ``list_regions`` row.
+
+    One row per distinct ``region`` text of the month's records, in the order of the
+    file, so a region printed with several indents or marks has a row for each.
+
+    Attributes:
+        region: The region as printed, e.g. ``"        China"``, ``"World  3/"``, ``"U.S."``.
+        region_label: As read, e.g. ``"China"``, ``"World"``: what ``get_data``'s
+            ``region`` compares.
+        tables: The labels of the tables whose records carry it, in the order of the
+            file.
+    """
+
+    region: str
+    region_label: str
+    tables: list[str]
 
 
 class WasdeXlsText(UpstreamModel):
@@ -272,146 +304,3 @@ class WasdePdfPage(UpstreamModel):
 
     page: int
     text: str
-
-
-class Table(UpstreamModel):
-    """One page of a WASDE release's tables, as its XML file heads it: a ``list_tables`` row.
-
-    One record per page element, ``sr08`` to ``sr37``, read from the attributes of the
-    page's ``<Report>`` and the names of its report items, as printed
-    (``reference/table.json``): its titles, subtitles and footers, stated once here for
-    the page.
-
-    Attributes:
-        report: The page's ``Name``, e.g. ``"sr12"``: what a ``WasdeXmlCell``'s
-            ``report`` holds.
-        page: The printed page number, the number that ends ``page_title``
-            (``" WASDE - 676 - 12"`` gives ``12``).
-        sub_report_title: The page's first title as printed, e.g. ``"U.S. Feed Grain and
-            Corn Supply and Use  1/"``.
-        sub_report_title2: ``sub_report_title2`` as printed, the second table's title on
-            pages 11, 16, 31 and 33 (October 2026), e.g. ``"U.S. Wheat by Class: Supply
-            and Use"``; ``None`` where the page has none.
-        sub_report_title3: ``sub_report_title3`` as printed, on page 9 (October 2026),
-            ``"World and U.S. Supply and Use for Cotton  1/"``; ``None`` elsewhere.
-        sub_report_subtitle: ``sub_report_subtitle`` as printed, e.g. ``"(Million
-            Metric Tons)"``; ``None`` where the page prints none.
-        sub_report_subtitle2: ``sub_report_subtitle2`` as printed; ``None`` on every page
-            of October 2026.
-        sub_report_subtitle3: ``sub_report_subtitle3`` as printed, on page 9 (October
-            2026), ``"Million 480-lb. Bales"``; ``None`` elsewhere.
-        sub_report_footer: The page's footnotes as printed, ``sub_report_footer`` of its
-            ``<Report>``, e.g. ``"1/ Aggregate of local marketing years. ..."``; on the
-            reliability pages 35 to 37, whose ``<Report>`` holds none, the
-            ``sub_report_footer`` of the one report item that carries it (``table1``,
-            ``table4``); ``None`` where the page has none. Stated once here for the page
-            (https://github.com/xippios/sdk-usda-wasde/pull/4).
-        sub_report_footer2: ``sub_report_footer2`` as printed, the second table's
-            footnotes, e.g. on pages 9, 25, 27, 31 and 32 (October 2026); ``None`` where
-            the page has none.
-        sub_report_footer3: ``sub_report_footer3`` as printed, e.g. on pages 16, 17, 33
-            and 34 (October 2026); ``None`` where the page has none.
-        matrices: The page's report items in document order, their element names as
-            printed, e.g. ``["matrix1", "matrix2"]``, ``["matrix3", "matrix4"]`` on page
-            26, ``["table1", "table2", "table3", "table4"]`` on page 37: the values a
-            ``WasdeXmlCell``'s ``matrix`` takes on the page, and their number.
-        report_month: The page's ``Report_Month`` as printed, e.g. ``"October 2026"``.
-    """
-
-    report: str
-    page: int
-    sub_report_title: str
-    sub_report_title2: str | None
-    sub_report_title3: str | None
-    sub_report_subtitle: str | None
-    sub_report_subtitle2: str | None
-    sub_report_subtitle3: str | None
-    sub_report_footer: str | None
-    sub_report_footer2: str | None
-    sub_report_footer3: str | None
-    matrices: list[str]
-    report_month: str
-
-
-class Commodity(UpstreamModel):
-    """One supply-and-use matrix, with its commodity: a ``list_commodities`` row.
-
-    One record per report item of the supply-and-use pages, the U.S. pages 11 to 17, 32
-    and 33 and the world pages 18 to 30 (``reference/commodity.json``). The XML names the
-    commodity of none of them as a whole: only page 32's records carry a ``commodity``, one
-    per row (e.g. ``Beef``, ``Pork``, ``Broiler``, ``Turkey``, ``Red Meat & Poultry``), and its
-    matrix is ``Meats`` here, so a search for a row's commodity finds nothing in this
-    list. On pages 12 to 15 the commodity is the XLS's block title, the Nth of
-    sheet ``Page N`` for the page's Nth report item (``FEED GRAINS``, ``CORN``); on the
-    other pages it is the commodity the item's title names. Pages 8 to 10 (the world and
-    U.S. aggregates), 31 (quarterly production and prices), 34 (dairy prices) and 35 to 37
-    (reliability) are not in the list.
-
-    Attributes:
-        commodity: The commodity as printed: on pages 12 to 15 the XLS block title
-            verbatim, e.g. ``"CORN"``, ``"SOYBEAN MEAL"``; on pages 11, 16 to 30, 32 and
-            33 the words of the item's title between its region and ``Supply and Use``
-            (or ``by Class: Supply and Use``), e.g. ``"Wheat"``, ``"Coarse Grain"``,
-            ``"Meats"``, ``"Milk"``.
-        region: The region the item's title names: ``"United States"`` for a title that
-            starts ``U.S.`` (pages 11 to 17, 32, 33), ``"Mexico"`` for page 16's second item,
-            ``"World"`` for the world pages 18 to 30, whose matrices hold the world and
-            its regions, as ``list_regions`` prints them.
-        report: The page's ``Name``, e.g. ``"sr12"``.
-        matrix: The report item, its element name, e.g. ``"matrix2"``: with ``report``,
-            the ``WasdeXmlCell`` records of the matrix.
-        table: The item's title as ``parse_wasde_xml`` assigns it, e.g. ``"U.S. Feed
-            Grain and Corn Supply and Use  1/"``.
-        report_month: The page's ``Report_Month`` as printed, e.g. ``"October 2026"``.
-    """
-
-    commodity: str
-    region: str
-    report: str
-    matrix: str
-    table: str
-    report_month: str
-
-
-class Region(UpstreamModel):
-    """One region a WASDE release's XML prints, with the pages it is on: a ``list_regions`` row.
-
-    One record per distinct ``region`` text of the file, in the order of its first
-    appearance (``reference/region.json``): the rows of the world pages 18 to 30, page
-    9's cotton table and the reliability pages 35 and 36. The U.S. pages print no region
-    text.
-
-    Attributes:
-        region: The text as printed, with its indent, footnote marker and spaces, e.g.
-            ``"World"``, ``"World  3/"``, ``"United States"``, ``"        Burma"``,
-            ``"U.S."``: what a ``WasdeXmlCell``'s ``region`` holds.
-        reports: The pages that print it, their ``Name`` in file order, e.g.
-            ``["sr09", "sr18", "sr35"]``.
-        report_month: The release's ``Report_Month`` as printed, e.g. ``"October 2026"``.
-    """
-
-    region: str
-    reports: list[str]
-    report_month: str
-
-
-class Attribute(UpstreamModel):
-    r"""One row label of a WASDE table: an ``attribute`` a matrix of the XML prints.
-
-    One record per distinct ``report``, ``matrix`` and ``attribute`` of the file, in file
-    order (``reference/attribute.json``); a value without an ``attribute`` (page 31,
-    page 37's tables 2 to 4, which name their rows by commodity) gives none. Packaged for
-    the tasks that name a table's rows; no task answers with it in 0.1.0.
-
-    Attributes:
-        report: The page's ``Name``, e.g. ``"sr12"``.
-        matrix: The report item, e.g. ``"matrix1"``.
-        attribute: The row label as printed, e.g. ``"Area Planted"``, ``"    Supply,
-            Total"``, ``"Total\r\nSupply"``.
-        report_month: The page's ``Report_Month`` as printed, e.g. ``"October 2026"``.
-    """
-
-    report: str
-    matrix: str
-    attribute: str
-    report_month: str

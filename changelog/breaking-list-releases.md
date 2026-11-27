@@ -1,0 +1,1 @@
+- `list_releases` takes `since` and `until` by keyword alone, and its `Release` keeps ESMIS's `id`, `release_datetime` and `files`, without `month` and `revision`: a reposted month's file names carry `v2`. (ADR-0060, https://github.com/xippios/sdk-usda-esr/issues/60)

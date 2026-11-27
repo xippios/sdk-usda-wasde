@@ -17,7 +17,7 @@ The parser tests read samples of a release's files under
   them; no formatting, no merged cells, no other sheet. A cut-off binary file cannot be
   read (conventions §10), so the sample is rewritten; before anything is written the copy
   is read back with xlrd and compared with the original, cell for cell. It is named after
-  the sheets kept, snake_cased (``--sheet "WASDE Text" --sheet "Page 8"`` writes
+  the sheets kept, snake_cased (``--sheet "WASDE Text" --sheet "Page 8"`` would write
   ``wasde_text_page_8.xls``).
 - ``pdf``: ``wasde_pdf/<name>``, the file kept whole, named as ESMIS names it
   (``wasde-07-09-2010.pdf``).
@@ -52,8 +52,12 @@ e.g. when WAOB reposted the release. Run from the repository root::
         --keep sr08,sr35,sr36 --fixture sr08_sr35_sr36 --sha256 85e67ec8...
     uv run python scripts/cut_sample.py --release 796099 --keep sr11,sr24 \
         --fixture sr11_sr24 --case wasde1026_xml_sr11_sr24 --sha256 85e67ec8...
+    uv run python scripts/cut_sample.py --release 796099 --keep sr14 --keep sr15 \
+        --keep sr17 --fixture sr14 --case wasde1026_xml_sr14 --sha256 85e67ec8...
     uv run python scripts/cut_sample.py --release 796099 --format xls \
-        --sheet "WASDE Text" --sheet "Page 8" --fixture wasde_text_page_8 --sha256 5beb5732...
+        --sheet "WASDE Text" --sheet "Page 8" --sheet "Page 12" --sheet "Page 13" \
+        --sheet "Page 14" --sheet "Page 15" \
+        --fixture wasde_text_page_8_page_12_page_13_page_14_page_15 --sha256 5beb5732...
     uv run python scripts/cut_sample.py --release 95659 --format pdf \
         --fixture wasde-07-09-2010
 """
