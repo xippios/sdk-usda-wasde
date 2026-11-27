@@ -258,6 +258,23 @@ def test_get_data_names_pages_12_to_15_from_the_layout_without_an_xls(
     assert sent_urls(download) == [XML]
 
 
+@pytest.mark.parametrize("titles", [{14: ["ONE", "TWO"]}, {}], ids=["another-count", "none"])
+def test_an_xls_whose_titles_are_not_read_names_no_xls_url(
+    replay_fixture: ReplayFixture, monkeypatch: pytest.MonkeyPatch, titles: dict[int, list[str]]
+) -> None:
+    """Every record says ``layout``, and the answer names no ``xls_url``: no record read it.
+
+    The block titles that ``read_block_titles`` answers here are an input of the test, not
+    an answer from ESMIS.
+    """
+    monkeypatch.setattr(tasks, "read_block_titles", lambda path: titles)
+    *_, xls = replay_october(replay_fixture, "wasde1026_xml_sr14", "wasde1026_xls")
+    result = tasks.get_data(2026, 10)
+    assert {record.commodity_source for record in result.data} == {"layout"}
+    assert "xls_url" not in result.meta.request
+    assert sent_urls(xls) == [XLS], "the XLS was downloaded and could not be read"
+
+
 @pytest.mark.parametrize(
     ("filters", "count", "xls_read"),
     [
