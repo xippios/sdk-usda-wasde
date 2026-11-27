@@ -273,11 +273,11 @@ async def get_data_async(
     with its number, and its footnotes' texts, each label beside its ``_label``. On pages
     12 to 15 the commodity is the block title of the release's XLS, else the report's
     layout (``commodity_source``). The filters keep the records whose ``_label`` equals
-    them, else answer the empty list. Requests, each tried up to 4 times: the pages of ESMIS's list from the newest back to the month, 25 releases a
-    page (1 for the last two years), the release and the XML, 2, and where a record of
-    pages 12 to 15 is kept the release and the XLS, 2 more. A month before July 2010
-    raises ``InvalidRequestError`` before anything is sent; a month without a release
-    ``NotFoundError``.
+    them, else answer the empty list. Requests, each tried up to 4 times: the pages of
+    ESMIS's list from the newest back to the month, 25 releases a page (1 for the last two
+    years), the release and the XML, 2, and where a record of pages 12 to 15 is kept the
+    release and the XLS, 2 more. A month before July 2010 raises ``InvalidRequestError``
+    before anything is sent; a month without a release ``NotFoundError``.
 
     Args:
         year: The report's year, e.g. ``2026``.
