@@ -85,7 +85,10 @@ RICE = "U.S. Rice Supply and Use"
 
 
 def page_0() -> list[EsmisRelease]:
-    """ESMIS's releases on the recorded page 0, parsed as esmis parses them."""
+    """ESMIS's releases on the recorded page 0, parsed as esmis parses them.
+
+    Each release parsed here is an input of the test, not an answer from ESMIS.
+    """
     fixture = load_fixture(FIXTURES / "release_find_by_identifier" / "wasde_page0.json")
     body = json.loads(fixture.response.content)
     return TypeAdapter(ReleaseResults).validate_python(body).results
@@ -264,8 +267,7 @@ def test_an_xls_whose_titles_are_not_read_names_no_xls_url(
 ) -> None:
     """Every record says ``layout``, and the answer names no ``xls_url``: no record read it.
 
-    The block titles that ``read_block_titles`` answers here are an input of the test, not
-    an answer from ESMIS.
+    Each answer of ``read_block_titles`` here is an input of the test, not an answer from ESMIS.
     """
     monkeypatch.setattr(tasks, "read_block_titles", lambda path: titles)
     *_, xls = replay_october(replay_fixture, "wasde1026_xml_sr14", "wasde1026_xls")
@@ -415,7 +417,10 @@ def test_get_report_text_reads_the_xls_sheet(
 
 
 def july_2010() -> EsmisRelease:
-    """Release 95659, 2010-07, as recorded: TXT, XML, PDF and XLS."""
+    """Release 95659, 2010-07, as recorded: TXT, XML, PDF and XLS.
+
+    The release parsed here is an input of the test, not an answer from ESMIS.
+    """
     fixture = load_fixture(FIXTURES / "release_find_by_id" / "95659.json")
     body = json.loads(fixture.response.content)
     (release,) = TypeAdapter(ReleaseResults).validate_python(body).results
@@ -423,8 +428,10 @@ def july_2010() -> EsmisRelease:
 
 
 def leaving_out(release: EsmisRelease, format: str) -> Release:
-    """NOT RECORDED: the recorded release with its files of ``format`` left out
-    (conventions §10, kind 4), projected, as a release without that file."""
+    """The recorded release with its files of ``format`` left out, projected.
+
+    The release built here is an input of the test, not an answer from ESMIS.
+    """
     files = [url for url in release.files if not url.endswith(f".{format}")]
     return tasks._release(release.model_copy(update={"files": files}))
 
@@ -451,7 +458,10 @@ async def test_a_release_without_an_xls_is_read_from_its_pdf(
 
 
 def no_narrative(path: Path) -> list[Any]:
-    """``parse_wasde_xls`` on a workbook without the sheet, as its own refusal reads."""
+    """``parse_wasde_xls`` on a workbook without the sheet, as its own refusal reads.
+
+    The refusal raised here is an input of the test, not an answer from ESMIS.
+    """
     raise NotFoundError(
         "wasde.xls: the workbook has no sheet 'WASDE Text', which holds the narrative; its "
         "sheets: Revisions",
@@ -498,7 +508,8 @@ async def test_an_xls_without_the_narrative_and_no_pdf_is_not_found(
 def test_a_month_without_an_xls_or_a_pdf_is_refused_naming_its_formats() -> None:
     """As 1995 to 1997 are, TXT only (OBSERVED.md).
 
-    NOT RECORDED: page 0's first release with its TXT file alone (conventions §10, kind 4).
+    Page 0's first release, with its TXT file alone.
+    The release built here is an input of the test, not an answer from ESMIS.
     """
     october = page_0()[0]
     txt = october.model_copy(

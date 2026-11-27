@@ -1,8 +1,7 @@
 """``scripts/probe_releases.py`` offline: its count of requests and its reading of kept files.
 
 The script reads older and revised WASDE files once
-(https://github.com/xippios/sdk-usda-wasde/issues/18); these tests send nothing. The kept
-files are the XML sample, an input of the test, not an answer from ESMIS.
+(https://github.com/xippios/sdk-usda-wasde/issues/18); these tests send nothing.
 """
 
 import importlib.util
@@ -39,6 +38,9 @@ def test_a_run_sends_sixteen_requests() -> None:
 def test_kept_files_are_read_again_without_a_request(
     tmp_path: Path, capsys: pytest.CaptureFixture[str], respx_mock: respx.MockRouter
 ) -> None:
+    """Each kept file, the XML sample under a probe's name or the bytes ``not a workbook``,
+    is an input of the test, not an answer from ESMIS.
+    """
     probe = load_script()
     for item in probe.PROBES:
         if item.format == "xml":

@@ -229,6 +229,7 @@ def test_pages_12_to_15_read_the_xls_block_titles_by_position() -> None:
 
 
 def test_without_the_xls_pages_12_to_15_read_the_layout() -> None:
+    """The literal ``block_titles`` is an input of the test, not an answer from ESMIS."""
     rice = records("sr14")
     assert list(dict.fromkeys((r.commodity, r.commodity_source) for r in rice)) == [
         ("TOTAL RICE", "layout"),
@@ -273,6 +274,7 @@ def test_the_xls_block_titles_are_read_in_columns_0_to_4(tmp_path: Path) -> None
 
 
 def test_a_page_of_the_layout_with_another_count_of_tables_is_refused(tmp_path: Path) -> None:
+    """The page written here is an input of the test, not an answer from ESMIS."""
     path = tmp_path / "wasde.xml"
     page = (
         '<sr14><Report Name="sr14" Report_Month="October 2026" page_title=" WASDE - 676 - 14" '
@@ -336,7 +338,7 @@ def test_a_value_printed_with_a_mark_keeps_its_number_and_the_mark() -> None:
 def test_value_number_reads_a_number_with_its_marks_left_out(
     tmp_path: Path, text: str, number: Decimal | None
 ) -> None:
-    """A value of a small XML text written here, an input of the test, not an answer from ESMIS."""
+    """The value written here is an input of the test, not an answer from ESMIS."""
     body = f'<m1_year_group market_year1="2026"><Cell cell_value1="{text}" /></m1_year_group>'
     (record,) = parse_wasde_xml(xml_file(tmp_path, body))
     assert (record.value, record.value_number) == (text, number)
@@ -379,7 +381,7 @@ PAGE = (
 
 
 def xml_file(tmp_path: Path, body: str, *, titles: str = "", more: str = "") -> Path:
-    """A small XML text written in the test, an input of the test, not an answer from ESMIS."""
+    """The small XML text written here is an input of the test, not an answer from ESMIS."""
     path = tmp_path / "wasde.xml"
     text = PAGE.format(titles=titles, body=body, more=more)
     path.write_text(f'﻿<?xml version="1.0" encoding="utf-8"?><Report Name="wasde">{text}</Report>')
@@ -427,6 +429,7 @@ def test_an_unknown_page_attribute_is_refused(tmp_path: Path) -> None:
 
 
 def test_a_page_title_without_its_numbers_is_refused(tmp_path: Path) -> None:
+    """The text written here is an input of the test, not an answer from ESMIS."""
     path = xml_file(tmp_path, "")
     path.write_text(path.read_text().replace(" WASDE - 676 - 99", "Page 99"))
     with pytest.raises(ValidationError, match="names no report and page number"):
@@ -434,7 +437,7 @@ def test_a_page_title_without_its_numbers_is_refused(tmp_path: Path) -> None:
 
 
 def test_a_file_that_is_not_well_formed_is_refused(tmp_path: Path) -> None:
-    """The sample's first 5000 bytes, an input of the test, not an answer from ESMIS."""
+    """The cut sample is an input of the test, not an answer from ESMIS."""
     path = tmp_path / "wasde.xml"
     path.write_bytes((SAMPLES / "sr08_sr35_sr36.xml").read_bytes()[:5000])
     with pytest.raises(ValidationError, match=r"^wasde\.xml: not well-formed XML"):
@@ -442,7 +445,10 @@ def test_a_file_that_is_not_well_formed_is_refused(tmp_path: Path) -> None:
 
 
 def test_another_root_is_refused(tmp_path: Path) -> None:
-    """As July 2010's file is, its root in a namespace (``docs/upstream/OBSERVED.md``)."""
+    """As July 2010's file is, its root in a namespace (``docs/upstream/OBSERVED.md``).
+
+    The root written here is an input of the test, not an answer from ESMIS.
+    """
     path = tmp_path / "other.xml"
     path.write_text('<Report Name="other"></Report>')
     with pytest.raises(ValidationError, match='not <Report Name="wasde">'):
